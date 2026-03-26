@@ -1,6 +1,7 @@
 {
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "user": "User"
   },
   "nav": {
     "features": "Features",
@@ -15,26 +16,62 @@
     "partner": "Official Mus Partner",
     "title": "The Ultimate Platform for",
     "subtitle": "Mus Tournaments",
-    "desc": "Professional bracket management, real-time scoring, and seamless player registration for the traditional Spanish card game. Perfect for clubs and friendlies.",
-    "cta": "Create your first tournament",
-    "demo": "Watch Demo",
+    "desc": "Professional bracket management, create and manage your mus tournaments quickly and easily. Completely FREE.",
+    "cta": "Create your tournament for FREE",
+    "demo": "View Demo",
     "joinedBy": "Joined by {count} elite players",
     "tracking": "Tracking Tournament #{id}"
   },
   "features": {
-    "title": "Everything you need for a perfect tournament",
-    "desc": "Designed by Mus enthusiasts for the most authentic experience, from small groups to professional federations.",
+    "title": "Everything you need to manage your mus tournaments",
+    "desc": "From creation to awards ceremony, Mus Manager has it all covered.",
+    "banner": {
+      "title1": "Mus is tradition.",
+      "title2": "Management should be too.",
+      "desc": "Mus Manager is not just an application; it is the ultimate ally to safeguard the essence of Mus while embracing modernity. Our platform is born from the real need of organizers: to leave behind the chaos of infinite spreadsheets, lost papers, and endless WhatsApp threads. Whether you manage a small neighborhood club, a flash tournament among friends, or a large professional league with hundreds of participants, Mus Manager offers you a centralized, robust, and elegant environment. Everything you need —tournaments, player records, live results, and historical standings— is now in the palm of your hand, accessible from anywhere and optimized for every device. It's time for you to worry only about what matters: betting 'envido' and enjoying the game."
+    },
     "management": {
-      "title": "Bracket Management",
-      "desc": "Easily handle single elimination, double elimination, or round robin formats with automatic pairings."
+      "title": "Organize tournaments effortlessly",
+      "desc": "Create tournaments in minutes, define phases, pair teams, and track every match in real-time. No errors, no paper, no chaos.",
+      "points": [
+        "Comprehensive management of knockouts and leagues",
+        "Automatic generation of brackets and matchups",
+        "Full control of tables and timing"
+      ]
     },
     "registration": {
-      "title": "Player Registration",
-      "desc": "Manage entries, payments, and team assignment. Support for individual players or pre-formed pairs."
+      "title": "Your community, well managed",
+      "desc": "Register teams and pairs, check who participates in each tournament, and always have the history at hand. Perfect from a small social group to a club with hundreds of members.",
+      "points": [
+        "Centralized player database",
+        "Detailed participation history",
+        "Management of teams and regular pairs"
+      ]
     },
     "results": {
-      "title": "Live Results",
-      "desc": "Real-time scoring updates. Public standings so everyone can follow the tournament status live."
+      "title": "Rankings always up to date",
+      "desc": "Standings update automatically after each result. All participants can consult them at any time, from any device.",
+      "points": [
+        "Real-time point updates",
+        "Public access to live standings",
+        "Victory and performance statistics"
+      ]
+    },
+    "how_it_works": {
+      "title": "How it works?",
+      "step1_title": "1. Create your community",
+      "step1_desc": "Sign up, name your group, and start adding players. Your community is ready to play in less than five minutes.",
+      "step2_title": "2. Organize a tournament",
+      "step2_desc": "Define the format (league or knockout), add participating teams, and Mus Manager generates the bracket automatically.",
+      "step3_title": "3. Record results",
+      "step3_desc": "After each match, enter the score from any mobile or tablet. Standings are updated instantly.",
+      "step4_title": "4. Check the ranking",
+      "step4_desc": "Your players can follow the standings in real-time and review the tournament history without installing anything."
+    },
+    "stats_labels": {
+      "digital": "Digital & Cloud",
+      "cost": "Free for Groups",
+      "access": "Universal Access"
     }
   },
   "stats": {
@@ -45,15 +82,15 @@
   },
   "cta": {
     "title": "Ready to deal the cards?",
-    "desc": "Join hundreds of organizers already saving time and creating better experiences for their players.",
-    "button": "Get Started Free",
+    "desc": "Join hundreds of organizers who are already saving time and creating better experiences for their players.",
+    "button": "Start for Free",
     "note": "No credit card required. Setup in 2 minutes."
   },
   "auth": {
     "welcome": "Welcome",
     "loginDesc": "Access your Mus Manager account",
-    "join": "Join Us",
-    "registerDesc": "Register your Mus Manager account",
+    "join": "Join",
+    "registerDesc": "Register your Mus Manager user",
     "email": "Email",
     "password": "Password",
     "confirm": "Confirm Password",
@@ -82,7 +119,7 @@
     "empty_subtitle": "Start your legacy as a Mus Manager organizer today.",
     "my_tournaments": "My Tournaments",
     "copy_link": "Copy Link",
-    "copy_link_help": "Share this link among participants",
+    "copy_link_help": "Share this link with participants",
     "link_copied": "Link copied!",
     "view_poster": "View poster",
     "category": "Category",
@@ -100,6 +137,9 @@
     "desc": "The leading tournament management platform for the competitive Mus community. Precision, elegance, and passion.",
     "product": "Product",
     "company": "Company",
+    "about": "About Us",
+    "contact": "Contact",
+    "legal": "Legal",
     "subscribe": "Subscribe",
     "rights": "© 2026 Mus Manager. All rights reserved.",
     "privacy": "Privacy",
@@ -110,11 +150,12 @@
     "title": "Live Tournaments",
     "subtitle": "Upcoming Events",
     "view_details": "View Details",
-    "empty": "No pending tournaments at this moment.",
-    "active": "Active",
-    "pending": "Open Registration",
+    "empty": "No pending tournaments at this time.",
+    "active": "In Progress",
+    "pending": "Registration Open",
     "coming_soon": "Coming Soon",
-    "players_count": "{count} Players"
+    "players_count": "{count} Players",
+    "pairs_count": "{count} Pairs"
   },
   "tournament_form": {
     "create_title": "New Tournament",
@@ -124,33 +165,41 @@
       "name": "Tournament Name",
       "startDate": "Start Date",
       "endDate": "End Date",
+      "location": "Event Location",
       "poster": "Tournament Poster (Image or PDF)",
       "gameSystem": "Game System",
       "status": "Status",
       "statusInitial": "Initial Status",
       "statusDescription": "Status Information",
-      "statusDescriptionPlaceholder": "Ex: Registration open until Friday. Draw on Saturday at 10:00.",
-      "statusDescriptionPlaceholderEdit": "Details about current tournament status...",
+      "statusDescriptionPlaceholder": "E.g.: Registration open until Friday. Draw on Saturday at 10:00.",
+      "statusDescriptionPlaceholderEdit": "Details about the current status of the tournament...",
       "posterSelect": "Select Image or PDF",
       "posterChange": "Change Image or PDF",
-      "posterSelected": "PDF selected for upload",
+      "posterSelected": "PDF selected to upload",
       "newPoster": "New image:",
       "currentPoster": "Current poster:",
       "ruleKings": "Kings",
       "rulePoints": "Points",
-      "ruleGames": "Games",
+      "ruleGames": "Sets",
       "tablesCount": "Number of Tables",
-      "rules_section": "Rules and Management"
+      "rules_section": "Rules & Management",
+      "other": "Other"
+    },
+    "placeholders": {
+      "name": "E.g.: Great Spring Tournament",
+      "location": "E.g.: Casino de Madrid, Calle Mayor 1",
+      "customPoints": "Specify points",
+      "customGames": "Specify sets"
     },
     "types": {
       "eliminatory": "Single Elimination",
       "league": "League (Round Robin)",
-      "groups": "Group Phase + Playoffs",
-      "ceros": "Zeroes"
+      "groups": "Groups + Knockout",
+      "ceros": "Ceros"
     },
     "statuses": {
       "draft": "Draft",
-      "pending": "Pending (open registration)",
+      "pending": "Pending (registration open)",
       "active": "Active (in progress)",
       "finished": "Finished",
       "publish": "Publish Tournament"
@@ -163,16 +212,25 @@
     },
     "messages": {
       "create_success": "Tournament created successfully!",
-      "save_success": "Saved successfully! Redirecting...",
+      "save_success": "Saved correctly! Redirecting...",
       "load_error": "Could not load tournament (UUID: {uuid}): {error}"
+    }
+  },
+  "tournament_card": {
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "active": "Active",
+      "finished": "Finished"
     }
   },
   "tournament_view": {
     "restricted_access": "Restricted Access",
     "uuid": "UUID",
     "current_round": "Current Round",
-    "average_points": "Average Points",
+    "average_points": "Avg Points",
     "players_count": "{count} Players",
+    "pairs_count": "{count} Pairs",
     "location": "Location",
     "matches_in_progress": "Matches in Progress",
     "view_full_bracket": "View Full Bracket",
@@ -188,7 +246,8 @@
     },
     "rounds": {
       "title": "Round",
-      "stage": "Stage"
+      "stage": "Stage",
+      "general": "General"
     },
     "classification": {
       "team": "Team",
@@ -199,8 +258,8 @@
       "empty": "No standings available yet"
     },
     "bracket": {
-      "title": "Elimination Bracket",
-      "empty_desc": "The bracket will be automatically generated after the group phase"
+      "title": "Knockout Bracket",
+      "empty_desc": "The bracket will be generated automatically after the group stage"
     },
     "teams": {
       "empty": "No teams enrolled yet",
@@ -211,17 +270,42 @@
       "save": "Save Result"
     },
     "activity": {
-      "title": "Recent Activity"
+      "title": "Recent Activity",
+      "match_closed": "Table {table} closed: {team} wins {score}",
+      "match_started": "Table {table} started: {team1} vs {team2}",
+      "player_registered": "{name} has registered",
+      "time_5m": "5m ago",
+      "time_12m": "12m ago",
+      "time_20m": "20m ago"
     },
-    "draft_mode": "DRAFT MODE"
+    "draft_mode": "DRAFT MODE",
+    "knockout": {
+      "t32": "Round of 32",
+      "t16": "Round of 16",
+      "t8": "Quarter-finals",
+      "t4": "Semi-finals",
+      "final": "Final",
+      "third_place": "3rd & 4th Place",
+      "deciding": "To be decided"
+    }
   },
   "team_form": {
     "title": "New Team",
-    "name": "Team Name",
-    "name_placeholder": "Ex: The Invincibles",
+    "name": "Pair Name",
+    "name_placeholder": "E.g.: The Invincibles",
     "tournament": "Tournament",
-    "submit": "Create & Enroll Team",
-    "success_msg": "Team created and enrolled successfully! You can add another one.",
+    "submit": "Create and Enroll Pair",
+    "success_msg": "Pair created and enrolled successfully! You can add another.",
     "error_loading_tournaments": "Error loading tournaments."
+  },
+  "tournament_mgmt": {
+    "team_mgmt": "Team Management",
+    "enrolled_count": "{count} Enrolled Teams",
+    "select_team": "Select team to enroll...",
+    "enroll": "Enroll",
+    "no_group": "No Group",
+    "groups_count_label": "Number of Groups",
+    "draw_groups": "Draw Groups",
+    "generate_matches": "Generate Match Schedule"
   }
 }

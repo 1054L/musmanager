@@ -231,7 +231,7 @@ const handlePublish = async () => {
           <label class="mus-label">{{ $t('tournament_form.labels.location') }}</label>
           <div class="relative">
             <i class="pi pi-map-marker absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-            <input v-model="form.location" type="text" placeholder="Ej: Casino de Madrid, Calle Mayor 1" class="mus-input pl-12">
+            <input v-model="form.location" type="text" :placeholder="t('tournament_form.placeholders.location')" class="mus-input pl-12">
           </div>
         </div>
 
@@ -378,11 +378,11 @@ const handlePublish = async () => {
                   </button>
                   <button type="button" @click="setPoints('other')" 
                           class="mus-btn-small" :class="{ active: isOtherPoints }">
-                    {{ $t('tournament_form.labels.other') || 'Otro' }}
+                    {{ t('tournament_form.labels.other') }}
                   </button>
                 </div>
                 <input v-if="isOtherPoints" v-model.number="form.rulePoints" type="number" 
-                       class="mus-input py-3 text-sm" placeholder="Especificar tantos">
+                       class="mus-input py-3 text-sm" :placeholder="t('tournament_form.placeholders.customPoints')">
               </div>
             </div>
 
@@ -398,11 +398,11 @@ const handlePublish = async () => {
                   </button>
                   <button type="button" @click="setGames('other')" 
                           class="mus-btn-small" :class="{ active: isOtherGames }">
-                    {{ $t('tournament_form.labels.other') || 'Otro' }}
+                    {{ t('tournament_form.labels.other') }}
                   </button>
                 </div>
                 <input v-if="isOtherGames" v-model.number="form.ruleGames" type="number" 
-                       class="mus-input py-3 text-sm" placeholder="Especificar chicos">
+                       class="mus-input py-3 text-sm" :placeholder="t('tournament_form.placeholders.customGames')">
               </div>
             </div>
           </div>

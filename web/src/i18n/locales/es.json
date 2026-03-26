@@ -1,6 +1,7 @@
 {
   "common": {
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "user": "Usuario"
   },
   "nav": {
     "features": "Características",
@@ -22,6 +23,8 @@
     "tracking": "Siguiendo Torneo #{id}"
   },
   "features": {
+    "title": "Todo lo que necesitas para gestionar tus torneos de mus",
+    "desc": "Desde la creación hasta la entrega de premios, Mus Manager lo tiene todo cubierto.",
     "banner": {
       "title1": "El mus es tradición.",
       "title2": "La gestión, también.",
@@ -180,7 +183,11 @@
       "ruleGames": "Chicos",
       "tablesCount": "Nº de Mesas",
       "rules_section": "Reglas y Gestión",
-      "other": "Otro",
+      "other": "Otro"
+    },
+    "placeholders": {
+      "name": "Ej: Gran Torneo de Primavera",
+      "location": "Ej: Casino de Madrid, Calle Mayor 1",
       "customPoints": "Especificar tantos",
       "customGames": "Especificar chicos"
     },
@@ -239,7 +246,8 @@
     },
     "rounds": {
       "title": "Jornada",
-      "stage": "Fase"
+      "stage": "Fase",
+      "general": "General"
     },
     "classification": {
       "team": "Equipo",

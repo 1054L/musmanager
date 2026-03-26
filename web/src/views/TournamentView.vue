@@ -41,7 +41,7 @@ const groupedMatches = computed(() => {
   if (!matches.value.length) return []
   const acc = {}
   matches.value.forEach(match => {
-    const stage = match.stage || 'General'
+    const stage = match.stage || t('tournament_view.rounds.general')
     if (knockoutStages.includes(stage)) return; // Exclude from normal list
     if (!acc[stage]) acc[stage] = []
     acc[stage].push(match)

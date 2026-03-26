@@ -1,40 +1,77 @@
 {
   "common": {
-    "loading": "Kargatzen..."
+    "loading": "Kargatzen...",
+    "user": "Erabiltzailea"
   },
   "nav": {
     "features": "Ezaugarriak",
     "tournaments": "Txapelketak",
-    "ranking": "Sailkapena",
-    "login": "Hasi saioa",
-    "getStarted": "Hasi orain",
-    "dashboard": "Aginte-panela",
+    "ranking": "Ranking",
+    "login": "Sartu",
+    "getStarted": "Hasi",
+    "dashboard": "Dashboard",
     "logout": "Irten"
   },
   "hero": {
-    "partner": "Mus Manager Bazkide Ofiziala",
-    "title": "Plataforma Definitiboa",
-    "subtitle": "Mus Txapelketetarako",
-    "desc": "Koadroen kudeaketa profesionala, denbora errealeko puntuazioa eta jokalarien erregistro erraza euskal karta joko tradizionalerako. Bikaina klub eta lagun arteko saioetarako.",
-    "cta": "Sortu zure lehen txapelketa",
+    "partner": "Mus Elkarte Ofiziala",
+    "title": "Mus Txapelketak",
+    "subtitle": "Kudeatzeko Plataforma",
+    "desc": "Koadroen kudeaketa profesionala, sortu eta kudeatu zure mus txapelketak modu azkar eta errazean. Guztiz DOAN.",
+    "cta": "Sortu zure txapelketa DOAN",
     "demo": "Ikusi Demo",
-    "joinedBy": "{count} goi mailako jokalarirekin bat eginda",
+    "joinedBy": "{count} eliteko jokalarirekin bat eginda",
     "tracking": "#{id} Txapelketa jarraitzen"
   },
   "features": {
-    "title": "Txapelketa perfektua izateko behar duzun guztia",
-    "desc": "Mus zaleek diseinatua esperientzia benetakoena izateko, talde txikietatik hasi eta federazio profesionaletaraino.",
+    "title": "Zure mus txapelketak kudeatzeko behar duzun guztia",
+    "desc": "Sorkuntzatik sari banaketara arte, Mus Managerrek dena estaltzen du.",
+    "banner": {
+      "title1": "Musa tradizioa da.",
+      "title2": "Kudeaketa ere bai.",
+      "desc": "Mus Manager ez da aplikazio bat soilik; Musaren esentzia babesteko eta modernitatea besarkatzeko azken aliatua da. Gure plataforma antolatzaileen benetako beharretik jaio da: kalkulu-orri infinituen, galtzen diren paperen eta WhatsApp bidezko mezu bukaezinen kaosetik ihes egiteko. Auzoko elkarte txiki bat, lagun arteko txapelketa azkar bat edo ehunka parte-hartzaile dituen liga profesional handi bat kudeatzen baduzu, Mus Managerrek ingurune zentralizatua, sendoa eta dotorea eskaintzen dizu. Behar duzun guztia —txapelketak, jokalarien fitxak, zuzeneko emaitzak eta sailkapen historikoak— orain zure esku dago, edozein lekutatik eskuragarri eta gailu bakoitzerako optimizatuta. Orain, benetan garrantzia duenaz soilik arduratzeko unea da: 'envido' jotzea eta partidaz gozatzea."
+    },
     "management": {
-      "title": "Koadroen Kudeaketa",
-      "desc": "Kudeatu erraz kanporaketa zuzena, kanporaketa bikoitza edo liga formatuak bikote automatikoekin."
+      "title": "Antolatu txapelketak esfortzurik gabe",
+      "desc": "Sortu txapelketak minututan, definitu faseak, parekatu taldeak eta kontrolatu partida bakoitza denbora errealean. Akatsik gabe, paperik gabe, kaoserik gabe.",
+      "points": [
+        "Kanporaketa eta ligen kudeaketa integrala",
+        "Koadroen eta gurutzaketen sorrera automatikoa",
+        "Mahaien eta denboren kontrol osoa"
+      ]
     },
     "registration": {
-      "title": "Jokalarien Erregistroa",
-      "desc": "Kudeatu sarrerak, ordainketak eta bikoteen esleipena. Banakako jokalariak edo jada eratutako bikoteak onartzen ditu."
+      "title": "Zure komunitatea, ondo kudeatua",
+      "desc": "Erregistratu taldeak eta bikoteak, kontsultatu nork hartzen duen parte txapelketa bakoitzean eta izan beti historia eskura. Perfektua auzo-elkarte txiki batetik ehunka bazkide dituen klub bateraino.",
+      "points": [
+        "Jokalarien datu-base zentralizatua",
+        "Parte-hartzeen historia zehatza",
+        "Ohiko talde eta bikoteen kudeaketa"
+      ]
     },
     "results": {
-      "title": "Emaitzak Zuzenean",
-      "desc": "Emaitzak denbora errealean eguneratzea. Sailkapen publikoa, txapelketaren egoera zuzenean jarraitu ahal izateko."
+      "title": "Sailkapenak beti egunean",
+      "desc": "Sailkapenak automatikoki eguneratzen dira emaitza bakoitzaren ondoren. Parte-hartzaile guztiek edozein unetan kontsulta ditzakete, edozein gailutatik.",
+      "points": [
+        "Puntuen eguneratzea denbora errealean",
+        "Zuzeneko sailkapenetarako sarbide publikoa",
+        "Garaipenen eta errendimenduaren estatistikak"
+      ]
+    },
+    "how_it_works": {
+      "title": "Nola funtzionatzen du?",
+      "step1_title": "1. Sortu zure komunitatea",
+      "step1_desc": "Eman izena, jarri izena zure taldeari eta hasi jokalariak gehitzen. Bost minutu baino gutxiagoan zure komunitatea jokatzeko prest dago.",
+      "step2_title": "2. Antolatu txapelketa bat",
+      "step2_desc": "Definitu formatua (liga edo kanporaketa), gehitu parte hartzen duten taldeak eta Mus Managerrek koadroa automatikoki sortzen du.",
+      "step3_title": "3. Erregistratu emaitzak",
+      "step3_desc": "Partida bakoitzaren ondoren, sartu markagailua edozein mugikor edo tabletetik. Sailkapenak berehala eguneratzen dira.",
+      "step4_title": "4. Kontsultatu rankinga",
+      "step4_desc": "Zure jokalariek sailkapena denbora errealean jarrai dezakete eta txapelketaren historia berrikusi dezakete ezer instalatu gabe."
+    },
+    "stats_labels": {
+      "digital": "Digital & Cloud",
+      "cost": "Doan Elkarteentzat",
+      "access": "Sarbide Unibertsala"
     }
   },
   "stats": {
@@ -44,24 +81,24 @@
     "support": "Laguntza"
   },
   "cta": {
-    "title": "Karta banatzeko prest?",
-    "desc": "Batu zaitez jada denbora aurrezten eta esperientzia hobeak sortzen ari diren ehunka antolatzailerekin.",
+    "title": "Prest kartak banatzeko?",
+    "desc": "Bat egin dagoeneko denbora aurrezten eta jokalarientzat esperientzia hobeak sortzen ari diren ehunka antolatzailerekin.",
     "button": "Hasi Doan",
-    "note": "Kreditu txartelik gabe. 2 minututan dena prest."
+    "note": "Kreditu-txartelik gabe. Konfigurazioa 2 minututan."
   },
   "auth": {
     "welcome": "Ongi etorri",
-    "loginDesc": "Sartu zure Mus Manager kontura",
-    "join": "Batu zaitez",
+    "loginDesc": "Sartu zure Mus Manager kontuan",
+    "join": "Bat egin",
     "registerDesc": "Erregistratu zure Mus Manager erabiltzailea",
     "email": "Emaila",
     "password": "Pasahitza",
-    "confirm": "Errepikatu Pasahitza",
+    "confirm": "Errepikatu pasahitza",
     "submitLogin": "Sartu",
     "submitRegister": "Erregistratu",
     "loading": "Sinkronizatzen...",
     "creating": "Sortzen...",
-    "noAccount": "Berria zara?",
+    "noAccount": "Berria elitean?",
     "createAccount": "Sortu zure kontua hemen",
     "haveAccount": "Baduzu kontua?",
     "loginHere": "Hasi saioa hemen"
@@ -71,19 +108,19 @@
     "subtitle": "Txapelketak",
     "welcome": "Ongi etorri berriro, {name}. {count} ekitaldi dituzu zure kudeaketapean.",
     "create": "Sortu Txapelketa Berria",
-    "loading": "Datuak kargatzen...",
-    "error": "Errore bat gertatu da txapelketak kargatzean",
-    "retry": "Saiatu berriro",
+    "loading": "Datuak Kargatzen...",
+    "error": "Errorea txapelketak kargatzean",
+    "retry": "Berriro saiatu",
     "manage": "Kudeatu",
     "live": "Zuzenean",
-    "empty": "Ez duzu txapelketarik zure kudeaketapean.",
-    "empty_title": "Zure taula hutsik dago",
+    "empty": "Ez dago txapelketarik zure kudeaketapean.",
+    "empty_title": "Zure arbela hutsik dago",
     "empty_cta": "Sortu zure lehen txapelketa",
-    "empty_subtitle": "Hasi zure bidea Mus Manager antolatzaile gisa gaur bertan.",
+    "empty_subtitle": "Hasi zure ondarea Mus Manager antolatzaile gisa gaur bertan.",
     "my_tournaments": "Nire Txapelketak",
     "copy_link": "Kopiatu Esteka",
-    "copy_link_help": "Partekatu esteka hau parte-hartzaileen artean",
-    "link_copied": "Esteka kopiatuta!",
+    "copy_link_help": "Partekatu esteka hau parte-hartzaileekin",
+    "link_copied": "Esteka kopiatua!",
     "view_poster": "Ikusi kartela",
     "category": "Kategoria",
     "status": "Egoera",
@@ -91,15 +128,18 @@
     "quick_actions_title": "Kudeaketa Nagusia",
     "quick_actions": {
       "new_tournament": "Txapelketa Berria",
-      "new_tournament_desc": "Abiarazi ekitaldi konpetitibo berria",
+      "new_tournament_desc": "Abian jarri lehiaketa berri bat",
       "new_team": "Talde Berria",
-      "new_team_desc": "Erregistratu parte hartuko duen bikotea"
+      "new_team_desc": "Erregistratu parte hartuko duen bikote bat"
     }
   },
   "footer": {
-    "desc": "Mus komunitate konpetitiborako txapelketa kudeaketarako plataforma liderra. Zehaztasuna, dotorezia eta pasioa.",
+    "desc": "Mus komunitate lehiakorrarentzako txapelketak kudeatzeko plataforma nagusia. Zehaztasuna, dotorezia eta pasioa.",
     "product": "Produktua",
     "company": "Enpresa",
+    "about": "Guri buruz",
+    "contact": "Kontaktua",
+    "legal": "Legala",
     "subscribe": "Harpidetu",
     "rights": "© 2026 Mus Manager. Eskubide guztiak erreserbatuta.",
     "privacy": "Pribatutasuna",
@@ -107,52 +147,61 @@
     "cookies": "Cookie-ak"
   },
   "tournaments_page": {
-    "title": "Txapelketak Zuzenean",
-    "subtitle": "Datozen Ekitaldiak",
+    "title": "Zuzeneko Txapelketak",
+    "subtitle": "Hurrengo Ekitaldiak",
     "view_details": "Ikusi Xehetasunak",
     "empty": "Ez dago txapelketarik zain une honetan.",
     "active": "Abian",
     "pending": "Izen-ematea Zabalik",
     "coming_soon": "Laster",
-    "players_count": "{count} Jokalari"
+    "players_count": "{count} Jokalari",
+    "pairs_count": "{count} Bikote"
   },
   "tournament_form": {
     "create_title": "Txapelketa Berria",
     "edit_title": "Txapelketa",
-    "back_dashboard": "Itzuli Aginte-panela",
+    "back_dashboard": "Itzuli Dashboard-era",
     "labels": {
       "name": "Txapelketaren Izena",
       "startDate": "Hasiera Data",
       "endDate": "Amaiera Data",
-      "poster": "Txapelketako Kartela (Irudia edo PDFa)",
+      "location": "Ekitaldiaren Lekua",
+      "poster": "Txapelketaren Kartela (Irudia edo PDFa)",
       "gameSystem": "Joko Sistema",
       "status": "Egoera",
       "statusInitial": "Hasierako Egoera",
-      "statusDescription": "Egoeraren Informazioa",
-      "statusDescriptionPlaceholder": "Adib: Izen-ematea zabalik ostiralera arte. Zozketa larunbatean 10:00etan.",
-      "statusDescriptionPlaceholderEdit": "Txapelketaren oraingo egoerari buruzko xehetasunak...",
+      "statusDescription": "Egoerari Buruzko Informazioa",
+      "statusDescriptionPlaceholder": "Adibidez: Izen-ematea zabalik ostiralera arte. Zozketa larunbatean 10:00etan.",
+      "statusDescriptionPlaceholderEdit": "Txapelketaren egungo egoerari buruzko xehetasunak...",
       "posterSelect": "Hautatu Irudia edo PDFa",
       "posterChange": "Aldatu Irudia edo PDFa",
-      "posterSelected": "PDFa hautatuta igotzeko",
+      "posterSelected": "PDFa hautatua igotzeko",
       "newPoster": "Irudi berria:",
-      "currentPoster": "Oraingo kartela:",
+      "currentPoster": "Egungo kartela:",
       "ruleKings": "Erregeak",
-      "rulePoints": "Tantoak",
+      "rulePoints": "Tantuak",
       "ruleGames": "Umeak",
-      "tablesCount": "Mahai kopurua",
-      "rules_section": "Arauak eta Kudeaketa"
+      "tablesCount": "Mahai Kopurua",
+      "rules_section": "Arauak eta Kudeaketa",
+      "other": "Beste bat"
+    },
+    "placeholders": {
+      "name": "Adib.: Udaberriko Txapelketa Handia",
+      "location": "Adib.: Madrilgo Kasinoa, Mayor Kalea 1",
+      "customPoints": "Zehaztu tantuak",
+      "customGames": "Zehaztu umeak"
     },
     "types": {
       "eliminatory": "Kanporaketa Zuzena",
       "league": "Liga (Guztiak guztien aurka)",
-      "groups": "Talde Fasea + Kanporaketak",
-      "ceros": "Zeroak"
+      "groups": "Taldeen Fasea + Kanporaketak",
+      "ceros": "Ceros"
     },
     "statuses": {
-      "draft": "Borradorea",
+      "draft": "Zirriborroa",
       "pending": "Zain (izen-ematea zabalik)",
-      "active": "Abian",
-      "finished": "Amaituta",
+      "active": "Aktibo (abian)",
+      "finished": "Amaitua",
       "publish": "Argitaratu Txapelketa"
     },
     "actions": {
@@ -162,22 +211,31 @@
       "cancel": "Utzi"
     },
     "messages": {
-      "create_success": "Txapelketa ondo sortu da!",
-      "save_success": "Ondo gordeta! Birzuzentzen...",
+      "create_success": "Txapelketa ongi sortu da!",
+      "save_success": "Ongi gorde da! Birbideratzen...",
       "load_error": "Ezin izan da txapelketa kargatu (UUID: {uuid}): {error}"
     }
   },
+  "tournament_card": {
+    "status": {
+      "draft": "Zirriborroa",
+      "pending": "Zain",
+      "active": "Abian",
+      "finished": "Amaitua"
+    }
+  },
   "tournament_view": {
-    "restricted_access": "Sarrera Mugatua",
+    "restricted_access": "Sarbide Mugatua",
     "uuid": "UUID",
-    "current_round": "Oraingo Ronda",
-    "average_points": "Puntuen Media",
+    "current_round": "Egungo Jardunaldia",
+    "average_points": "Bataz-besteko Tantuak",
     "players_count": "{count} Jokalari",
-    "location": "Kokapena",
-    "matches_in_progress": "Partidak Martxan",
+    "pairs_count": "{count} Bikote",
+    "location": "Lekua",
+    "matches_in_progress": "Partidak Abian",
     "view_full_bracket": "Ikusi Koadro Osoa",
     "match_status": {
-      "finished": "Amaituta",
+      "finished": "Amaitua",
       "pending": "Zain"
     },
     "tabs": {
@@ -188,40 +246,66 @@
     },
     "rounds": {
       "title": "Jardunaldia",
-      "stage": "Fasea"
+      "stage": "Fasea",
+      "general": "Orokorra"
     },
     "classification": {
       "team": "Taldea",
       "played": "J",
       "won": "I",
       "lost": "G",
-      "points": "PT",
-      "empty": "Sailkapenik ez dago oraindik"
+      "points": "PTS",
+      "empty": "Ez dago sailkapenik eskuragarri oraindik"
     },
     "bracket": {
       "title": "Kanporaketa Koadroa",
-      "empty_desc": "Talde fasea amaitutakoan sortuko da koadroa automatikoki"
+      "empty_desc": "Koadroa automatikoki sortuko da taldeen fasearen ondoren"
     },
     "teams": {
       "empty": "Ez dago talderik izena emanda oraindik",
       "enrolled_count": "Izena Emandako Taldeak"
     },
     "match_edit": {
-      "title": "Emaitza Sartu",
+      "title": "Sartu Emaitza",
       "save": "Gorde Emaitza"
     },
     "activity": {
-      "title": "Berriki egindako ekintzak"
+      "title": "Azken Jarduera",
+      "match_closed": "{table}. mahaia itxia: {team}-(e)k irabazi du {score}",
+      "match_started": "{table}. mahaia hasia: {team1} vs {team2}",
+      "player_registered": "{name}-(e)k izena eman du",
+      "time_5m": "duela 5m",
+      "time_12m": "duela 12m",
+      "time_20m": "duela 20m"
     },
-    "draft_mode": "BORRADORE MODUA"
+    "draft_mode": "ZIRRIBORRO MODUA",
+    "knockout": {
+      "t32": "Hogeitahamabitarrenak",
+      "t16": "Hamaseirenak",
+      "t8": "Final-laurdenak",
+      "t4": "Finalerdiak",
+      "final": "Finala",
+      "third_place": "3. eta 4. postua",
+      "deciding": "Erabakitzeke"
+    }
   },
   "team_form": {
     "title": "Talde Berria",
     "name": "Bikotearen Izena",
-    "name_placeholder": "Adibidez: Garaileak",
-    "tournament": "Torneoa",
-    "submit": "Bikotea Sortu eta Izena Eman",
-    "success_msg": "Bikotea ondo sortu eta izena eman du! Beste bat gehitu dezakezu.",
-    "error_loading_tournaments": "Errorea torneoak kargatzean."
+    "name_placeholder": "Adib.: Garaiezinak",
+    "tournament": "Txapelketa",
+    "submit": "Sortu eta Inskribatu Bikotea",
+    "success_msg": "Bikotea ongi sortu eta inskribatu da! Beste bat gehi dezakezu.",
+    "error_loading_tournaments": "Errorea txapelketak kargatzean."
+  },
+  "tournament_mgmt": {
+    "team_mgmt": "Taldeen Kudeaketa",
+    "enrolled_count": "{count} Talde Inskribatuta",
+    "select_team": "Hautatu inskribatzeko taldea...",
+    "enroll": "Inskribatu",
+    "no_group": "Talderik Gabe",
+    "groups_count_label": "Talde Kopurua",
+    "draw_groups": "Taldeen Zozketa",
+    "generate_matches": "Sortu Partiden Egutegia"
   }
 }

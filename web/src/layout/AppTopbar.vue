@@ -28,7 +28,7 @@ const { layoutConfig, toggleMenu } = useLayout();
                     {{ authService.getUser()?.email?.charAt(0)?.toUpperCase() || 'U' }}
                 </div>
                 <span class="text-slate-300 text-xs font-black uppercase tracking-widest hidden md:block group-hover:text-white transition-colors">
-                    {{ authService.getUser()?.email?.split('@')[0] || 'User' }}
+                    {{ authService.getUser()?.email?.split('@')[0] || t('common.user') }}
                 </span>
             </button>
         </div>
