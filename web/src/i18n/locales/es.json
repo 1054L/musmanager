@@ -1,0 +1,303 @@
+{
+  "common": {
+    "loading": "Cargando..."
+  },
+  "nav": {
+    "features": "Características",
+    "tournaments": "Torneos",
+    "ranking": "Ranking",
+    "login": "Entrar",
+    "getStarted": "Empezar",
+    "dashboard": "Dashboard",
+    "logout": "Salir"
+  },
+  "hero": {
+    "partner": "Socio Oficial de Mus",
+    "title": "La Plataforma Definitiva para",
+    "subtitle": "Torneos de Mus",
+    "desc": "Gestión profesional de cuadros, crea y gestiona tus torneos de mus de forma rápida y sencilla. Completamente GRATUITO.",
+    "cta": "Crea tu torneo GRATIS",
+    "demo": "Ver Demo",
+    "joinedBy": "Unido a {count} jugadores de élite",
+    "tracking": "Siguiendo Torneo #{id}"
+  },
+  "features": {
+    "banner": {
+      "title1": "El mus es tradición.",
+      "title2": "La gestión, también.",
+      "desc": "Mus Manager no es solo una aplicación; es el aliado definitivo para salvaguardar la esencia del Mus mientras abrazas la modernidad. Nuestra plataforma nace de la necesidad real de los organizadores: dejar atrás el caos de las hojas de cálculo infinitas, los papeles que se pierden y las cadenas de WhatsApp sin fin. Tanto si gestionas una pequeña peña de barrio, un torneo relámpago entre amigos o una gran liga profesional con cientos de participantes, Mus Manager te ofrece un entorno centralizado, robusto y elegante. Todo lo que necesitas —torneos, fichas de jugadores, resultados en vivo y clasificaciones históricas— está ahora en la palma de tu mano, accesible desde cualquier lugar y optimizado para cada dispositivo. Es hora de que te preocupes solo de lo que importa: de cantar 'envido' y disfrutar de la partida."
+    },
+    "management": {
+      "title": "Organiza torneos sin esfuerzo",
+      "desc": "Crea torneos en minutos, define las fases, empareja equipos y lleva el control de cada partida en tiempo real. Sin errores, sin papel, sin caos.",
+      "points": [
+        "Gestión integral de eliminatorias y ligas",
+        "Generación automática de cuadros y cruces",
+        "Control total de mesas y tiempos"
+      ]
+    },
+    "registration": {
+      "title": "Tu comunidad, bien gestionada",
+      "desc": "Registra equipos y parejas, consulta quién participa en cada torneo y ten siempre el historial a mano. Perfecto desde una pequeña peña hasta un club con cientos de socios.",
+      "points": [
+        "Base de datos centralizada de jugadores",
+        "Historial detallado de participaciones",
+        "Gestión de equipos y parejas habituales"
+      ]
+    },
+    "results": {
+      "title": "Rankings siempre al día",
+      "desc": "Las clasificaciones se actualizan automáticamente tras cada resultado. Todos los participantes pueden consultarlas en cualquier momento, desde cualquier dispositivo.",
+      "points": [
+        "Actualización de puntos en tiempo real",
+        "Acceso público a clasificaciones en vivo",
+        "Estadísticas de victorias y rendimiento"
+      ]
+    },
+    "how_it_works": {
+      "title": "¿Cómo funciona?",
+      "step1_title": "1. Crea tu comunidad",
+      "step1_desc": "Regístrate, ponle nombre a tu grupo y empieza a añadir jugadores. En menos de cinco minutos tu comunidad está lista para jugar.",
+      "step2_title": "2. Organiza un torneo",
+      "step2_desc": "Define el formato (liga o eliminatoria), añade los equipos participantes y Mus Manager genera el cuadro automáticamente.",
+      "step3_title": "3. Registra los resultados",
+      "step3_desc": "Tras cada partida, introduce el marcador desde cualquier móvil o tablet. Las clasificaciones se actualizan al instante.",
+      "step4_title": "4. Consulta el ranking",
+      "step4_desc": "Tus jugadores pueden seguir la clasificación en tiempo real y revisar el historial del torneo sin instalar nada."
+    },
+    "stats_labels": {
+      "digital": "Digital & Cloud",
+      "cost": "Gratis para Peñas",
+      "access": "Acceso Universal"
+    }
+  },
+  "stats": {
+    "tournaments": "Torneos",
+    "players": "Jugadores Activos",
+    "rating": "Valoración",
+    "support": "Soporte"
+  },
+  "cta": {
+    "title": "¿Listo para repartir las cartas?",
+    "desc": "Únete a cientos de organizadores que ya están ahorrando tiempo y creando mejores experiencias para sus jugadores.",
+    "button": "Empezar Gratis",
+    "note": "Sin tarjeta de crédito. Configuración en 2 minutos."
+  },
+  "auth": {
+    "welcome": "Bienvenido",
+    "loginDesc": "Accede a tu cuenta Mus Manager",
+    "join": "Únete",
+    "registerDesc": "Registra tu usuario Mus Manager",
+    "email": "Email",
+    "password": "Contraseña",
+    "confirm": "Repetir Contraseña",
+    "submitLogin": "Entrar",
+    "submitRegister": "Registrarme",
+    "loading": "Sincronizando...",
+    "creating": "Creando...",
+    "noAccount": "¿Nuevo en la élite?",
+    "createAccount": "Crea tu cuenta aquí",
+    "haveAccount": "¿Ya tienes cuenta?",
+    "loginHere": "Inicia sesión"
+  },
+  "dashboard": {
+    "title": "Tus",
+    "subtitle": "Torneos",
+    "welcome": "Bienvenido de nuevo, {name}. Tienes {count} eventos bajo tu gestión.",
+    "create": "Crear Nuevo Torneo",
+    "loading": "Cargando Datos...",
+    "error": "Error al cargar torneos",
+    "retry": "Reintentar Conexión",
+    "manage": "Gestionar",
+    "live": "En Vivo",
+    "empty": "No hay torneos bajo tu gestión.",
+    "empty_title": "Tu tablero está vacío",
+    "empty_cta": "Crea tu primer torneo",
+    "empty_subtitle": "Comienza tu legado como organizador de Mus Manager hoy mismo.",
+    "my_tournaments": "Mis Torneos",
+    "copy_link": "Copiar Enlace",
+    "copy_link_help": "Comparte este link entre los participantes",
+    "link_copied": "¡Enlace copiado!",
+    "view_poster": "Ver cartel",
+    "category": "Categoría",
+    "status": "Estado",
+    "tournament": "Torneo",
+    "quick_actions_title": "Gestión Maestra",
+    "quick_actions": {
+      "new_tournament": "Nuevo Torneo",
+      "new_tournament_desc": "Lanza un nuevo evento competitivo",
+      "new_team": "Nuevo Equipo",
+      "new_team_desc": "Registra una pareja participante"
+    }
+  },
+  "footer": {
+    "desc": "La plataforma líder de gestión de torneos para la comunidad competitiva del Mus. Precisión, elegancia y pasión.",
+    "product": "Producto",
+    "company": "Empresa",
+    "about": "Nosotros",
+    "contact": "Contacto",
+    "legal": "Legal",
+    "subscribe": "Subscríbete",
+    "rights": "© 2026 Mus Manager. Todos los derechos reservados.",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookies": "Cookies"
+  },
+  "tournaments_page": {
+    "title": "Torneos en Vivo",
+    "subtitle": "Próximos Eventos",
+    "view_details": "Ver Detalles",
+    "empty": "No hay torneos pendientes en este momento.",
+    "active": "En Curso",
+    "pending": "Inscripciones Abiertas",
+    "coming_soon": "Próximamente",
+    "players_count": "{count} Jugadores",
+    "pairs_count": "{count} Parejas"
+  },
+  "tournament_form": {
+    "create_title": "Nuevo Torneo",
+    "edit_title": "Torneo",
+    "back_dashboard": "Volver al Dashboard",
+    "labels": {
+      "name": "Nombre del Torneo",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Finalización",
+      "location": "Ubicación del Evento",
+      "poster": "Cartel del Torneo (Imagen o PDF)",
+      "gameSystem": "Sistema de Juego",
+      "status": "Estado",
+      "statusInitial": "Estado Inicial",
+      "statusDescription": "Información de Estado",
+      "statusDescriptionPlaceholder": "Ej: Inscripciones abiertas hasta el viernes. Sorteo el sábado a las 10:00.",
+      "statusDescriptionPlaceholderEdit": "Detalles sobre el estado actual del torneo...",
+      "posterSelect": "Seleccionar Imagen o PDF",
+      "posterChange": "Cambiar Imagen o PDF",
+      "posterSelected": "PDF seleccionado para subir",
+      "newPoster": "Nueva imagen:",
+      "currentPoster": "Cartel actual:",
+      "ruleKings": "Reyes",
+      "rulePoints": "Tantos",
+      "ruleGames": "Chicos",
+      "tablesCount": "Nº de Mesas",
+      "rules_section": "Reglas y Gestión",
+      "other": "Otro",
+      "customPoints": "Especificar tantos",
+      "customGames": "Especificar chicos"
+    },
+    "types": {
+      "eliminatory": "Eliminación Directa",
+      "league": "Liga (Todos contra todos)",
+      "groups": "Fase de Grupos + Eliminatorias",
+      "ceros": "Ceros"
+    },
+    "statuses": {
+      "draft": "Borrador",
+      "pending": "Pendiente (inscripciones abiertas)",
+      "active": "Activo (en curso)",
+      "finished": "Finalizado",
+      "publish": "Publicar Torneo"
+    },
+    "actions": {
+      "create": "Crear Torneo",
+      "save": "Guardar Cambios",
+      "saving": "Guardando...",
+      "cancel": "Cancelar"
+    },
+    "messages": {
+      "create_success": "¡Torneo creado con éxito!",
+      "save_success": "¡Guardado correctamente! Redirigiendo...",
+      "load_error": "No se pudo cargar el torneo (UUID: {uuid}): {error}"
+    }
+  },
+  "tournament_card": {
+    "status": {
+      "draft": "Borrador",
+      "pending": "Pendiente",
+      "active": "Activo",
+      "finished": "Finalizado"
+    }
+  },
+  "tournament_view": {
+    "restricted_access": "Acceso Restringido",
+    "uuid": "UUID",
+    "current_round": "Ronda Actual",
+    "average_points": "Puntos Media",
+    "players_count": "{count} Jugadores",
+    "pairs_count": "{count} Parejas",
+    "location": "Ubicación",
+    "matches_in_progress": "Partidas en Curso",
+    "view_full_bracket": "Ver Cuadro Completo",
+    "match_status": {
+      "finished": "Finalizado",
+      "pending": "Pendiente"
+    },
+    "tabs": {
+      "matches": "Partidos",
+      "standings": "Clasificación",
+      "bracket": "Cuadro",
+      "teams": "Equipos"
+    },
+    "rounds": {
+      "title": "Jornada",
+      "stage": "Fase"
+    },
+    "classification": {
+      "team": "Equipo",
+      "played": "PJ",
+      "won": "G",
+      "lost": "P",
+      "points": "PTS",
+      "empty": "No hay clasificación disponible todavía"
+    },
+    "bracket": {
+      "title": "Cuadro de Eliminatorias",
+      "empty_desc": "El cuadro se generará automáticamente tras la fase de grupos"
+    },
+    "teams": {
+      "empty": "No hay equipos inscritos todavía",
+      "enrolled_count": "Equipos Inscritos"
+    },
+    "match_edit": {
+      "title": "Ingresar Resultado",
+      "save": "Guardar Resultado"
+    },
+    "activity": {
+      "title": "Actividad Reciente",
+      "match_closed": "Mesa {table} cerrada: {team} gana {score}",
+      "match_started": "Mesa {table} iniciada: {team1} vs {team2}",
+      "player_registered": "{name} se ha registrado",
+      "time_5m": "hace 5m",
+      "time_12m": "hace 12m",
+      "time_20m": "hace 20m"
+    },
+    "draft_mode": "MODO BORRADOR",
+    "knockout": {
+      "t32": "Dieciseisavos de Final",
+      "t16": "Octavos de Final",
+      "t8": "Cuartos de Final",
+      "t4": "Semifinales",
+      "final": "Final",
+      "third_place": "3er y 4º Puesto",
+      "deciding": "Por decidir"
+    }
+  },
+  "team_form": {
+    "title": "Nuevo Equipo",
+    "name": "Nombre de la Pareja",
+    "name_placeholder": "Ej: Los Invencibles",
+    "tournament": "Torneo",
+    "submit": "Crear e Inscribir Pareja",
+    "success_msg": "¡Pareja creada e inscrita con éxito! Puedes añadir otra.",
+    "error_loading_tournaments": "Error al cargar los torneos."
+  },
+  "tournament_mgmt": {
+    "team_mgmt": "Gestión de Equipos",
+    "enrolled_count": "{count} Equipos Inscritos",
+    "select_team": "Seleccionar equipo para inscribir...",
+    "enroll": "Inscribir",
+    "no_group": "Sin Grupo",
+    "groups_count_label": "Número de Grupos",
+    "draw_groups": "Sorteo de Grupos",
+    "generate_matches": "Generar Calendario de Partidos"
+  }
+}

@@ -1,0 +1,227 @@
+{
+  "common": {
+    "loading": "Loading..."
+  },
+  "nav": {
+    "features": "Features",
+    "tournaments": "Tournaments",
+    "ranking": "Ranking",
+    "login": "Login",
+    "getStarted": "Get Started",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "hero": {
+    "partner": "Official Mus Partner",
+    "title": "The Ultimate Platform for",
+    "subtitle": "Mus Tournaments",
+    "desc": "Professional bracket management, real-time scoring, and seamless player registration for the traditional Spanish card game. Perfect for clubs and friendlies.",
+    "cta": "Create your first tournament",
+    "demo": "Watch Demo",
+    "joinedBy": "Joined by {count} elite players",
+    "tracking": "Tracking Tournament #{id}"
+  },
+  "features": {
+    "title": "Everything you need for a perfect tournament",
+    "desc": "Designed by Mus enthusiasts for the most authentic experience, from small groups to professional federations.",
+    "management": {
+      "title": "Bracket Management",
+      "desc": "Easily handle single elimination, double elimination, or round robin formats with automatic pairings."
+    },
+    "registration": {
+      "title": "Player Registration",
+      "desc": "Manage entries, payments, and team assignment. Support for individual players or pre-formed pairs."
+    },
+    "results": {
+      "title": "Live Results",
+      "desc": "Real-time scoring updates. Public standings so everyone can follow the tournament status live."
+    }
+  },
+  "stats": {
+    "tournaments": "Tournaments",
+    "players": "Active Players",
+    "rating": "Rating",
+    "support": "Support"
+  },
+  "cta": {
+    "title": "Ready to deal the cards?",
+    "desc": "Join hundreds of organizers already saving time and creating better experiences for their players.",
+    "button": "Get Started Free",
+    "note": "No credit card required. Setup in 2 minutes."
+  },
+  "auth": {
+    "welcome": "Welcome",
+    "loginDesc": "Access your Mus Manager account",
+    "join": "Join Us",
+    "registerDesc": "Register your Mus Manager account",
+    "email": "Email",
+    "password": "Password",
+    "confirm": "Confirm Password",
+    "submitLogin": "Login",
+    "submitRegister": "Register",
+    "loading": "Syncing...",
+    "creating": "Creating...",
+    "noAccount": "New to the elite?",
+    "createAccount": "Create your account here",
+    "haveAccount": "Already have an account?",
+    "loginHere": "Login here"
+  },
+  "dashboard": {
+    "title": "Your",
+    "subtitle": "Tournaments",
+    "welcome": "Welcome back, {name}. You have {count} events under your management.",
+    "create": "Create New Tournament",
+    "loading": "Loading Data...",
+    "error": "Error loading tournaments",
+    "retry": "Retry Connection",
+    "manage": "Manage",
+    "live": "Live",
+    "empty": "No tournaments under your management.",
+    "empty_title": "Your dashboard is empty",
+    "empty_cta": "Create your first tournament",
+    "empty_subtitle": "Start your legacy as a Mus Manager organizer today.",
+    "my_tournaments": "My Tournaments",
+    "copy_link": "Copy Link",
+    "copy_link_help": "Share this link among participants",
+    "link_copied": "Link copied!",
+    "view_poster": "View poster",
+    "category": "Category",
+    "status": "Status",
+    "tournament": "Tournament",
+    "quick_actions_title": "Master Management",
+    "quick_actions": {
+      "new_tournament": "New Tournament",
+      "new_tournament_desc": "Launch a new competitive event",
+      "new_team": "New Team",
+      "new_team_desc": "Register a participating pair"
+    }
+  },
+  "footer": {
+    "desc": "The leading tournament management platform for the competitive Mus community. Precision, elegance, and passion.",
+    "product": "Product",
+    "company": "Company",
+    "subscribe": "Subscribe",
+    "rights": "© 2026 Mus Manager. All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies"
+  },
+  "tournaments_page": {
+    "title": "Live Tournaments",
+    "subtitle": "Upcoming Events",
+    "view_details": "View Details",
+    "empty": "No pending tournaments at this moment.",
+    "active": "Active",
+    "pending": "Open Registration",
+    "coming_soon": "Coming Soon",
+    "players_count": "{count} Players"
+  },
+  "tournament_form": {
+    "create_title": "New Tournament",
+    "edit_title": "Tournament",
+    "back_dashboard": "Back to Dashboard",
+    "labels": {
+      "name": "Tournament Name",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "poster": "Tournament Poster (Image or PDF)",
+      "gameSystem": "Game System",
+      "status": "Status",
+      "statusInitial": "Initial Status",
+      "statusDescription": "Status Information",
+      "statusDescriptionPlaceholder": "Ex: Registration open until Friday. Draw on Saturday at 10:00.",
+      "statusDescriptionPlaceholderEdit": "Details about current tournament status...",
+      "posterSelect": "Select Image or PDF",
+      "posterChange": "Change Image or PDF",
+      "posterSelected": "PDF selected for upload",
+      "newPoster": "New image:",
+      "currentPoster": "Current poster:",
+      "ruleKings": "Kings",
+      "rulePoints": "Points",
+      "ruleGames": "Games",
+      "tablesCount": "Number of Tables",
+      "rules_section": "Rules and Management"
+    },
+    "types": {
+      "eliminatory": "Single Elimination",
+      "league": "League (Round Robin)",
+      "groups": "Group Phase + Playoffs",
+      "ceros": "Zeroes"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "pending": "Pending (open registration)",
+      "active": "Active (in progress)",
+      "finished": "Finished",
+      "publish": "Publish Tournament"
+    },
+    "actions": {
+      "create": "Create Tournament",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "create_success": "Tournament created successfully!",
+      "save_success": "Saved successfully! Redirecting...",
+      "load_error": "Could not load tournament (UUID: {uuid}): {error}"
+    }
+  },
+  "tournament_view": {
+    "restricted_access": "Restricted Access",
+    "uuid": "UUID",
+    "current_round": "Current Round",
+    "average_points": "Average Points",
+    "players_count": "{count} Players",
+    "location": "Location",
+    "matches_in_progress": "Matches in Progress",
+    "view_full_bracket": "View Full Bracket",
+    "match_status": {
+      "finished": "Finished",
+      "pending": "Pending"
+    },
+    "tabs": {
+      "matches": "Matches",
+      "standings": "Standings",
+      "bracket": "Bracket",
+      "teams": "Teams"
+    },
+    "rounds": {
+      "title": "Round",
+      "stage": "Stage"
+    },
+    "classification": {
+      "team": "Team",
+      "played": "P",
+      "won": "W",
+      "lost": "L",
+      "points": "PTS",
+      "empty": "No standings available yet"
+    },
+    "bracket": {
+      "title": "Elimination Bracket",
+      "empty_desc": "The bracket will be automatically generated after the group phase"
+    },
+    "teams": {
+      "empty": "No teams enrolled yet",
+      "enrolled_count": "Enrolled Teams"
+    },
+    "match_edit": {
+      "title": "Enter Result",
+      "save": "Save Result"
+    },
+    "activity": {
+      "title": "Recent Activity"
+    },
+    "draft_mode": "DRAFT MODE"
+  },
+  "team_form": {
+    "title": "New Team",
+    "name": "Team Name",
+    "name_placeholder": "Ex: The Invincibles",
+    "tournament": "Tournament",
+    "submit": "Create & Enroll Team",
+    "success_msg": "Team created and enrolled successfully! You can add another one.",
+    "error_loading_tournaments": "Error loading tournaments."
+  }
+}
