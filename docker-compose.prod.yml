@@ -1,0 +1,42 @@
+services:
+  database:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mus_manager}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMeInProd!}
+      POSTGRES_USER: ${POSTGRES_USER:-mus_user}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-mus_manager}", "-U", "${POSTGRES_USER:-mus_user}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mus_user}:${POSTGRES_PASSWORD:-!ChangeMeInProd!}@database:5432/${POSTGRES_DB:-mus_manager}?serverVersion=16&charset=utf8
+      APP_ENV: prod
+      APP_DEBUG: 0
+      APP_SECRET: ${APP_SECRET:-PleaseChangeMeToSomethingSecure}
+    depends_on:
+      database:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.prod
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  database_data:
