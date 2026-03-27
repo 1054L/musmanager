@@ -8,13 +8,19 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const router = useRouter()
 
+const today = new Date()
+const year = today.getFullYear()
+const month = String(today.getMonth() + 1).padStart(2, '0')
+const day = String(today.getDate()).padStart(2, '0')
+const defaultDate = `${year}-${month}-${day}T00:00`
+
 const form = ref({
   name: '',
   type: 'eliminatory',
   status: 'draft',
   statusDescription: '',
-  startDate: '',
-  endDate: '',
+  startDate: defaultDate,
+  endDate: defaultDate,
   ruleKings: 8,
   rulePoints: 40,
   ruleGames: 3,
