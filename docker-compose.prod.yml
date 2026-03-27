@@ -7,12 +7,14 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMeInProd!}
       POSTGRES_USER: ${POSTGRES_USER:-mus_user}
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-mus_manager}", "-U", "${POSTGRES_USER:-mus_user}"]
+      test: [ "CMD", "pg_isready", "-d", "${POSTGRES_DB:-mus_manager}", "-U", "${POSTGRES_USER:-mus_user}" ]
       timeout: 5s
       retries: 5
       start_period: 60s
     volumes:
       - database_data:/var/lib/postgresql/data:rw
+    networks:
+      - internal
 
   api:
     build:
@@ -27,16 +29,40 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    networks:
+      - internal
+      - proxy
 
   web:
     build:
       context: ./web
       dockerfile: Dockerfile.prod
     restart: always
-    ports:
-      - "80:80"
     depends_on:
       - api
+    networks:
+      - proxy
+
+  proxy:
+    image: jc21/nginx-proxy-manager:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - proxy_data:/data
+      - proxy_letsencrypt:/etc/letsencrypt
+    networks:
+      - proxy
+
+networks:
+  internal:
+    driver: bridge
+  proxy:
+    driver: bridge
 
 volumes:
   database_data:
+  proxy_data:
+  proxy_letsencrypt:
