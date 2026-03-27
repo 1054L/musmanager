@@ -245,7 +245,8 @@
       "matches": "Partidak",
       "standings": "Sailkapena",
       "bracket": "Koadroa",
-      "teams": "Taldeak"
+      "teams": "Taldeak",
+      "admin": "Administrazioa"
     },
     "rounds": {
       "title": "Jardunaldia",
@@ -268,6 +269,7 @@
       "empty": "Ez dago talderik izena emanda oraindik",
       "enrolled_count": "Izena Emandako Taldeak"
     },
+    "active_matches_desc": "Gorde partiden emaitzak sailkapena eguneratzeko",
     "match_edit": {
       "title": "Sartu Emaitza",
       "save": "Gorde Emaitza"

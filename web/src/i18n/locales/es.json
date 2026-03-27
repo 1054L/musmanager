@@ -245,7 +245,8 @@
       "matches": "Partidos",
       "standings": "Clasificación",
       "bracket": "Cuadro",
-      "teams": "Equipos"
+      "teams": "Equipos",
+      "admin": "Administración"
     },
     "rounds": {
       "title": "Jornada",
@@ -268,6 +269,7 @@
       "empty": "No hay equipos inscritos todavía",
       "enrolled_count": "Equipos Inscritos"
     },
+    "active_matches_desc": "Registra los resultados de los enfrentamientos para actualizar la clasificación",
     "match_edit": {
       "title": "Ingresar Resultado",
       "save": "Guardar Resultado"

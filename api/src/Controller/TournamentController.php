@@ -397,11 +397,57 @@ class TournamentController extends AbstractController
         elseif ($score2 >= $limit) $match->setWinner($match->getTeam2());
         else $match->setWinner(null);
 
-        // Recalculate stats for TournamentTeam
-        // Note: For a real app, this should be a service, but here I'll do it simple
+        $this->recalculateTournamentStats($tournament, $entityManager);
+        
         $entityManager->flush();
 
         return new JsonResponse(['success' => true]);
+    }
+
+    private function recalculateTournamentStats(Tournament $tournament, EntityManagerInterface $entityManager): void
+    {
+        // Reset all stats for tournament teams
+        foreach ($tournament->getTournamentTeams() as $tt) {
+            $tt->setPoints(0);
+            $tt->setGamesWon(0);
+            $tt->setGamesLost(0);
+            $tt->setMatchesPlayed(0);
+        }
+
+        // Aggregate stats from all matches
+        foreach ($tournament->getMatches() as $match) {
+            $team1 = $match->getTeam1();
+            $team2 = $match->getTeam2();
+            $s1 = $match->getScoreTeam1();
+            $s2 = $match->getScoreTeam2();
+            $winner = $match->getWinner();
+
+            // Skip if no score yet (unless winner set manually, but we use scores)
+            if ($s1 === 0 && $s2 === 0 && !$winner) continue;
+
+            $tt1 = null; $tt2 = null;
+            foreach ($tournament->getTournamentTeams() as $tt) {
+                if ($tt->getTeam()->getId() === $team1->getId()) $tt1 = $tt;
+                if ($tt->getTeam()->getId() === $team2->getId()) $tt2 = $tt;
+            }
+
+            if ($tt1) {
+                $tt1->setMatchesPlayed($tt1->getMatchesPlayed() + 1);
+                $tt1->setGamesWon($tt1->getGamesWon() + $s1);
+                $tt1->setGamesLost($tt1->getGamesLost() + $s2);
+                if ($winner && $winner->getId() === $team1->getId()) {
+                    $tt1->setPoints($tt1->getPoints() + 3);
+                }
+            }
+            if ($tt2) {
+                $tt2->setMatchesPlayed($tt2->getMatchesPlayed() + 1);
+                $tt2->setGamesWon($tt2->getGamesWon() + $s2);
+                $tt2->setGamesLost($tt2->getGamesLost() + $s1);
+                if ($winner && $winner->getId() === $team2->getId()) {
+                    $tt2->setPoints($tt2->getPoints() + 3);
+                }
+            }
+        }
     }
 
     #[Route('/api/tournament/{uuid}/classification', name: 'app_tournament_classification', methods: ['GET'])]

@@ -229,6 +229,10 @@ const saveMatchResult = async () => {
                       class="mus-tab-btn" :class="{ active: activeTab === 'teams' }">
                 {{ t('tournament_view.tabs.teams') }}
               </button>
+              <button v-if="tournament.isManager" @click="activeTab = 'admin'" 
+                      class="mus-tab-btn border-l border-white/5 pl-4 ml-auto" :class="{ active: activeTab === 'admin' }">
+                <i class="pi pi-cog mr-2"></i> {{ t('tournament_view.tabs.admin') || 'Admin' }}
+              </button>
            </div>
 
            <!-- Content according to active tab -->
@@ -385,6 +389,47 @@ const saveMatchResult = async () => {
               <div v-if="!tournament.tournamentTeams?.length" class="text-center py-10 opacity-30">
                  <i class="pi pi-users text-4xl mb-4"></i>
                  <p class="font-bold">{{ t('tournament_view.teams.empty') }}</p>
+              </div>
+           </div>
+
+           <!-- Admin / Result Entry Section -->
+           <div v-else-if="activeTab === 'admin' && tournament.isManager" class="admin-section">
+              <div class="mb-6 flex align-items-center justify-between">
+                <div>
+                   <h3 class="text-white font-black uppercase italic tracking-tight m-0">{{ t('tournament_view.match_edit.title') }}</h3>
+                   <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">{{ t('tournament_view.active_matches_desc') || 'Registra los resultados de los enfrentamientos' }}</p>
+                </div>
+              </div>
+
+              <div class="grid">
+                <div v-if="matches.length === 0" class="col-12 text-center py-10 opacity-30 border-2 border-dashed border-white/10 rounded-2xl">
+                   <p class="font-bold uppercase tracking-widest">{{ t('tournament_view.bracket.empty_desc') }}</p>
+                </div>
+                <div v-else v-for="match in matches" :key="match.id" class="col-12 md:col-6 lg:col-4 mb-4">
+                   <div class="mus-glass p-4 rounded-2xl border border-white/5 hover:border-[#0fb361]/30 transition-all cursor-pointer group" @click="openEditModal(match)">
+                      <div class="flex justify-between items-center mb-3">
+                         <Tag :value="match.stage" severity="secondary" class="text-[8px] opacity-60" />
+                         <span class="text-[8px] font-black text-[#0fb361]" v-if="match.status === t('tournament_view.match_status.finished')">
+                            <i class="pi pi-check-circle mr-1"></i> {{ match.status }}
+                         </span>
+                      </div>
+                      <div class="flex flex-column gap-2 mb-4">
+                         <div class="flex justify-between items-center">
+                            <span class="text-white font-bold text-sm truncate max-w-[150px]">{{ match.teamA }}</span>
+                            <span class="font-black text-lg" :class="match.scoreA > match.scoreB ? 'text-[#0fb361]' : 'text-slate-600'">{{ match.scoreA }}</span>
+                         </div>
+                         <div class="flex justify-between items-center">
+                            <span class="text-white font-bold text-sm truncate max-w-[150px]">{{ match.teamB }}</span>
+                            <span class="font-black text-lg" :class="match.scoreB > match.scoreA ? 'text-[#0fb361]' : 'text-slate-600'">{{ match.scoreB }}</span>
+                         </div>
+                      </div>
+                      <div class="pt-3 border-t border-white/5 text-center">
+                         <span class="text-[9px] font-black uppercase text-[#0fb361] group-hover:bg-[#0fb361]/10 px-3 py-1 rounded-full transition-all">
+                            {{ t('tournament_view.match_edit.save') }}
+                         </span>
+                      </div>
+                   </div>
+                </div>
               </div>
            </div>
         </div>
