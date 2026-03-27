@@ -131,7 +131,10 @@
       "new_tournament_desc": "Lanza un nuevo evento competitivo",
       "new_team": "Nuevo Equipo",
       "new_team_desc": "Registra una pareja participante"
-    }
+    },
+    "delete_confirm_title": "Eliminar Torneo",
+    "delete_confirm_msg": "¿Estás seguro de que deseas eliminar este torneo? Todos los datos asociados (parejas, partidos) se perderán permanentemente. Esta acción no se puede deshacer.",
+    "delete_success": "Torneo eliminado correctamente"
   },
   "footer": {
     "desc": "La plataforma líder de gestión de torneos para la comunidad competitiva del Mus. Precisión, elegancia y pasión.",

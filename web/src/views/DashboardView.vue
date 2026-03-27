@@ -8,9 +8,15 @@ import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import Popover from 'primevue/popover'
+import MusLoader from '../components/MusLoader.vue'
+import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 const { t } = useI18n()
 const router = useRouter()
+const confirm = useConfirm()
+const toast = useToast()
 const user = authService.getUser()
 const tournaments = ref([])
 const loading = ref(true)
@@ -26,6 +32,35 @@ const onPosterHover = (event, posterPath) => {
 
 const onPosterLeave = () => {
   posterOp.value.hide()
+}
+
+const confirmDelete = (event, tournament) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: t('dashboard.delete_confirm_msg'),
+    header: t('dashboard.delete_confirm_title'),
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+        label: t('tournament_form.actions.cancel'),
+        severity: 'secondary',
+        outlined: true
+    },
+    acceptProps: {
+        label: t('common.loading') === 'Kargatzen...' ? 'Ezabatu' : (t('common.loading') === 'Loading...' ? 'Delete' : 'Eliminar'),
+        severity: 'danger'
+    },
+    accept: async () => {
+      loading.value = true
+      try {
+        await tournamentService.deleteTournament(tournament.uuid)
+        toast.add({ severity: 'success', summary: t('dashboard.delete_success'), life: 3000 })
+        await fetchTournaments()
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+        loading.value = false
+      }
+    }
+  })
 }
 
 const copyToClipboard = async (uuid) => {
@@ -45,11 +80,34 @@ const fetchTournaments = async () => {
   loading.value = true
   error.value = null
   try {
+    // Artificial delay to ensure MusLoader is visible and premium feel is maintained
+    await new Promise(resolve => setTimeout(resolve, 500))
     tournaments.value = await tournamentService.getManagedTournaments()
+    
+    // Debug info for dev console
+    console.log('User ID from Auth:', user?.id)
+    console.log('Tournaments loaded:', tournaments.value.length)
   } catch (e) {
-    error.value = t('dashboard.error')
+    console.error('Error loading tournaments:', e)
+    // Show detailed error if possible
+    error.value = `${t('dashboard.error')}: ${e.message}`
   } finally {
     loading.value = false
+  }
+}
+
+// Hidden debug toggle (triple click on subtitle)
+const debugInfo = ref(null)
+const showDebug = ref(false)
+const toggleDebug = () => {
+  showDebug.value = !showDebug.value
+  if (showDebug.value) {
+    debugInfo.value = {
+      user: { ...user, password: '***' },
+      apiUrl: '/api',
+      localStorage: { ...localStorage },
+      userAgent: navigator.userAgent
+    }
   }
 }
 
@@ -90,9 +148,14 @@ onMounted(fetchTournaments)
         <h1 class="mus-h1 italic">
           {{ t('dashboard.title') }} <span class="text-[#0fb361]">{{ t('dashboard.subtitle') }}</span>
         </h1>
-        <p class="mus-p opacity-60 mt-4">
+        <p class="mus-p opacity-60 mt-4 cursor-pointer select-none" @click="toggleDebug">
           {{ t('dashboard.welcome', { name: user?.email.split('@')[0], count: tournaments.length }) }}
         </p>
+        
+        <!-- Debug Info Panel -->
+        <div v-if="showDebug" class="debug-panel mt-4 p-4 mus-glass text-xs font-mono text-slate-400 overflow-auto max-h-[200px]">
+          <pre>{{ JSON.stringify(debugInfo, null, 2) }}</pre>
+        </div>
       </div>
     </header>
 
@@ -126,9 +189,8 @@ onMounted(fetchTournaments)
         </div>
       </div>
 
-      <div v-if="loading" class="p-8 text-center">
-        <div class="spinner mb-4"></div>
-        <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">{{ t('dashboard.loading') }}</p>
+      <div v-if="loading" class="p-8">
+        <MusLoader />
       </div>
 
       <div v-else-if="error" class="p-8 text-center">
@@ -200,6 +262,13 @@ onMounted(fetchTournaments)
                        v-tooltip.top="t('dashboard.manage')">
                  <i class="pi pi-pencil"></i>
                </router-link>
+
+               <!-- Delete -->
+               <button class="row-action-btn hover:!bg-rose-500/10 hover:!text-rose-500 hover:!border-rose-500/20"
+                       @click="confirmDelete($event, slotProps.data)"
+                       v-tooltip.top="t('common.loading') === 'Kargatzen...' ? 'Ezabatu' : (t('common.loading') === 'Loading...' ? 'Delete' : 'Eliminar')">
+                 <i class="pi pi-trash"></i>
+               </button>
              </div>
           </template>
         </Column>
@@ -209,7 +278,7 @@ onMounted(fetchTournaments)
       <Popover ref="posterOp" class="poster-preview-popover">
         <div class="poster-preview-content">
           <img v-if="hoveredPoster" 
-               :src="`http://localhost:8002${hoveredPoster}`" 
+               :src="hoveredPoster" 
                alt="Poster">
         </div>
       </Popover>
@@ -466,16 +535,6 @@ onMounted(fetchTournaments)
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 2px solid rgba(15, 179, 97, 0.1);
-  border-top-color: #0fb361;
-  border-radius: 50%;
-  animation: rotate 1s linear infinite;
-  margin: 0 auto;
 }
 
 @keyframes rotate {

@@ -10,6 +10,7 @@ import Button from 'primevue/button'
 import Timeline from 'primevue/timeline'
 import Dialog from 'primevue/dialog'
 import GoogleAd from '../components/GoogleAd.vue'
+import MusLoader from '../components/MusLoader.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -138,9 +139,8 @@ const saveMatchResult = async () => {
 <template>
   <div class="grid">
     <!-- Loading State -->
-    <div v-if="loading" class="col-12 text-center py-8">
-       <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
-       <p class="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mt-4">{{ t('dashboard.loading') }}</p>
+    <div v-if="loading" class="col-12 py-8">
+       <MusLoader />
     </div>
 
     <!-- Error State -->

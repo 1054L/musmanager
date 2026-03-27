@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { authService } from '../services/api'
 import { useI18n } from 'vue-i18n'
+import MusLoader from './MusLoader.vue'
 
 const props = defineProps({
   initialMode: {
@@ -54,15 +55,12 @@ const handleSubmit = async () => {
     await authService.login(email.value, password.value)
     emit('success')
     
-    // Redirect if needed
+    // Use location.href to ensure a clean state and full reload on the dashboard
     if (props.redirect) {
-      router.push(props.redirect)
-    }
-    
-    // Always reload to ensure global state (Navbar, etc) catches the new user info
-    setTimeout(() => {
+      window.location.href = props.redirect
+    } else {
       window.location.reload()
-    }, 150)
+    }
   } catch (e) {
     error.value = e.message
   } finally {
@@ -73,6 +71,7 @@ const handleSubmit = async () => {
 
 <template>
   <div class="auth-form-container relative z-10">
+    <MusLoader v-if="loading" overlay />
     <header class="text-center mb-10">
       <div class="logo-box">
         <span class="logo-letter mus-gold-text">M</span>
@@ -124,12 +123,8 @@ const handleSubmit = async () => {
       </Transition>
 
       <button type="submit" :disabled="loading" class="mus-button-primary w-full py-5 mt-4 group">
-        <span v-if="loading" class="spinner-custom mr-3"></span>
         <span class="font-black uppercase tracking-widest text-sm">
-          {{ isLogin 
-            ? (loading ? t('auth.loading') : t('auth.submitLogin')) 
-            : (loading ? t('auth.creating') : t('auth.submitRegister')) 
-          }}
+          {{ isLogin ? t('auth.submitLogin') : t('auth.submitRegister') }}
         </span>
         <i v-if="!loading" class="pi pi-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
       </button>
@@ -180,11 +175,7 @@ const handleSubmit = async () => {
 }
 .mus-input-field:focus { outline: none; border-color: #0fb361; background: rgba(15, 179, 97, 0.02); box-shadow: 0 0 0 4px rgba(15, 179, 97, 0.05); }
 
-.spinner-custom {
-  width: 18px; height: 18px; border: 3px solid rgba(5, 5, 5, 0.2);
-  border-top-color: #050505; border-radius: 50%; animation: rotate 0.8s linear infinite;
-  display: inline-block; vertical-align: middle;
-}
+
 
 .footer-switch { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #475569; }
 .switch-btn {

@@ -16,15 +16,20 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/api')]
 class TournamentController extends AbstractController
 {
     #[Route('/user/tournaments', name: 'app_tournament_list_managed', methods: ['GET'])]
+    #[Route('/api/user/tournaments', name: 'app_tournament_list_managed_api', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function listManaged(TournamentRepository $tournamentRepository): JsonResponse
     {
         $user = $this->getUser();
-        $tournaments = $tournamentRepository->findManagedByUser($user);
+        
+        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_SUPER_ADMIN')) {
+            $tournaments = $tournamentRepository->findBy([], ['id' => 'DESC']);
+        } else {
+            $tournaments = $tournamentRepository->findManagedByUser($user);
+        }
 
         return new JsonResponse(array_map(function(Tournament $t) {
             return [
@@ -46,7 +51,7 @@ class TournamentController extends AbstractController
         }, $tournaments));
     }
 
-    #[Route('/admin/tournament', name: 'app_tournament_create', methods: ['POST'])]
+    #[Route('/api/admin/tournament', name: 'app_tournament_create', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function create(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): JsonResponse
     {
@@ -106,8 +111,8 @@ class TournamentController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/tournament/{uuid}', name: 'app_tournament_update', methods: ['POST'])]
-    #[IsGranted('TOURNAMENT_EDIT', subject: 'tournament')]
+    #[Route('/api/admin/tournament/{uuid}', name: 'app_tournament_update', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function update(string $uuid, Request $request, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager, SluggerInterface $slugger): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
@@ -183,6 +188,24 @@ class TournamentController extends AbstractController
         ]);
     }
 
+    #[Route('/api/admin/tournament/{uuid}', name: 'app_tournament_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_USER')]
+    public function delete(string $uuid, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
+
+        if (!$tournament) {
+            return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+        }
+
+        $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tournament);
+
+        $entityManager->remove($tournament);
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
     private function handleFileUpload($file, SluggerInterface $slugger): string
     {
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -198,6 +221,7 @@ class TournamentController extends AbstractController
     }
 
     #[Route('/tournament/{uuid}', name: 'app_tournament_show', methods: ['GET'])]
+    #[Route('/api/tournament/{uuid}', name: 'app_tournament_show_api', methods: ['GET'])]
     public function show(string $uuid, TournamentRepository $tournamentRepository): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
@@ -215,7 +239,9 @@ class TournamentController extends AbstractController
         $user = $this->getUser();
         $isManager = false;
         if ($user) {
-            $isManager = ($tournament->getCreatedBy() && $tournament->getCreatedBy()->getId() === $user->getId());
+            $isManager = ($tournament->getCreatedBy() && $tournament->getCreatedBy()->getId() === $user->getId()) 
+                         || $this->isGranted('ROLE_ADMIN') 
+                         || $this->isGranted('ROLE_SUPER_ADMIN');
             if (!$isManager) {
                 foreach ($tournament->getManagers() as $manager) {
                     if ($manager->getId() === $user->getId()) {
@@ -267,8 +293,8 @@ class TournamentController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/tournament/{uuid}/enroll-team', name: 'app_tournament_enroll_team', methods: ['POST'])]
-    #[IsGranted('TOURNAMENT_EDIT', subject: 'tournament')]
+    #[Route('/api/admin/tournament/{uuid}/enroll-team', name: 'app_tournament_enroll_team', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function enrollTeam(string $uuid, Request $request, TournamentRepository $tournamentRepository, TeamRepository $teamRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
@@ -295,8 +321,8 @@ class TournamentController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    #[Route('/admin/tournament/{uuid}/generate-groups', name: 'app_tournament_generate_groups', methods: ['POST'])]
-    #[IsGranted('TOURNAMENT_EDIT', subject: 'tournament')]
+    #[Route('/api/admin/tournament/{uuid}/generate-groups', name: 'app_tournament_generate_groups', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function generateGroups(string $uuid, Request $request, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
@@ -317,8 +343,8 @@ class TournamentController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    #[Route('/admin/tournament/{uuid}/generate-matches', name: 'app_tournament_generate_matches', methods: ['POST'])]
-    #[IsGranted('TOURNAMENT_EDIT', subject: 'tournament')]
+    #[Route('/api/admin/tournament/{uuid}/generate-matches', name: 'app_tournament_generate_matches', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function generateMatches(string $uuid, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
@@ -349,7 +375,7 @@ class TournamentController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    #[Route('/admin/match/{id}', name: 'app_match_update', methods: ['POST'])]
+    #[Route('/api/admin/match/{id}', name: 'app_match_update', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function updateMatch(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -378,7 +404,7 @@ class TournamentController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    #[Route('/tournament/{uuid}/classification', name: 'app_tournament_classification', methods: ['GET'])]
+    #[Route('/api/tournament/{uuid}/classification', name: 'app_tournament_classification', methods: ['GET'])]
     public function getClassification(string $uuid, TournamentRepository $tournamentRepository): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
@@ -405,6 +431,7 @@ class TournamentController extends AbstractController
     }
 
     #[Route('/public/tournaments', name: 'app_tournament_list_public', methods: ['GET'])]
+    #[Route('/api/public/tournaments', name: 'app_tournament_list_public_api', methods: ['GET'])]
     public function listPublic(TournamentRepository $tournamentRepository): JsonResponse
     {
         $tournaments = $tournamentRepository->findBy(['status' => ['active', 'pending']], ['id' => 'DESC']);

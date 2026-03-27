@@ -35,7 +35,7 @@ const enrollmentTeamId = ref(null)
 const groupsCount = ref(2)
 const generating = ref(false)
 
-const API_HOST = 'http://localhost:8002'
+
 
 // Rules state for "Otro"
 const isOtherPoints = ref(false)
@@ -270,7 +270,7 @@ const handlePublish = async () => {
           </div>
           <div v-else-if="existingPosterPath && !form.poster" class="poster-preview">
             <p class="preview-tag">{{ $t('tournament_form.labels.currentPoster') }}</p>
-            <img :src="existingPosterPath.startsWith('http') ? existingPosterPath : API_HOST + existingPosterPath" alt="Cartel actual">
+            <img :src="existingPosterPath" alt="Cartel actual">
           </div>
         </div>
 

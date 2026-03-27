@@ -4,6 +4,7 @@ import { useTournamentStore } from '../stores/tournamentStore'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import MusLoader from '../components/MusLoader.vue'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -37,8 +38,7 @@ onMounted(() => {
     </header>
 
     <div v-if="loading" class="loading-state">
-      <div class="spinner"></div>
-      <p class="text-xs font-black uppercase tracking-widest text-slate-500 mt-6">{{ t('dashboard.loading') }}</p>
+      <MusLoader />
     </div>
 
     <div v-else-if="error" class="error-state mus-glass">
@@ -239,19 +239,7 @@ onMounted(() => {
   box-shadow: 0 10px 20px rgba(15, 179, 97, 0.3);
 }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(15, 179, 97, 0.1);
-  border-top-color: #0fb361;
-  border-radius: 50%;
-  animation: rotate 1s linear infinite;
-  margin: 0 auto;
-}
 
-@keyframes rotate {
-  to { transform: rotate(360deg); }
-}
 
 .line-clamp-1 {
   display: -webkit-box;

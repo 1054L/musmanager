@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8002/api';
+const API_URL = '/api';
 
 export const authService = {
   async login(email, password) {
@@ -70,21 +70,43 @@ export const tournamentService = {
   },
 
   async getManagedTournaments() {
-    const response = await fetch(`${API_URL}/user/tournaments`, {
-      headers: authService.getAuthHeader()
-    });
-    if (!response.ok) {
-      throw new Error('Error al cargar torneos');
+    try {
+      const response = await fetch(`${API_URL}/user/tournaments`, {
+        headers: authService.getAuthHeader()
+      });
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          throw new Error(`Error ${response.status}: El servidor no devolvió JSON (posible error de proxy)`);
+        }
+        throw new Error(errorData.error || `Error ${response.status}`);
+      }
+      return response.json();
+    } catch (err) {
+      console.error('getManagedTournaments error:', err);
+      throw err;
     }
-    return response.json();
   },
 
   async getPublicTournaments() {
-    const response = await fetch(`${API_URL}/public/tournaments`);
-    if (!response.ok) {
-      throw new Error('Error al cargar la lista pública de torneos');
+    try {
+      const response = await fetch(`${API_URL}/public/tournaments`);
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          throw new Error(`Error ${response.status}: El servidor no devolvió JSON (posible error de proxy)`);
+        }
+        throw new Error(errorData.error || `Error ${response.status}`);
+      }
+      return response.json();
+    } catch (err) {
+      console.error('getPublicTournaments error:', err);
+      throw err;
     }
-    return response.json();
   },
 
   async createTournament(data) {
@@ -135,6 +157,26 @@ export const tournamentService = {
         if (response.status === 403) errorMessage = 'No tienes permisos para realizar esta acción';
         else if (response.status === 401) errorMessage = 'Sesión expirada o inválida';
         else errorMessage = `Error del servidor (${response.status})`;
+      }
+      throw new Error(errorMessage);
+    }
+    return response.json();
+  },
+
+  async deleteTournament(uuid) {
+    const response = await fetch(`${API_URL}/admin/tournament/${uuid}`, {
+      method: 'DELETE',
+      headers: authService.getAuthHeader()
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Error al eliminar el torneo';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        if (response.status === 403) errorMessage = 'No tienes permisos para eliminar este torneo';
+        else errorMessage = `Error (${response.status})`;
       }
       throw new Error(errorMessage);
     }

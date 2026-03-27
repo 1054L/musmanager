@@ -2,6 +2,8 @@
 import { ref, provide } from 'vue'
 import MusNavbar from './MusNavbar.vue'
 import AuthModal from '../components/AuthModal.vue'
+import ConfirmDialog from 'primevue/confirmdialog'
+import Toast from 'primevue/toast'
 
 // Global Auth Modal State
 const showAuthModal = ref(false)
@@ -18,6 +20,8 @@ provide('openAuthModal', openAuthModal)
 
 <template>
   <div class="mus-layout">
+    <Toast />
+    <ConfirmDialog />
     
     <!-- Background Elements -->
     <div class="bg-elements">

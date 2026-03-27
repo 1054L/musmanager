@@ -131,7 +131,10 @@
       "new_tournament_desc": "Launch a new competitive event",
       "new_team": "New Team",
       "new_team_desc": "Register a participating pair"
-    }
+    },
+    "delete_confirm_title": "Delete Tournament",
+    "delete_confirm_msg": "Are you sure you want to delete this tournament? All associated data (teams, matches) will be permanently lost. This action cannot be undone.",
+    "delete_success": "Tournament successfully deleted"
   },
   "footer": {
     "desc": "The leading tournament management platform for the competitive Mus community. Precision, elegance, and passion.",

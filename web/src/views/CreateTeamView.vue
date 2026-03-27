@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { teamService, tournamentService } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import MusLoader from '../components/MusLoader.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -69,12 +70,10 @@ const handleCreate = async () => {
     </header>
 
     <div class="form-card mus-glass">
-      <div v-if="loading" class="loading-state">
-        <span class="spinner"></span>
-        <p>{{ $t('common.loading') }}</p>
-      </div>
-
-      <form v-else @submit.prevent="handleCreate" class="mus-form">
+      <MusLoader v-if="loading" />
+      <MusLoader v-if="saving" overlay />
+      
+      <form v-if="!loading" @submit.prevent="handleCreate" class="mus-form">
         <div v-if="error" class="error-msg">{{ error }}</div>
         <div v-if="success" class="success-msg">{{ $t('team_form.success_msg') }}</div>
 
@@ -95,7 +94,6 @@ const handleCreate = async () => {
         </div>
 
         <button type="submit" :disabled="saving" class="mus-btn-primary w-full mt-4">
-          <span v-if="saving" class="spinner mr-2"></span>
           {{ saving ? $t('tournament_form.actions.saving') : '👥 ' + $t('team_form.submit') }}
         </button>
       </form>
@@ -161,11 +159,5 @@ const handleCreate = async () => {
 .mus-btn-primary:hover:not(:disabled) { background: #0ca358; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(15,179,97,0.4); }
 .mus-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.spinner {
-  width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.1);
-  border-top-color: black; border-radius: 50%;
-  animation: rotate 0.6s linear infinite;
-}
 
-@keyframes rotate { to { transform: rotate(360deg); } }
 </style>

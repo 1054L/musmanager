@@ -131,7 +131,10 @@
       "new_tournament_desc": "Abian jarri lehiaketa berri bat",
       "new_team": "Talde Berria",
       "new_team_desc": "Erregistratu parte hartuko duen bikote bat"
-    }
+    },
+    "delete_confirm_title": "Txapelketa Ezabatu",
+    "delete_confirm_msg": "Ziur al zaude txapelketa hau ezabatu nahi duzula? Lotutako datu guztiak (bikoteak, partidak) betiko galduko dira. Ekintza hau ezin da desegin.",
+    "delete_success": "Txapelketa ongi ezabatu da"
   },
   "footer": {
     "desc": "Mus komunitate lehiakorrarentzako txapelketak kudeatzeko plataforma nagusia. Zehaztasuna, dotorezia eta pasioa.",
