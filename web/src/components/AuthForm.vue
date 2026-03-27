@@ -73,9 +73,7 @@ const handleSubmit = async () => {
   <div class="auth-form-container relative z-10">
     <MusLoader v-if="loading" overlay />
     <header class="text-center mb-10">
-      <div class="logo-box">
-        <span class="logo-letter mus-gold-text">M</span>
-      </div>
+      <img src="/logo.png" class="logo-image-form" alt="Mus Manager Logo" />
       <h2 class="auth-title">
         {{ isLogin ? t('auth.welcome') : t('auth.join') }}
       </h2>
@@ -144,14 +142,13 @@ const handleSubmit = async () => {
 </template>
 
 <style scoped>
-.logo-box {
-  width: 64px; height: 64px; background: linear-gradient(135deg, rgba(15, 179, 97, 0.2), rgba(15, 179, 97, 0.05));
-  border: 1px solid rgba(15, 179, 97, 0.2); border-radius: 20px;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 24px; box-shadow: 0 10px 30px rgba(15, 179, 97, 0.1);
-  overflow: hidden;
+.logo-image-form {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin: 0 auto 24px;
+  filter: drop-shadow(0 10px 20px rgba(15, 179, 97, 0.2));
 }
-.logo-letter { font-size: 32px; font-weight: 950; line-height: 1; }
 .auth-title { font-size: 32px; font-weight: 950; color: white; font-style: italic; text-transform: uppercase; letter-spacing: -0.025em; line-height: 1; }
 .auth-subtitle { color: #475569; margin-top: 12px; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
 

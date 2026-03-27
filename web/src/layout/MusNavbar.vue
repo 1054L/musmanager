@@ -37,9 +37,7 @@ const handleLogout = () => {
       
       <!-- Logo -->
       <router-link to="/" class="logo-area">
-        <div class="logo-box">
-          <span class="logo-letter mus-gold-text">M</span>
-        </div>
+        <img src="/logo.png" class="logo-image" alt="Mus Manager Logo" />
         <div class="logo-text">
           <span class="logo-title mus-gold-text">Mus Manager</span>
           <!--<span class="logo-subtitle">Elite Suite</span>-->
@@ -122,25 +120,11 @@ const handleLogout = () => {
   text-decoration: none;
 }
 
-.logo-box {
-  width: 36px;
-  height: 36px;
-  background: #0fb361;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #050505;
-  font-weight: 950;
-  font-size: 18px;
-  box-shadow: 0 0 15px rgba(15, 179, 97, 0.3);
-  overflow: hidden;
-}
-
-.logo-letter {
-  font-size: 22px;
-  font-weight: 950;
-  line-height: 1;
+.logo-image {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(15, 179, 97, 0.2));
 }
 
 .logo-text {

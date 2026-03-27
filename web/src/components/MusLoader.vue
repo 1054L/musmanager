@@ -27,9 +27,7 @@ defineProps({
   ]">
     <div class="loader-content">
       <div class="logo-animation-wrapper">
-        <div class="logo-box-animated">
-          <span class="logo-letter">M</span>
-        </div>
+        <img src="/logo.png" class="logo-image-animated" alt="Mus Manager Logo" />
         <div class="pulse-ring"></div>
         <div class="pulse-ring-outer"></div>
       </div>
@@ -75,33 +73,20 @@ defineProps({
 
 .logo-animation-wrapper {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.logo-box-animated {
-  width: 44px;
-  height: 44px;
-  background: #0fb361;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #050505;
-  box-shadow: 0 0 30px rgba(15, 179, 97, 0.4);
+.logo-image-animated {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
   z-index: 10;
   animation: logo-float 2s ease-in-out infinite;
-}
-
-.logo-letter {
-  font-size: 26px;
-  font-weight: 950;
-  font-style: italic;
-  line-height: 1;
-  transform: translateY(-1px);
+  filter: drop-shadow(0 0 20px rgba(15, 179, 97, 0.3));
 }
 
 .pulse-ring, .pulse-ring-outer {

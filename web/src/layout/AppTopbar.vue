@@ -10,7 +10,7 @@ const { layoutConfig, toggleMenu } = useLayout();
 <template>
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo flex align-items-center gap-3 no-underline">
-            <div class="w-10 h-10 bg-[#0fb361] rounded-xl flex items-center justify-center text-[#050505] font-black text-xl shadow-lg shadow-[#0fb361]/20">M</div>
+            <img src="/logo.png" class="w-10 h-10 object-contain drop-shadow-lg" alt="Mus Manager Logo" />
             <span class="text-white font-black italic tracking-tighter text-xl">MUS MANAGER</span>
         </router-link>
 

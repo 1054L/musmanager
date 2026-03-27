@@ -1,35 +1,17 @@
 services:
-  database:
-    image: postgres:16-alpine
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-mus_manager}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMeInProd!}
-      POSTGRES_USER: ${POSTGRES_USER:-mus_user}
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-d", "${POSTGRES_DB:-mus_manager}", "-U", "${POSTGRES_USER:-mus_user}" ]
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    volumes:
-      - database_data:/var/lib/postgresql/data:rw
-    networks:
-      - internal
-
   api:
     build:
       context: ./api
       dockerfile: Dockerfile.prod
     restart: always
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-mus_user}:${POSTGRES_PASSWORD:-!ChangeMeInProd!}@database:5432/${POSTGRES_DB:-mus_manager}?serverVersion=16&charset=utf8
+      DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
       DEFAULT_URI: https://musmanager.com
       APP_ENV: prod
       APP_DEBUG: 0
       APP_SECRET: ${APP_SECRET:-PleaseChangeMeToSomethingSecure}
-    depends_on:
-      database:
-        condition: service_healthy
+    volumes:
+      - api_var:/var/www/html/var
     networks:
       - internal
       - proxy
@@ -64,6 +46,6 @@ networks:
     driver: bridge
 
 volumes:
-  database_data:
+  api_var:
   proxy_data:
   proxy_letsencrypt:

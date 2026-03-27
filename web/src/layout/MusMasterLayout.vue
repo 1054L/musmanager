@@ -47,12 +47,10 @@ provide('openAuthModal', openAuthModal)
     <footer class="mus-footer">
       <div class="mus-footer-grid">
         <div class="footer-brand">
-           <div class="footer-logo">
-              <div class="logo-box">
-                <span class="logo-letter mus-gold-text">M</span>
-              </div>
-              <span class="logo-title mus-gold-text">Mus Manager</span>
-           </div>
+            <div class="footer-logo">
+               <img src="/logo.png" class="logo-image-footer" alt="Mus Manager Logo" />
+               <span class="logo-title mus-gold-text">Mus Manager</span>
+            </div>
            <p class="footer-desc">
              {{ $t('footer.desc') }}
            </p>
@@ -214,23 +212,11 @@ provide('openAuthModal', openAuthModal)
   gap: 12px;
 }
 
-.logo-box {
-  width: 32px;
-  height: 32px;
-  background: #0fb361;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #050505;
-  font-weight: 900;
-  overflow: hidden;
-}
-
-.logo-letter {
-  font-size: 18px;
-  font-weight: 950;
-  line-height: 1;
+.logo-image-footer {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(15, 179, 97, 0.2));
 }
 
 .logo-title {
