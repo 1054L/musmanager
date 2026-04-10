@@ -133,7 +133,7 @@
       "new_team_desc": "Registra una pareja participante"
     },
     "delete_confirm_title": "Eliminar Torneo",
-    "delete_confirm_msg": "¿Estás seguro de que deseas eliminar este torneo? Todos los datos asociados (parejas, partidos) se perderán permanentemente. Esta acción no se puede deshacer.",
+    "delete_confirm_msg": "¿Estás seguro de que deseas eliminar este torneo? Todos los datos asociados (parejas, partidas) se perderán permanentemente. Esta acción no se puede deshacer.",
     "delete_success": "Torneo eliminado correctamente"
   },
   "footer": {
@@ -242,7 +242,7 @@
       "pending": "Pendiente"
     },
     "tabs": {
-      "matches": "Partidos",
+      "matches": "Partidas",
       "standings": "Clasificación",
       "bracket": "Cuadro",
       "teams": "Equipos",
@@ -311,6 +311,6 @@
     "no_group": "Sin Grupo",
     "groups_count_label": "Número de Grupos",
     "draw_groups": "Sorteo de Grupos",
-    "generate_matches": "Generar Calendario de Partidos"
+    "generate_matches": "Generar Calendario de Partidas"
   }
 }

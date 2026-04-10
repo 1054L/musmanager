@@ -35,8 +35,8 @@ class TournamentVoter extends Voter
             return false;
         }
 
-        // Superadmin and Admin have full access
-        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles()) || in_array('ROLE_ADMIN', $user->getRoles())) {
+        // Superadmin has full access
+        if (in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
             return true;
         }
 

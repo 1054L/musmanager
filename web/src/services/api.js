@@ -13,13 +13,13 @@ export const authService = {
     }
 
     const user = await response.json();
-    const authData = { 
-      email, 
+    const authData = {
+      email,
       password, // Storing for Basic Auth simulation
       roles: user.roles,
       id: user.id
     };
-    
+
     localStorage.setItem('user', JSON.stringify(authData));
     return authData;
   },
@@ -140,7 +140,7 @@ export const tournamentService = {
     const isFormData = data instanceof FormData;
     // Using POST for update to better support file uploads in various environments
     const response = await fetch(`${API_URL}/admin/tournament/${uuid}`, {
-      method: 'POST', 
+      method: 'POST',
       headers: {
         ...authService.getAuthHeader(),
         ...(isFormData ? {} : { 'Content-Type': 'application/json' })
@@ -235,7 +235,7 @@ export const tournamentService = {
       headers: authService.getAuthHeader()
     });
     if (!response.ok) {
-      let errorMessage = 'Error al generar partidos';
+      let errorMessage = 'Error al generar partidas';
       try {
         const errorData = await response.json();
         errorMessage = errorData.error || errorData.detail || errorData.title || errorMessage;

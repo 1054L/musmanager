@@ -26,19 +26,7 @@ onMounted(() => {
     </div>
     
     <div v-else class="relative h-full min-h-[100px] flex align-items-center justify-content-center p-4">
-      <div class="absolute top-2 right-4 text-[8px] font-black text-slate-600 uppercase tracking-widest">Publicidad de Google</div>
-      
-      <!-- Placeholder content that looks like a real ad -->
-      <div class="flex align-items-center gap-6">
-        <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-[#0fb361] to-[#0ca358] flex align-items-center justify-center shadow-lg">
-          <i class="pi pi-verified text-2xl text-black"></i>
-        </div>
-        <div class="space-y-1">
-          <h4 class="text-white font-black italic uppercase text-lg m-0">¡Únete al Torneo Nacional!</h4>
-          <p class="text-slate-400 text-xs font-bold m-0 italic">Aprende de los maestros del Mus. Solo este fin de semana.</p>
-          <div class="mt-2 inline-flex align-items-center bg-[#0fb361] text-black text-[10px] font-black px-4 py-1 rounded-full uppercase">Saber más</div>
-        </div>
-      </div>
+      <div class="absolute top-2 right-4 text-[8px] font-black text-slate-600 uppercase tracking-widest w-full h-full" style="border: 1px solid white;"></div>
     </div>
   </div>
 </template>

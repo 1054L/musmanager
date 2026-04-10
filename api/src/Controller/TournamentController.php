@@ -25,7 +25,7 @@ class TournamentController extends AbstractController
     {
         $user = $this->getUser();
         
-        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_SUPER_ADMIN')) {
+        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
             $tournaments = $tournamentRepository->findBy([], ['id' => 'DESC']);
         } else {
             $tournaments = $tournamentRepository->findManagedByUser($user);
