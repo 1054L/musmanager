@@ -211,7 +211,7 @@ const saveMatchResult = async () => {
 
       <!-- Main Content Container -->
       <div :class="showActivity ? 'col-12 lg:col-8' : 'col-12'">
-        <div class="card p-6 mus-glass border-white/5">
+        <div class="card p-3 md:p-6 mus-glass border-white/5">
            <div class="flex gap-4 mb-2 border-b border-white/5 pb-4">
               <button v-if="tournament.type !== 'eliminatory'" @click="activeTab = 'matches'" 
                       class="mus-tab-btn" :class="{ active: activeTab === 'matches' }">
@@ -409,8 +409,8 @@ const saveMatchResult = async () => {
                 <p>{{ t('tournament_view.bracket.empty_desc') }}</p>
               </div>
               <div v-else>
-                <div class="flex overflow-x-auto py-8 px-2 gap-8 bracket-container justify-content-center">
-                  <div v-for="col in bracketMatches" :key="col.stage" class="flex flex-column justify-content-around gap-6 min-w-[280px] w-[320px] relative">
+                <div class="flex overflow-x-auto py-8 px-2 gap-4 md:gap-8 bracket-container">
+                   <div v-for="col in bracketMatches" :key="col.stage" class="flex flex-column justify-content-around gap-6 min-w-[280px] w-[320px] relative">
                      <h4 class="text-center font-black uppercase tracking-widest text-[#0fb361] text-xs mb-2 bg-[#0fb361]/10 py-2 rounded">{{ col.stage }}</h4>
                      <div class="flex-1 flex flex-column justify-content-around gap-6">
                         <div v-for="(m, i) in col.matches" :key="i" class="card bg-[#0a0a0a] border border-white/10 p-4 rounded-xl relative hover:border-[#0fb361]/50 cursor-pointer transition-colors" @click="tournament.isManager ? openEditModal(m) : null">

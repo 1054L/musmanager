@@ -175,17 +175,29 @@ provide('openAuthModal', openAuthModal)
 .mus-content-wrapper {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 12px;
+}
+
+@media (min-width: 768px) {
+  .mus-content-wrapper {
+    padding: 0 24px;
+  }
 }
 
 .mus-footer {
   position: relative;
   z-index: 10;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 120px 24px 80px;
+  padding: 80px 16px 60px;
   max-width: 1280px;
   margin: 0 auto;
   width: 100%;
+}
+
+@media (min-width: 768px) {
+  .mus-footer {
+    padding: 120px 24px 80px;
+  }
 }
 
 .mus-footer-grid {
