@@ -33,6 +33,7 @@ services:
       APP_SECRET: ${APP_SECRET}
     volumes:
       - api_var:/var/www/html/var
+      - uploads_data:/var/www/html/public/uploads
     networks:
       - internal
       - proxy
@@ -69,5 +70,6 @@ networks:
 volumes:
   db_data:
   api_var:
+  uploads_data:
   proxy_data:
   proxy_letsencrypt:
