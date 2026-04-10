@@ -1,11 +1,32 @@
 services:
+  database:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD:-!ChangeMe!}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD:-!ChangeMe!}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   api:
     build:
       context: ./api
       dockerfile: Dockerfile.prod
     restart: always
+    depends_on:
+      database:
+        condition: service_healthy
     environment:
-      DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
+      DATABASE_URL: mysql://app:${DATABASE_PASSWORD:-!ChangeMe!}@database:3306/app?serverVersion=8.0.32&charset=utf8mb4
       DEFAULT_URI: https://musmanager.com
       APP_ENV: prod
       APP_DEBUG: 0
@@ -46,6 +67,7 @@ networks:
     driver: bridge
 
 volumes:
+  db_data:
   api_var:
   proxy_data:
   proxy_letsencrypt:
