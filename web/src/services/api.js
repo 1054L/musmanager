@@ -92,7 +92,9 @@ export const tournamentService = {
 
   async getPublicTournaments() {
     try {
-      const response = await fetch(`${API_URL}/public/tournaments`);
+      const response = await fetch(`${API_URL}/public/tournaments`, {
+        headers: authService.getAuthHeader()
+      });
       if (!response.ok) {
         let errorData;
         try {

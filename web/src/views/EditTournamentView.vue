@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { tournamentService, teamService } from '../services/api'
 import { useI18n } from 'vue-i18n'
+import MusLoader from '../components/MusLoader.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -209,11 +210,18 @@ const handlePublish = async () => {
     </header>
 
     <!-- Loading skeleton -->
-    <div v-if="loading" class="form-card mus-glass flex items-center justify-center" style="min-height:300px;">
-      <div class="spinner-lg"></div>
+    <div v-if="loading" class="form-card mus-glass flex items-center justify-center" style="min-height:600px;">
+      <MusLoader />
     </div>
 
-    <div v-else class="form-card mus-glass">
+    <div v-else class="form-card mus-glass relative overflow-hidden">
+      <!-- Saving Overlay -->
+      <div v-if="saving" class="absolute inset-0 z-50 flex flex-column items-center justify-center bg-black/60 backdrop-blur-sm rounded-3xl">
+        <MusLoader />
+        <p class="mt-4 text-[#0fb361] font-black italic uppercase tracking-widest text-xs animate-pulse">
+          {{ t('tournament_form.actions.saving') }}
+        </p>
+      </div>
       <form @submit.prevent="handleSave" class="mus-form">
         <div v-if="error" class="error-msg">{{ error }}</div>
         <div v-if="success" class="success-msg">
@@ -436,8 +444,8 @@ const handlePublish = async () => {
           
           <div class="flex-1 flex gap-4">
             <button type="submit" :disabled="saving || success" class="mus-btn-primary flex-1">
-              <i class="pi" :class="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
-              <span>{{ saving ? $t('tournament_form.actions.saving') : $t('tournament_form.actions.save') }}</span>
+              <i class="pi" :class="saving ? 'pi-spin pi-spinner opacity-0' : 'pi-save'"></i>
+              <span>{{ saving ? t('tournament_form.actions.saving') : t('tournament_form.actions.save') }}</span>
             </button>
             
             <button v-if="form.status === 'draft'" type="button" @click="handlePublish" 

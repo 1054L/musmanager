@@ -318,7 +318,10 @@
     "active_matches_desc": "Registra los resultados de los enfrentamientos para actualizar la clasificación",
     "match_edit": {
       "title": "Ingresar Resultado",
-      "save": "Guardar Resultado"
+      "save": "Guardar Resultado",
+      "local": "Local",
+      "visitor": "Visitante",
+      "rule_summary": "Partida a {games} chicos de {points} tantos"
     },
     "activity": {
       "title": "Actividad Reciente",

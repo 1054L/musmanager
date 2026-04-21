@@ -4,6 +4,7 @@ import { tournamentService } from '../services/api'
 import { useRouter } from 'vue-router'
 
 import { useI18n } from 'vue-i18n'
+import MusLoader from '../components/MusLoader.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -117,7 +118,14 @@ const handleCreate = async () => {
       <h1 class="mus-h1 italic mt-8">{{ $t('tournament_form.create_title') }}</h1>
     </header>
 
-    <div class="form-card mus-glass">
+    <div class="form-card mus-glass relative overflow-hidden">
+      <!-- Loading Overlay -->
+      <div v-if="loading" class="absolute inset-0 z-50 flex flex-column items-center justify-center bg-black/60 backdrop-blur-sm rounded-3xl">
+        <MusLoader />
+        <p class="mt-4 text-[#0fb361] font-black italic uppercase tracking-widest text-xs animate-pulse">
+          {{ t('tournament_form.actions.saving') }}
+        </p>
+      </div>
       <form @submit.prevent="handleCreate" class="mus-form">
         <div v-if="error" class="error-msg">{{ error }}</div>
 
@@ -269,9 +277,9 @@ const handleCreate = async () => {
                     class="mus-input min-h-[100px] py-4"></textarea>
         </div>
 
-        <button type="submit" :disabled="loading" class="mus-button-primary w-full mt-4">
-          <span v-if="loading" class="spinner mr-2"></span>
-          {{ loading ? $t('tournament_form.actions.saving') : '🏆 ' + $t('tournament_form.actions.create') }}
+        <button type="submit" :disabled="loading" class="mus-btn-primary w-full mt-4">
+          <i v-if="!loading" class="pi pi-trophy mr-2"></i>
+          {{ loading ? t('tournament_form.actions.saving') : t('tournament_form.actions.create') }}
         </button>
       </form>
     </div>

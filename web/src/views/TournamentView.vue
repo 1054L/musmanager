@@ -123,6 +123,17 @@ const openEditModal = (match) => {
   editScore2.value = match.scoreB
 }
 
+const adjustScore = (team, amount) => {
+  const max = tournament.value?.ruleGames || 40 // Default to 40 if not set, though usually it's 2, 3 or 4
+  if (team === 1) {
+    const newVal = editScore1.value + amount
+    if (newVal >= 0 && newVal <= max) editScore1.value = newVal
+  } else {
+    const newVal = editScore2.value + amount
+    if (newVal >= 0 && newVal <= max) editScore2.value = newVal
+  }
+}
+
 const saveMatchResult = async () => {
   isSavingResult.value = true
   try {
@@ -559,26 +570,79 @@ const openPoster = () => {
     </template>
 
     <!-- Dialogs -->
-    <Dialog v-model:visible="editingMatch" modal :header="t('tournament_view.match_edit.title')" :style="{ width: '400px' }" class="mus-dialog">
-      <div v-if="editingMatch" class="p-4">
+    <Dialog v-model:visible="editingMatch" modal :header="t('tournament_view.match_edit.title')" :style="{ width: '460px' }" class="mus-dialog">
+      <div v-if="editingMatch" class="p-6">
         <div class="flex flex-column gap-6">
-          <div class="flex align-items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-            <span class="font-black text-white italic">{{ editingMatch.teamA }}</span>
-            <input v-model.number="editScore1" type="number" class="mus-input w-20 text-center text-xl font-black" min="0" max="40">
+          <!-- Team A scorecard -->
+          <div class="p-6 bg-white/[0.02] rounded-3xl border border-white/5 flex flex-column align-items-center gap-5 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-[#0fb361]/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+            
+            <div class="flex flex-column align-items-center relative z-10 text-center">
+              <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#0fb361] mb-2 opacity-60">{{ t('tournament_view.match_edit.local') }}</span>
+              <span class="font-black text-white italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamA }}</span>
+            </div>
+
+            <div class="flex align-items-center justify-content-center gap-5 relative z-10">
+              <button @click="adjustScore(1, -1)" class="stepper-btn-v3" :disabled="editScore1 <= 0">
+                <i class="pi pi-minus"></i>
+              </button>
+              <div class="score-display-v2">
+                <input v-model.number="editScore1" type="number" readonly class="score-input-v2" :max="tournament.ruleGames">
+              </div>
+              <button @click="adjustScore(1, 1)" class="stepper-btn-v3" :disabled="editScore1 >= (tournament.ruleGames || 40)">
+                <i class="pi pi-plus"></i>
+              </button>
+            </div>
           </div>
-          <div class="flex align-items-center justify-content-center opacity-20">
-            <div class="h-px bg-white flex-1"></div>
-            <span class="mx-4 text-xs font-black uppercase tracking-widest">VS</span>
-            <div class="h-px bg-white flex-1"></div>
+
+          <!-- Battle Divider -->
+          <div class="flex align-items-center justify-content-center py-1">
+            <div class="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent flex-1"></div>
+            <div class="mx-8 px-5 py-2 rounded-full border border-white/10 bg-[#0c0d0c] shadow-2xl z-10">
+               <span class="text-[11px] font-black uppercase tracking-[0.5em] text-slate-600">VS</span>
+            </div>
+            <div class="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent flex-1"></div>
           </div>
-          <div class="flex align-items-center justify-content-between p-4 bg-white/5 rounded-2xl border border-white/5">
-            <span class="font-black text-white italic">{{ editingMatch.teamB }}</span>
-            <input v-model.number="editScore2" type="number" class="mus-input w-20 text-center text-xl font-black" min="0" max="40">
+
+          <!-- Team B scorecard -->
+          <div class="p-6 bg-white/[0.02] rounded-3xl border border-white/5 flex flex-column align-items-center gap-5 relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-[#0fb361]/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+            
+            <div class="flex flex-column align-items-center relative z-10 text-center">
+              <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#0fb361] mb-2 opacity-60">{{ t('tournament_view.match_edit.visitor') }}</span>
+              <span class="font-black text-white italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamB }}</span>
+            </div>
+
+            <div class="flex align-items-center justify-content-center gap-5 relative z-10">
+              <button @click="adjustScore(2, -1)" class="stepper-btn-v3" :disabled="editScore2 <= 0">
+                <i class="pi pi-minus"></i>
+              </button>
+              <div class="score-display-v2">
+                <input v-model.number="editScore2" type="number" readonly class="score-input-v2" :max="tournament.ruleGames">
+              </div>
+              <button @click="adjustScore(2, 1)" class="stepper-btn-v3" :disabled="editScore2 >= (tournament.ruleGames || 40)">
+                <i class="pi pi-plus"></i>
+              </button>
+            </div>
           </div>
         </div>
-        <div class="mt-8 flex gap-4">
-          <Button :label="t('tournament_form.actions.cancel')" text @click="editingMatch = null" class="flex-1 p-button-secondary font-black uppercase text-xs" />
-          <Button :label="t('tournament_view.match_edit.save')" @click="saveMatchResult" :loading="isSavingResult" class="flex-1 mus-btn-primary" />
+
+        <!-- Rule Summary Footer -->
+        <div class="mt-8 p-4 rounded-2xl bg-[#0fb361]/5 border border-[#0fb361]/10 flex align-items-center gap-3">
+            <i class="pi pi-info-circle text-[#0fb361]"></i>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                {{ t('tournament_view.match_edit.rule_summary', { games: tournament.ruleGames || '...', points: tournament.rulePoints || '...' }) }}
+            </span>
+        </div>
+
+        <div class="mt-10 flex gap-4">
+          <button @click="editingMatch = null" class="mus-btn-secondary flex-1">
+            {{ t('tournament_form.actions.cancel') }}
+          </button>
+          <button @click="saveMatchResult" :disabled="isSavingResult" class="mus-btn-primary flex-1">
+            <i v-if="isSavingResult" class="pi pi-spin pi-spinner mr-2"></i>
+            {{ t('tournament_view.match_edit.save') }}
+          </button>
         </div>
       </div>
     </Dialog>
@@ -627,6 +691,79 @@ th { border-bottom: 1px solid rgba(255,255,255,0.05); }
 .rule-icon-item:hover {
   opacity: 0.8;
 }
+
+/* Premium Scorecard V3 Styles */
+.stepper-btn-v3 {
+  width: 58px;
+  height: 52px;
+  background: linear-gradient(180deg, rgba(15, 179, 97, 0.15) 0%, rgba(15, 179, 97, 0.05) 100%);
+  border: 1px solid rgba(15, 179, 97, 0.3);
+  border-bottom: 3px solid rgba(15, 179, 97, 0.5); /* 3D effect */
+  border-radius: 16px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 18px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.stepper-btn-v3:hover:not(:disabled) {
+  background: var(--primary);
+  color: #050505;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px var(--primary-glow);
+}
+
+.stepper-btn-v3:active:not(:disabled) {
+  transform: translateY(1px);
+  border-bottom-width: 1px;
+}
+
+.stepper-btn-v3:disabled {
+  opacity: 0.05;
+  cursor: not-allowed;
+  filter: grayscale(1);
+  border-bottom-width: 1px;
+}
+
+.score-display-v2 {
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  width: 110px;
+  height: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 6px 20px rgba(0, 0, 0, 0.9);
+}
+
+.score-input-v2 {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 48px;
+  font-weight: 950;
+  text-align: center;
+  width: 100%;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  font-style: italic;
+  letter-spacing: -2px;
+  text-shadow: 0 0 20px rgba(15, 179, 97, 0.3);
+}
+
+/* Remove Arrows from Number Input */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+input[type=number] { -moz-appearance: textfield; }
 
 .mus-btn-gold {
   background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #aa771c 100%) !important;

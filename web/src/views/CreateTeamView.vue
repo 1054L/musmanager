@@ -1,61 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { teamService, tournamentService } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import MusLoader from '../components/MusLoader.vue'
+import TeamEnrollmentForm from '../components/TeamEnrollmentForm.vue'
 
 const { t } = useI18n()
 const router = useRouter()
 
-const form = ref({
-  name: '',
-  tournamentId: null
-})
-
-const tournaments = ref([])
-const loading = ref(false)
-const saving = ref(false)
-const error = ref(null)
-const success = ref(false)
-
-onMounted(async () => {
-  loading.value = true
-  try {
-    tournaments.value = await tournamentService.getManagedTournaments()
-    // By default select the first one if available
-    if (tournaments.value.length > 0) {
-      form.value.tournamentId = tournaments.value[0].id
-    }
-  } catch (e) {
-    error.value = t('team_form.error_loading_tournaments')
-  } finally {
-    loading.value = false
-  }
-})
-
-const handleCreate = async () => {
-  saving.value = true
-  error.value = null
-  success.value = false
-  try {
-    await teamService.createTeam({
-      name: form.value.name,
-      tournamentId: form.value.tournamentId
-    })
-    
-    // Clear name but KEEP tournamentId for "sticky" behavior
-    form.value.name = ''
-    success.value = true
-    
-    // Optional: Hide success message after 3 seconds
-    setTimeout(() => { success.value = false }, 3000)
-    
-  } catch (e) {
-    error.value = e.message
-  } finally {
-    saving.value = false
-  }
+const handleSuccess = () => {
+  // Optional: redirect or show message. 
+  // The component already shows a success message.
 }
 </script>
 
@@ -64,39 +17,13 @@ const handleCreate = async () => {
     <header class="form-header">
       <button @click="router.push('/dashboard')" class="back-link">
         <i class="pi pi-arrow-left"></i>
-        {{ $t('tournament_form.back_dashboard') }}
+        {{ t('tournament_form.back_dashboard') }}
       </button>
-      <h1 class="mus-h1 italic mt-8">{{ $t('team_form.title') }}</h1>
+      <h1 class="mus-h1 italic mt-8">{{ t('team_form.title') }}</h1>
     </header>
 
     <div class="form-card mus-glass">
-      <MusLoader v-if="loading" />
-      <MusLoader v-if="saving" overlay />
-      
-      <form v-if="!loading" @submit.prevent="handleCreate" class="mus-form">
-        <div v-if="error" class="error-msg">{{ error }}</div>
-        <div v-if="success" class="success-msg">{{ $t('team_form.success_msg') }}</div>
-
-        <!-- Seleccionar Torneo -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('team_form.tournament') }} <span class="required">*</span></label>
-          <select v-model="form.tournamentId" required class="mus-input">
-            <option v-for="t in tournaments" :key="t.id" :value="t.id">
-              {{ t.name }} ({{ $t('tournament_card.status.' + t.status) }})
-            </option>
-          </select>
-        </div>
-
-        <!-- Nombre del Equipo -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('team_form.name') }} <span class="required">*</span></label>
-          <input v-model="form.name" type="text" required :placeholder="$t('team_form.name_placeholder')" class="mus-input">
-        </div>
-
-        <button type="submit" :disabled="saving" class="mus-btn-primary w-full mt-4">
-          {{ saving ? $t('tournament_form.actions.saving') : '👥 ' + $t('team_form.submit') }}
-        </button>
-      </form>
+      <TeamEnrollmentForm standalone @success="handleSuccess" />
     </div>
   </div>
 </template>

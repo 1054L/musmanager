@@ -6,10 +6,14 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MusLoader from '../components/MusLoader.vue'
 import GoogleAd from '../components/GoogleAd.vue'
+import { authService } from '../services/api'
 
 const { t, locale } = useI18n()
 const router = useRouter()
 const tournamentStore = useTournamentStore()
+
+const user = authService.getUser()
+const isSuperAdmin = user?.roles?.includes('ROLE_SUPER_ADMIN')
 
 // Use storeToRefs to maintain reactivity
 const { tournaments, loading, error } = storeToRefs(tournamentStore)
@@ -84,6 +88,17 @@ onMounted(() => {
             <div class="meta-item">
               <i class="pi pi-calendar"></i>
               <span>{{ formatDate(tny.startDate) }}</span>
+            </div>
+            <!-- Admin Only: Owner Info -->
+            <div v-if="isSuperAdmin && tny.owner" class="admin-meta mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+              <div class="flex items-center gap-2 text-[10px] font-black text-rose-400">
+                <i class="pi pi-shield text-[10px]"></i>
+                <span class="uppercase tracking-widest">Admin Info</span>
+              </div>
+              <div class="mt-1 text-[11px] text-slate-300 font-bold">
+                <span class="text-slate-500">Owner:</span> {{ tny.owner.name }} 
+                <span class="text-slate-600 bg-black/40 px-2 py-0.5 rounded ml-2">ID: {{ tny.owner.id }}</span>
+              </div>
             </div>
           </div>
 

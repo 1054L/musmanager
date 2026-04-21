@@ -47,6 +47,7 @@ class TournamentController extends AbstractController
                 'location' => $t->getLocation(),
                 'posterPath' => $t->getPosterPath(),
                 'teamsCount' => count($t->getTournamentTeams()),
+                'hasMatches' => count($t->getMatches()) > 0,
             ];
         }, $tournaments));
     }
@@ -350,6 +351,10 @@ class TournamentController extends AbstractController
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
         if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
 
+        if (count($tournament->getMatches()) > 0) {
+            return new JsonResponse(['error' => 'Ya existe un calendario generado para este torneo'], 400);
+        }
+
         $groups = [];
         foreach ($tournament->getTournamentTeams() as $tt) {
             $gn = $tt->getGroupName() ?: 'Sin Grupo';
@@ -481,9 +486,11 @@ class TournamentController extends AbstractController
     public function listPublic(TournamentRepository $tournamentRepository): JsonResponse
     {
         $tournaments = $tournamentRepository->findBy(['status' => ['active', 'pending']], ['id' => 'DESC']);
+        $user = $this->getUser();
+        $isSuperAdmin = $user && in_array('ROLE_SUPER_ADMIN', $user->getRoles());
 
-        return new JsonResponse(array_map(function(Tournament $t) {
-            return [
+        return new JsonResponse(array_map(function(Tournament $t) use ($isSuperAdmin) {
+            $data = [
                 'id' => $t->getId(),
                 'name' => $t->getName(),
                 'uuid' => $t->getUuidAccessToken(),
@@ -497,8 +504,18 @@ class TournamentController extends AbstractController
                 'posterPath' => $t->getPosterPath(),
                 'location' => $t->getLocation(),
                 'teamsCount' => count($t->getTournamentTeams()),
-                'playerCount' => 24, // Keep for legacy if needed, but we'll use teamsCount
+                'playerCount' => 24,
             ];
+
+            if ($isSuperAdmin) {
+                $owner = $t->getCreatedBy();
+                $data['owner'] = [
+                    'id' => $owner ? $owner->getId() : null,
+                    'name' => $owner ? ($owner->getPlayer() ? $owner->getPlayer()->getName() : $owner->getEmail()) : 'System'
+                ];
+            }
+
+            return $data;
         }, $tournaments));
     }
 }

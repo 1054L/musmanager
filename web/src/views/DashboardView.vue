@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { tournamentService, authService } from '../services/api'
+import { tournamentService, teamService, authService } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import DataTable from 'primevue/datatable'
@@ -9,6 +9,7 @@ import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import Popover from 'primevue/popover'
 import MusLoader from '../components/MusLoader.vue'
+import TeamEnrollmentForm from '../components/TeamEnrollmentForm.vue'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -24,6 +25,9 @@ const error = ref(null)
 const copiedUuid = ref(null)
 const posterOp = ref(null)
 const hoveredPoster = ref(null)
+const processingUuid = ref(null)
+const enrollOp = ref(null)
+const selectedTnyForEnroll = ref(null)
 
 const onPosterHover = (event, posterPath) => {
   hoveredPoster.value = posterPath
@@ -76,6 +80,41 @@ const copyToClipboard = async (uuid) => {
   }
 }
 
+const handleGenerateGroups = async (tournament) => {
+  const count = prompt(t('tournament_mgmt.groups_count_label'), '2')
+  if (count === null) return 
+  
+  const groupsCount = parseInt(count)
+  if (isNaN(groupsCount) || groupsCount < 1) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Número de grupos inválido', life: 3000 })
+    return
+  }
+
+  processingUuid.value = tournament.uuid
+  try {
+    await tournamentService.generateGroups(tournament.uuid, groupsCount)
+    toast.add({ severity: 'success', summary: t('tournament_mgmt.draw_groups'), detail: 'Grupos generados con éxito', life: 3000 })
+    await fetchTournaments()
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+  } finally {
+    processingUuid.value = null
+  }
+}
+
+const handleGenerateMatches = async (tournament) => {
+  processingUuid.value = tournament.uuid
+  try {
+    await tournamentService.generateMatches(tournament.uuid)
+    toast.add({ severity: 'success', summary: t('tournament_mgmt.generate_matches'), detail: 'Calendario generado con éxito', life: 3000 })
+    await fetchTournaments()
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+  } finally {
+    processingUuid.value = null
+  }
+}
+
 const fetchTournaments = async () => {
   loading.value = true
   error.value = null
@@ -111,6 +150,17 @@ const toggleDebug = () => {
   }
 }
 
+const openEnroll = (event, tournament) => {
+  selectedTnyForEnroll.value = tournament
+  enrollOp.value.toggle(event)
+}
+
+const handleEnrollSuccess = () => {
+  toast.add({ severity: 'success', summary: t('tournament_mgmt.enroll'), detail: 'Pareja inscrita correctamente', life: 3000 })
+  enrollOp.value.hide()
+  fetchTournaments()
+}
+
 const getStatusSeverity = (status) => {
   switch (status) {
     case 'active': return 'success';
@@ -136,7 +186,9 @@ const quickActions = [
   }
 ]
 
-onMounted(fetchTournaments)
+onMounted(() => {
+  fetchTournaments()
+})
 </script>
 
 <template>
@@ -256,6 +308,27 @@ onMounted(fetchTournaments)
                  <i :class="copiedUuid === slotProps.data.uuid ? 'pi pi-check text-[#0fb361]' : 'pi pi-copy'"></i>
                </button>
 
+               <!-- Quick Actions: Enroll, Sorteo & Calendario -->
+               <button class="row-action-btn"
+                       @click="openEnroll($event, slotProps.data)"
+                       v-tooltip.top="t('tournament_mgmt.enroll')">
+                   <i class="pi pi-user-plus"></i>
+               </button>
+
+               <button class="row-action-btn"
+                       @click="handleGenerateGroups(slotProps.data)"
+                       :disabled="processingUuid === slotProps.data.uuid"
+                       v-tooltip.top="t('tournament_mgmt.draw_groups')">
+                   <i class="pi" :class="processingUuid === slotProps.data.uuid ? 'pi-spin pi-spinner' : 'pi-sitemap'"></i>
+               </button>
+
+               <button class="row-action-btn"
+                       @click="handleGenerateMatches(slotProps.data)"
+                       :disabled="processingUuid === slotProps.data.uuid"
+                       v-tooltip.top="t('tournament_mgmt.generate_matches')">
+                   <i class="pi" :class="processingUuid === slotProps.data.uuid ? 'pi-spin pi-spinner' : 'pi-calendar'"></i>
+               </button>
+
                <!-- Edit -->
                <router-link :to="`/admin/tournament/${slotProps.data.uuid}/edit`"
                        class="row-action-btn"
@@ -280,6 +353,20 @@ onMounted(fetchTournaments)
           <img v-if="hoveredPoster" 
                :src="hoveredPoster" 
                alt="Poster">
+        </div>
+      </Popover>
+
+      <!-- Quick Enrollment Popover -->
+      <Popover ref="enrollOp" class="mus-glass-dark p-0 border-white/10 shadow-2xl overflow-hidden">
+        <div class="p-6 w-[320px]">
+          <div class="text-[10px] uppercase font-black tracking-widest text-[#0fb361] mb-6">
+              {{ t('team_form.title') }}
+          </div>
+          <TeamEnrollmentForm 
+            v-if="selectedTnyForEnroll"
+            :tournamentId="selectedTnyForEnroll.id" 
+            @success="handleEnrollSuccess"
+            @cancel="enrollOp.hide()" />
         </div>
       </Popover>
     </section>
@@ -312,6 +399,11 @@ onMounted(fetchTournaments)
   box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
   overflow: hidden;
   border-radius: 12px;
+}
+
+:deep(.poster-preview-popover::before),
+:deep(.poster-preview-popover::after) {
+  display: none !important; /* Remove the arrow for a cleaner "hover" look */
 }
 
 :deep(.poster-preview-popover::before),

@@ -4,9 +4,11 @@
   --bg-deep: #050505;
   --surface: #0a0a0a;
   --surface-hover: #111111;
-  --border: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.03);
+  --primary-glow: rgba(15, 179, 97, 0.15);
+  --bg-darker: #050505;
   --text-main: #ffffff;
-  --text-muted: #94a3b8;
+  --text-muted: #64748b;
 }
 
 body {
@@ -29,11 +31,19 @@ body {
 
 /* Premium Utilities */
 .mus-glass {
-  background: rgba(15, 179, 97, 0.03);
+  background: rgba(15, 179, 97, 0.02);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mus-glass-dark {
+  background: rgba(5, 5, 5, 0.94);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 1);
 }
 
 .mus-glass:hover {
@@ -82,4 +92,78 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 900;
+}
+
+/* Global PrimeVue Popover Overrides (Deep Dark Mode Refined) */
+.p-popover, 
+.p-popover-content, 
+.p-popover-arrow {
+  background: #0c0d0c !important; /* Slightly lighter and neutral-greenish */
+  color: white !important;
+}
+
+.p-popover {
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border: 1px solid rgba(15, 179, 97, 0.4) !important; /* Corporate primary border */
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9) !important;
+  border-radius: 24px !important;
+  padding: 0 !important;
+}
+
+.p-popover::before,
+.p-popover::after,
+.p-popover-arrow::before {
+  display: none !important;
+}
+
+.p-popover-content {
+  border-radius: 24px !important;
+  padding: 0 !important;
+}
+
+/* Global PrimeVue Dialog Overrides (Premium Dark Glass) */
+.p-dialog {
+  background: #0c0d0c !important;
+  backdrop-filter: blur(40px) !important;
+  -webkit-backdrop-filter: blur(40px) !important;
+  border: 1px solid rgba(15, 179, 97, 0.4) !important;
+  box-shadow: 0 40px 150px rgba(0, 0, 0, 1) !important;
+  border-radius: 28px !important;
+  overflow: hidden !important; /* Eliminate internal scrolls */
+}
+
+.p-dialog-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+  padding: 24px 32px !important;
+  color: white !important;
+}
+
+.p-dialog-title {
+  font-size: 11px !important;
+  font-weight: 950 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3em !important;
+  color: var(--primary) !important;
+}
+
+.p-dialog-content {
+  background: transparent !important;
+  padding: 0 !important;
+  color: white !important;
+  overflow: hidden !important; /* Eliminate internal scrolls */
+}
+
+.p-dialog .p-dialog-header-icons .p-dialog-header-icon {
+  color: #64748b !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.p-dialog .p-dialog-header-icons .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
 }
