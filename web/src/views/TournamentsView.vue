@@ -1,22 +1,49 @@
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useTournamentStore } from '../stores/tournamentStore'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import MusLoader from '../components/MusLoader.vue'
 import GoogleAd from '../components/GoogleAd.vue'
 import { authService } from '../services/api'
 
 const { t, locale } = useI18n()
+const route = useRoute()
 const router = useRouter()
 const tournamentStore = useTournamentStore()
 
 const user = authService.getUser()
 const isSuperAdmin = user?.roles?.includes('ROLE_SUPER_ADMIN')
 
+// Filter State
+const filterStatus = ref(route.query.status || 'all')
+
+// Sync with route query
+watch(() => route.query.status, (newStatus) => {
+  filterStatus.value = newStatus || 'all'
+})
+
 // Use storeToRefs to maintain reactivity
 const { tournaments, loading, error } = storeToRefs(tournamentStore)
+
+const dynamicTitle = computed(() => {
+  return t(`tournaments_page.title_${filterStatus.value}`)
+})
+
+const filteredTournaments = computed(() => {
+  return tournaments.value.filter(tny => {
+    // CRITICAL: Always exclude drafts from public view
+    if (tny.status === 'draft') return false
+    
+    if (filterStatus.value === 'all') return true
+    
+    // Safety matching (case-insensitive and trimmed)
+    const current = (tny.status || '').toLowerCase().trim()
+    const target = filterStatus.value.toLowerCase().trim()
+    return current === target
+  })
+})
 
 const formatDate = (dateString) => {
   if (!dateString) return t('tournaments_page.coming_soon')
@@ -29,7 +56,7 @@ const formatDate = (dateString) => {
 }
 
 onMounted(() => {
-  tournamentStore.fetchPublicTournaments()
+  tournamentStore.fetchPublicTournaments(true)
 })
 </script>
 
@@ -37,15 +64,25 @@ onMounted(() => {
   <div class="tournaments-view">
     <header class="page-header">
       <h1 class="mus-h1 italic">
-        {{ t('tournaments_page.title') }}
+        {{ dynamicTitle }}
       </h1>
       <p class="mus-p opacity-60 mt-4">{{ t('tournaments_page.subtitle') }}</p>
     </header>
     
-    <div class="col-12 px-4">
-      <GoogleAd :key="'top-tournaments'" />
-    </div>
-
+    <!-- Sub-menu Filter Bar -->
+    <nav class="filter-bar-container">
+      <div class="filter-bar">
+        <button v-for="status in ['all', 'active', 'pending', 'finished']" 
+                :key="status"
+                @click="filterStatus = status"
+                class="filter-btn"
+                :class="{ 'active': filterStatus === status }">
+          <span class="filter-dot" v-if="filterStatus === status"></span>
+          {{ t(`tournaments_page.filters.${status}`) }}
+        </button>
+      </div>
+    </nav>
+    
     <div v-if="loading" class="loading-state">
       <MusLoader />
     </div>
@@ -55,30 +92,30 @@ onMounted(() => {
       <button @click="tournamentStore.fetchPublicTournaments()" class="mus-button-primary scale-90">{{ t('dashboard.retry') }}</button>
     </div>
 
-    <div v-else-if="tournaments.length === 0" class="empty-state">
-      <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 overflow-hidden">
-        <img src="/vertical.png" class="w-full h-full object-cover" style="object-fit: cover; width: 100%; height: 100%;" />
+    <div v-else-if="filteredTournaments.length === 0" class="empty-state">
+      <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 overflow-hidden border border-white/5">
+        <img src="/vertical.png" class="w-full h-full object-cover opacity-20" />
       </div>
-      <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">{{ t('tournaments_page.empty') }}</p>
+      <p class="text-slate-500 font-black uppercase tracking-[0.2em] text-[10px]">{{ t('tournaments_page.empty') }}</p>
     </div>
 
     <div v-else class="tournaments-grid">
-      <div v-for="tny in tournaments" :key="tny.id" 
+      <div v-for="tny in filteredTournaments" :key="tny.id" 
            class="t-card mus-glass overflow-hidden cursor-pointer"
            @click="router.push(`/tournament/${tny.uuid}`)">
         <div class="t-poster-wrapper">
           <img v-if="tny.posterPath" :src="tny.posterPath" :alt="tny.name" class="t-poster" />
           <div v-else class="t-poster-placeholder">
-             <img src="/vertical.png" class="t-poster" />
+             <img src="/vertical.png" class="t-poster opacity-20" />
           </div>
           <div class="t-poster-overlay"></div>
           <div class="t-badge" :class="tny.status">
-            {{ tny.status === 'active' ? t('tournaments_page.active') : t('tournaments_page.pending') }}
+            {{ tny.status === 'active' ? t('tournaments_page.active') : (tny.status === 'pending' ? t('tournaments_page.pending') : t('tournament_form.statuses.finished')) }}
           </div>
         </div>
         
         <div class="t-content">
-          <h3 class="mus-h3 mb-4 line-clamp-1">{{ tny.name }}</h3>
+          <h3 class="mus-h3 mb-4 line-clamp-1 italic">{{ tny.name }}</h3>
           
           <div class="t-meta">
             <div class="meta-item">
@@ -90,8 +127,8 @@ onMounted(() => {
               <span>{{ formatDate(tny.startDate) }}</span>
             </div>
             <!-- Admin Only: Owner Info -->
-            <div v-if="isSuperAdmin && tny.owner" class="admin-meta mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-              <div class="flex items-center gap-2 text-[10px] font-black text-rose-400">
+            <div v-if="isSuperAdmin && tny.owner" class="admin-meta mt-4 p-3 rounded-xl bg-primary/5 border border-primary/20">
+              <div class="flex items-center gap-2 text-[10px] font-black text-primary">
                 <i class="pi pi-shield text-[10px]"></i>
                 <span class="uppercase tracking-widest">Admin Info</span>
               </div>
@@ -109,7 +146,7 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <div class="col-12 px-4">
+    <div class="col-12 px-4" v-if="filteredTournaments.length > 0">
       <GoogleAd :key="'bottom-tournaments'" />
     </div>
   </div>
@@ -119,8 +156,64 @@ onMounted(() => {
 .tournaments-view {
   display: flex;
   flex-direction: column;
-  gap: 80px;
+  gap: 40px;
   padding-bottom: 120px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.filter-bar-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.filter-bar {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  padding: 6px;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 4px;
+}
+
+.filter-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  padding: 10px 24px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: #050505;
+  box-shadow: 0 10px 20px var(--primary-glow);
+}
+
+.filter-dot {
+  width: 4px;
+  height: 4px;
+  background: #050505;
+  border-radius: 50%;
 }
 
 .page-header {

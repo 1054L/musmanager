@@ -196,15 +196,25 @@
     "terms_title": "Términos y Condiciones de Uso"
   },
   "tournaments_page": {
-    "title": "Torneos en Vivo",
-    "subtitle": "Próximos Eventos",
+    "title": "Torneos",
+    "title_all": "Todos los Torneos",
+    "title_active": "Torneos en Curso",
+    "title_pending": "Próximos Torneos",
+    "title_finished": "Torneos Finalizados",
+    "subtitle": "Explora los mejores torneos de Mus y únete a la competición.",
     "view_details": "Ver Detalles",
     "empty": "No hay torneos pendientes en este momento.",
     "active": "En Curso",
     "pending": "Inscripciones Abiertas",
     "coming_soon": "Próximamente",
     "players_count": "{count} Jugadores",
-    "pairs_count": "{count} Parejas"
+    "pairs_count": "{count} Parejas",
+    "filters": {
+      "all": "Todos",
+      "active": "En Curso",
+      "pending": "Inscripciones",
+      "finished": "Finalizados"
+    }
   },
   "tournament_form": {
     "create_title": "Nuevo Torneo",

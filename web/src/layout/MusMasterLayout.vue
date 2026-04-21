@@ -60,7 +60,7 @@ provide('openAuthModal', openAuthModal)
            <h4 class="footer-h4">{{ $t('footer.product') }}</h4>
             <ul class="footer-ul">
               <li><router-link to="/features" class="footer-link">{{ $t('nav.features') }}</router-link></li>
-              <li><router-link to="/tournaments" class="footer-link">{{ $t('nav.tournaments') }}</router-link></li>
+              <li><router-link :to="{ path: '/tournaments', query: { status: 'active' } }" class="footer-link">{{ $t('nav.tournaments') }}</router-link></li>
               <li><router-link to="/about" class="footer-link">{{ $t('footer.about_us') }}</router-link></li>
             </ul>
         </div>

@@ -47,7 +47,7 @@ const handleLogout = () => {
       <!-- Nav Links -->
       <nav class="nav-links">
         <router-link to="/features" class="nav-item">{{ t('nav.features') }}</router-link>
-        <router-link to="/tournaments" class="nav-item">{{ t('nav.tournaments') }}</router-link>
+        <router-link :to="{ path: '/tournaments', query: { status: 'active' } }" class="nav-item">{{ t('nav.tournaments') }}</router-link>
       </nav>
 
       <!-- Right Side -->

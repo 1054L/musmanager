@@ -485,7 +485,7 @@ class TournamentController extends AbstractController
     #[Route('/api/public/tournaments', name: 'app_tournament_list_public_api', methods: ['GET'])]
     public function listPublic(TournamentRepository $tournamentRepository): JsonResponse
     {
-        $tournaments = $tournamentRepository->findBy(['status' => ['active', 'pending']], ['id' => 'DESC']);
+        $tournaments = $tournamentRepository->findBy(['status' => ['active', 'pending', 'finished']], ['id' => 'DESC']);
         $user = $this->getUser();
         $isSuperAdmin = $user && in_array('ROLE_SUPER_ADMIN', $user->getRoles());
 
