@@ -10,7 +10,8 @@
     "login": "Entrar",
     "getStarted": "Empezar",
     "dashboard": "Dashboard",
-    "logout": "Salir"
+    "logout": "Salir",
+    "about": "Sobre Nosotros"
   },
   "hero": {
     "partner": "Socio Oficial de Mus",
@@ -122,6 +123,7 @@
     "copy_link_help": "Comparte este link entre los participantes",
     "link_copied": "¡Enlace copiado!",
     "view_poster": "Ver cartel",
+    "poster": "Cartel",
     "category": "Categoría",
     "status": "Estado",
     "tournament": "Torneo",
@@ -147,7 +149,51 @@
     "rights": "© 2026 Mus Manager. Todos los derechos reservados.",
     "privacy": "Privacidad",
     "terms": "Términos",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "about_us": "Sobre Nosotros",
+    "history": "Nuestra Historia",
+    "platform": "La Plataforma"
+  },
+  "about": {
+    "title": "Sobre Mus Manager",
+    "subtitle": "Pasión por la tradición, precisión por el juego.",
+    "p1": "Mus Manager nació de una necesidad compartida por miles de aficionados: profesionalizar la gestión de uno de los juegos más emblemáticos de nuestra cultura. Lo que empezó como una herramienta interna para pequeñas peñas, se ha convertido en la plataforma líder para organizar torneos de Mus en todo el mundo.",
+    "mission_title": "Nuestra Misión",
+    "mission_text": "Nuestra misión es preservar la esencia del Mus proporcionando a los organizadores herramientas digitales modernas que eliminen el caos del papel y las hojas de cálculo. Queremos que el único foco de los jugadores sea la partida, el envite y la estrategia.",
+    "why_title": "¿Por qué elegirnos?",
+    "why_text": "A diferencia de otras herramientas genéricas, Mus Manager está diseñado específicamente para las casuísticas del Mus: gestión de ceros, ligas de peñas, eliminatorias directas y clasificaciones en tiempo real adaptadas a las reglas tradicionales.",
+    "tradition_title": "Mus: Más que un juego",
+    "tradition_text": "Entendemos que el Mus es un rito social, una excusa para reunirse y competir con nobleza. Por eso, nuestra plataforma es 100% gratuita para peñas y grupos de amigos, asegurando que nadie se quede fuera de la mesa digital."
+  },
+  "legal": {
+    "privacy_title": "Política de Privacidad",
+    "privacy_last_updated": "Última actualización: Abril 2026",
+    "privacy_p1": "En Mus Manager, valoramos tu privacidad. Esta política detalla cómo recopilamos y protegemos tus datos personales al usar nuestra plataforma de gestión de torneos.",
+    "privacy_sections": [
+      {
+        "title": "Recopilación de Datos",
+        "text": "Recopilamos información básica como nombre de usuario y correo electrónico para la gestión de cuentas y ranking de torneos."
+      },
+      {
+        "title": "Uso de la Información",
+        "text": "Tus datos se utilizan exclusivamente para validar tu participación en eventos y generar estadísticas de juego."
+      }
+    ],
+    "terms_title": "Términos y Condiciones",
+    "terms_p1": "Al acceder a Mus Manager, aceptas cumplir con nuestros términos de uso diseñados para garantizar un entorno de juego justo y respetuoso.",
+    "cookies_title": "Política de Cookies",
+    "cookies_p1": "Utilizamos cookies propias y de terceros (como Google AdSense) para mejorar tu experiencia y servir anuncios relevantes que financian el mantenimiento gratuito de la plataforma."
+  },
+  "seo": {
+    "home_title": "Mus Manager | La Plataforma de Gestión de Torneos de Mus",
+    "home_desc": "Gestiona tus torneos de mus de forma profesional y gratuita. Cuadros automáticos, clasificaciones en vivo y mucho más.",
+    "features_title": "Características y Funciones | Mus Manager",
+    "features_desc": "Descubre cómo profesionalizar tu peña de mus con nuestras herramientas de gestión.",
+    "tournaments_title": "Torneos en Vivo | Compite en la comunidad de Mus",
+    "tournaments_desc": "Consulta los próximos torneos de mus y únete a la competición.",
+    "about_title": "Sobre Nosotros | La Misión de Mus Manager",
+    "privacy_title": "Política de Privacidad | Seguridad de Datos en Mus Manager",
+    "terms_title": "Términos y Condiciones de Uso"
   },
   "tournaments_page": {
     "title": "Torneos en Vivo",

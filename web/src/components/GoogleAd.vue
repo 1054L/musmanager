@@ -26,7 +26,7 @@ onMounted(() => {
     </div>
     
     <div v-else class="relative h-full min-h-[100px] flex align-items-center justify-content-center p-4">
-      <div class="absolute top-2 right-4 text-[8px] font-black text-slate-600 uppercase tracking-widest w-full h-full" style="border: 1px solid white;"></div>
+      <div class="absolute top-2 right-4 text-[8px] font-black text-slate-600 uppercase tracking-widest w-full h-full"></div>
     </div>
   </div>
 </template>

@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MusLoader from '../components/MusLoader.vue'
+import GoogleAd from '../components/GoogleAd.vue'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -36,6 +37,10 @@ onMounted(() => {
       </h1>
       <p class="mus-p opacity-60 mt-4">{{ t('tournaments_page.subtitle') }}</p>
     </header>
+    
+    <div class="col-12 px-4">
+      <GoogleAd :key="'top-tournaments'" />
+    </div>
 
     <div v-if="loading" class="loading-state">
       <MusLoader />
@@ -47,15 +52,21 @@ onMounted(() => {
     </div>
 
     <div v-else-if="tournaments.length === 0" class="empty-state">
-      <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">🎴</div>
+      <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 overflow-hidden">
+        <img src="/vertical.png" class="w-full h-full object-cover" style="object-fit: cover; width: 100%; height: 100%;" />
+      </div>
       <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">{{ t('tournaments_page.empty') }}</p>
     </div>
 
     <div v-else class="tournaments-grid">
-      <div v-for="tny in tournaments" :key="tny.id" class="t-card mus-glass overflow-hidden">
+      <div v-for="tny in tournaments" :key="tny.id" 
+           class="t-card mus-glass overflow-hidden cursor-pointer"
+           @click="router.push(`/tournament/${tny.uuid}`)">
         <div class="t-poster-wrapper">
           <img v-if="tny.posterPath" :src="tny.posterPath" :alt="tny.name" class="t-poster" />
-          <div v-else class="t-poster-placeholder">🎴</div>
+          <div v-else class="t-poster-placeholder">
+             <img src="/vertical.png" class="t-poster" />
+          </div>
           <div class="t-poster-overlay"></div>
           <div class="t-badge" :class="tny.status">
             {{ tny.status === 'active' ? t('tournaments_page.active') : t('tournaments_page.pending') }}
@@ -76,12 +87,15 @@ onMounted(() => {
             </div>
           </div>
 
-          <button @click="router.push(`/tournament/${tny.uuid}`)" class="details-btn">
+          <div class="details-btn">
             {{ t('tournaments_page.view_details') }}
             <i class="pi pi-arrow-right"></i>
-          </button>
+          </div>
         </div>
       </div>
+    </div>
+    <div class="col-12 px-4">
+      <GoogleAd :key="'bottom-tournaments'" />
     </div>
   </div>
 </template>
@@ -134,6 +148,7 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top;
   transition: transform 0.6s ease;
 }
 

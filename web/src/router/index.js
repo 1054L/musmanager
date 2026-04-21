@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import i18n from '../i18n'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/HomeView.vue')
+    component: () => import('../views/HomeView.vue'),
+    meta: { titleKey: 'seo.home_title', descKey: 'seo.home_desc' }
   },
   {
     path: '/login',
@@ -55,12 +57,38 @@ const routes = [
   {
     path: '/features',
     name: 'Features',
-    component: () => import('../views/FeaturesView.vue')
+    component: () => import('../views/FeaturesView.vue'),
+    meta: { titleKey: 'seo.features_title', descKey: 'seo.features_desc' }
   },
   {
     path: '/tournaments',
     name: 'Tournaments',
-    component: () => import('../views/TournamentsView.vue')
+    component: () => import('../views/TournamentsView.vue'),
+    meta: { titleKey: 'seo.tournaments_title', descKey: 'seo.tournaments_desc' }
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: () => import('../views/AboutView.vue'),
+    meta: { titleKey: 'seo.about_title', descKey: 'seo.home_desc' }
+  },
+  {
+    path: '/privacy',
+    name: 'Privacy',
+    component: () => import('../views/PrivacyPolicyView.vue'),
+    meta: { titleKey: 'seo.privacy_title', descKey: 'legal.privacy_p1' }
+  },
+  {
+    path: '/terms',
+    name: 'Terms',
+    component: () => import('../views/TermsView.vue'),
+    meta: { titleKey: 'seo.terms_title', descKey: 'legal.terms_p1' }
+  },
+  {
+    path: '/cookies',
+    name: 'Cookies',
+    component: () => import('../views/CookiesView.vue'),
+    meta: { titleKey: 'legal.cookies_title', descKey: 'legal.cookies_p1' }
   }
 ]
 
@@ -75,6 +103,20 @@ router.beforeEach((to, from, next) => {
     next('/login')
   } else {
     next()
+  }
+})
+
+router.afterEach((to) => {
+  const { titleKey, descKey } = to.meta
+  const t = i18n.global.t
+  
+  if (titleKey) {
+    document.title = t(titleKey)
+  }
+
+  const descriptionTag = document.querySelector('meta[name="description"]')
+  if (descriptionTag && descKey) {
+    descriptionTag.setAttribute('content', t(descKey))
   }
 })
 

@@ -71,7 +71,7 @@ const stats = [
     </section>
 
     <!-- Stats Section -->
-    <section class="mus-stats">
+    <section class="mus-stats" style="display: none;">
        <div v-for="(stat, i) in stats" :key="i" class="mus-stat-item">
          <p class="mus-stat-value">{{ stat.value }}</p>
          <p class="mus-stat-label">{{ t(stat.label) }}</p>

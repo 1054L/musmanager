@@ -26,6 +26,7 @@ const editingMatch = ref(null)
 const editScore1 = ref(0)
 const editScore2 = ref(0)
 const isSavingResult = ref(false)
+const showPosterDialog = ref(false)
 
 
 const activeStageTab = ref(null);
@@ -134,6 +135,15 @@ const saveMatchResult = async () => {
     isSavingResult.value = false
   }
 }
+
+const openPoster = () => {
+  const path = tournament.value?.posterPath || '/vertical.png';
+  if (path.toLowerCase().endsWith('.pdf')) {
+    window.open(path, '_blank');
+  } else {
+    showPosterDialog.value = true;
+  }
+}
 </script>
 
 <template>
@@ -175,7 +185,11 @@ const saveMatchResult = async () => {
                 <Tag :value="t('tournament_form.statuses.' + tournament.status)" severity="success" class="italic font-black uppercase text-[8px] tracking-widest" />
               </div>
               <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight italic uppercase leading-tight m-0">{{ tournament.name }}</h1>
-              <p class="text-slate-500 text-xs font-bold uppercase tracking-widest m-0 flex align-items-center gap-4">
+              <p class="text-slate-500 text-xs font-bold uppercase tracking-widest m-0 flex flex-wrap align-items-center gap-4">
+                <span @click="openPoster" class="cursor-pointer hover:text-white transition-colors flex align-items-center gap-2">
+                  <i class="pi pi-eye text-[#0fb361]"></i>
+                  {{ t('dashboard.poster') }}
+                </span>
                 <span><i class="pi pi-user mr-2 text-[#0fb361]"></i>{{ t('tournament_view.pairs_count', { count: tournament.teamsCount || 0 }) }}</span>
                 <span><i class="pi pi-calendar mr-2 text-[#0fb361]"></i>{{ tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : '...' }} - {{ tournament.endDate ? new Date(tournament.endDate).toLocaleDateString() : '...' }}</span>
                 <span v-if="tournament.location"><i class="pi pi-map-marker mr-2 text-[#0fb361]"></i>{{ tournament.location }}</span>
@@ -568,6 +582,13 @@ const saveMatchResult = async () => {
         </div>
       </div>
     </Dialog>
+
+    <!-- Tournament Poster Dialog -->
+    <Dialog v-model:visible="showPosterDialog" modal :header="tournament?.name" :style="{ width: '90vw', maxWidth: '800px' }" class="mus-dialog">
+      <div class="flex justify-center bg-black/40 p-4 rounded-xl">
+         <img :src="tournament?.posterPath || '/vertical.png'" class="max-w-full h-auto rounded-lg shadow-2xl" alt="Tournament Poster" />
+      </div>
+    </Dialog>
   </div>
 </template>
 
@@ -605,5 +626,21 @@ th { border-bottom: 1px solid rgba(255,255,255,0.05); }
 }
 .rule-icon-item:hover {
   opacity: 0.8;
+}
+
+.mus-btn-gold {
+  background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #aa771c 100%) !important;
+  color: #050505 !important;
+  border: none !important;
+  font-weight: 900 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  border-radius: 99px !important;
+  transition: all 0.3s;
+}
+
+.mus-btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(191, 149, 63, 0.4);
 }
 </style>

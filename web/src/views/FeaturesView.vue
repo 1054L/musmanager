@@ -1,5 +1,6 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
+import GoogleAd from '../components/GoogleAd.vue';
 
 const { t, tm } = useI18n()
 
@@ -32,10 +33,14 @@ const benefits = [
         {{ t('features.banner.title1') }} <br/>
         <span class="mus-gradient-text">{{ t('features.banner.title2') }}</span>
       </h1>
-      <p class="mus-p max-w-2xl mx-auto mt-8">
+      <p class="mus-p max-w-2xl mx-auto mt-8" style="display: none;">
         {{ t('features.banner.desc', { brand: 'Mus Manager' }) }}
       </p>
     </section>
+
+    <div class="col-12 px-4">
+      <GoogleAd :key="'top-features'" />
+    </div>
 
     <section class="benefits-grid">
       <div v-for="(benefit, i) in benefits" :key="i" class="benefit-card mus-glass">
@@ -54,6 +59,9 @@ const benefits = [
       </div>
     </section>
 
+    <div class="col-12 px-4">
+      <GoogleAd :key="'middle-features'" />
+    </div>
     <!-- How it Works Section -->
     <section class="how-it-works">
       <h2 class="mus-h2 text-center italic mb-12">{{ t('features.how_it_works.title') }}</h2>
@@ -81,6 +89,10 @@ const benefits = [
       </div>
     </section>
 
+    <div class="col-12 px-4">
+      <GoogleAd :key="'bottom-features'" />
+    </div>
+    
     <section class="deep-dive mus-glass">
       <div class="dive-content">
         <h2 class="mus-h2 italic">{{ t('hero.title') }}</h2>
