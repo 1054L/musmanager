@@ -58,5 +58,3 @@ volumes:
   db_data:
   api_var:
   uploads_data:
-  proxy_data:
-  proxy_letsencrypt:
