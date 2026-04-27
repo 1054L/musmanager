@@ -10,7 +10,8 @@
     "login": "Login",
     "getStarted": "Get Started",
     "dashboard": "Dashboard",
-    "logout": "Logout"
+    "logout": "Logout",
+    "about": "About Us"
   },
   "hero": {
     "partner": "Official Mus Partner",
@@ -117,11 +118,8 @@
     "empty_title": "Your dashboard is empty",
     "empty_cta": "Create your first tournament",
     "empty_subtitle": "Start your legacy as a Mus Manager organizer today.",
-    "my_tournaments": "My Tournaments",
-    "copy_link": "Copy Link",
-    "copy_link_help": "Share this link with participants",
-    "link_copied": "Link copied!",
     "view_poster": "View poster",
+    "poster": "Poster",
     "category": "Category",
     "status": "Status",
     "tournament": "Tournament",
@@ -147,18 +145,72 @@
     "rights": "© 2026 Mus Manager. All rights reserved.",
     "privacy": "Privacy",
     "terms": "Terms",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "about_us": "About Us",
+    "history": "Our History",
+    "platform": "The Platform"
+  },
+  "about": {
+    "title": "About Mus Manager",
+    "subtitle": "Passion for tradition, precision for the game.",
+    "p1": "Mus Manager was born from a need shared by thousands of fans: to professionalize the management of one of the most emblematic games of our culture. What started as an internal tool for small social clubs has become the leading platform for organizing Mus tournaments worldwide.",
+    "mission_title": "Our Mission",
+    "mission_text": "Our mission is to preserve the essence of Mus by providing organizers with modern digital tools that eliminate the chaos of paper and spreadsheets. We want the players' only focus to be the game, the bid, and the strategy.",
+    "why_title": "Why choose us?",
+    "why_text": "Unlike other generic tools, Mus Manager is specifically designed for Mus scenarios: zero management, club leagues, direct knockouts, and real-time standings adapted to traditional rules.",
+    "tradition_title": "Mus: More than a game",
+    "tradition_text": "We understand that Mus is a social rite, an excuse to gather and compete with nobility. That's why our platform is 100% free for social clubs and groups of friends, ensuring no one is left out of the digital table."
+  },
+  "legal": {
+    "privacy_title": "Privacy Policy",
+    "privacy_last_updated": "Last updated: April 2026",
+    "privacy_p1": "At Mus Manager, we value your privacy. This policy details how we collect and protect your personal data when using our tournament management platform.",
+    "privacy_sections": [
+      {
+        "title": "Data Collection",
+        "text": "We collect basic information such as username and email for account management and tournament ranking."
+      },
+      {
+        "title": "Use of Information",
+        "text": "Your data is used exclusively to validate your participation in events and generate game statistics."
+      }
+    ],
+    "terms_title": "Terms and Conditions",
+    "terms_p1": "By accessing Mus Manager, you agree to comply with our terms of use designed to ensure a fair and respectful gaming environment.",
+    "cookies_title": "Cookies Policy",
+    "cookies_p1": "We use our own and third-party cookies (such as Google AdSense) to improve your experience and serve relevant ads that fund the free maintenance of the platform."
+  },
+  "seo": {
+    "home_title": "Mus Manager | The Mus Tournament Management Platform",
+    "home_desc": "Manage your mus tournaments professionally and for free. Automatic brackets, live standings and much more.",
+    "features_title": "Features and Functions | Mus Manager",
+    "features_desc": "Discover how to professionalize your mus club with our management tools.",
+    "tournaments_title": "Live Tournaments | Compete in the Mus community",
+    "tournaments_desc": "Check the upcoming mus tournaments and join the competition.",
+    "about_title": "About Us | The Mission of Mus Manager",
+    "privacy_title": "Privacy Policy | Data Security at Mus Manager",
+    "terms_title": "Terms and Conditions of Use"
   },
   "tournaments_page": {
-    "title": "Live Tournaments",
-    "subtitle": "Upcoming Events",
+    "title": "Tournaments",
+    "title_all": "All Tournaments",
+    "title_active": "Tournaments in Progress",
+    "title_pending": "Upcoming Tournaments",
+    "title_finished": "Finished Tournaments",
+    "subtitle": "Explore the best Mus tournaments and join the competition.",
     "view_details": "View Details",
     "empty": "No pending tournaments at this time.",
     "active": "In Progress",
     "pending": "Registration Open",
     "coming_soon": "Coming Soon",
     "players_count": "{count} Players",
-    "pairs_count": "{count} Pairs"
+    "pairs_count": "{count} Pairs",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "pending": "Registration",
+      "finished": "Finished"
+    }
   },
   "tournament_form": {
     "create_title": "New Tournament",
@@ -272,7 +324,10 @@
     "active_matches_desc": "Record match results to update the classification",
     "match_edit": {
       "title": "Enter Result",
-      "save": "Save Result"
+      "save": "Save Result",
+      "local": "Local",
+      "visitor": "Visitor",
+      "rule_summary": "Match to {games} sets of {points} points"
     },
     "activity": {
       "title": "Recent Activity",

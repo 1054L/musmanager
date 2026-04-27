@@ -10,7 +10,8 @@
     "login": "Sartu",
     "getStarted": "Hasi",
     "dashboard": "Dashboard",
-    "logout": "Irten"
+    "logout": "Irten",
+    "about": "Guri Buruz"
   },
   "hero": {
     "partner": "Mus Elkarte Ofiziala",
@@ -117,11 +118,8 @@
     "empty_title": "Zure arbela hutsik dago",
     "empty_cta": "Sortu zure lehen txapelketa",
     "empty_subtitle": "Hasi zure ondarea Mus Manager antolatzaile gisa gaur bertan.",
-    "my_tournaments": "Nire Txapelketak",
-    "copy_link": "Kopiatu Esteka",
-    "copy_link_help": "Partekatu esteka hau parte-hartzaileekin",
-    "link_copied": "Esteka kopiatua!",
     "view_poster": "Ikusi kartela",
+    "poster": "Kartela",
     "category": "Kategoria",
     "status": "Egoera",
     "tournament": "Txapelketa",
@@ -147,18 +145,72 @@
     "rights": "© 2026 Mus Manager. Eskubide guztiak erreserbatuta.",
     "privacy": "Pribatutasuna",
     "terms": "Baldintzak",
-    "cookies": "Cookie-ak"
+    "cookies": "Cookie-ak",
+    "about_us": "Guri Buruz",
+    "history": "Gure Historia",
+    "platform": "Plataforma"
+  },
+  "about": {
+    "title": "Mus Manager-i Buruz",
+    "subtitle": "Tradizioarekiko pasioa, jokoarekiko zehaztasuna.",
+    "p1": "Mus Manager milaka zalek partekatutako behar batetik jaio zen: gure kulturako joko enblematikoenetako baten kudeaketa profesionalizatzea. Peña txikientzako barne-tresna gisa hasi zena, mundu osoko Mus txapelketak antolatzeko plataforma nagusi bihurtu da.",
+    "mission_title": "Gure Misioa",
+    "mission_text": "Gure misioa Musaren esentzia babestea da, antolatzaileei tresna digital modernoak eskainiz, paperaren eta kalkulu-orrien kaosa alde batera utziz. Jokalarien arreta bakarra partida, hordagoa eta estrategia izatea nahi dugu.",
+    "why_title": "Zergatik aukeratu gu?",
+    "why_text": "Beste tresna orokor batzuek ez bezala, Mus Manager Musaren kasuistiketarako berariaz diseinatuta dago: zeroen kudeaketa, peña ligak, kanporaketa zuzenak eta arau tradizionaletara egokitutako sailkapenak denbora errealean.",
+    "tradition_title": "Musa: Joko bat baino gehiago",
+    "tradition_text": "Musa erritu sozial bat dela ulertzen dugu, elkartzeko eta nobleziaz lehiatzeko aitzakia bat. Horregatik, gure plataforma %100 doakoa da peña eta lagun taldeentzat, inor mahai digitaletik kanpo geratuko ez dela ziurtatuz."
+  },
+  "legal": {
+    "privacy_title": "Pribatutasun Politika",
+    "privacy_last_updated": "Azken eguneratzea: 2026ko apirila",
+    "privacy_p1": "Mus Manager-en, zure pribatutasuna baloratzen dugu. Politika honek xehetasunez azaltzen du nola biltzen eta babesten ditugun zure datu pertsonalak gure txapelketak kudeatzeko plataforma erabiltzean.",
+    "privacy_sections": [
+      {
+        "title": "Datu Bilketa",
+        "text": "Oinarrizko informazioa biltzen dugu, hala nola erabiltzaile-izena eta helbide elektronikoa, kontuak kudeatzeko eta txapelketen rankinga egiteko."
+      },
+      {
+        "title": "Informazioaren Erabilera",
+        "text": "Zure datuak ekitaldietan parte hartzea balioztatzeko eta joko-estatistikak sortzeko soilik erabiltzen dira."
+      }
+    ],
+    "terms_title": "Baldintzak eta Baldintzak",
+    "terms_p1": "Mus Manager-en sartzean, joko-ingurune zuzen eta errespetuzkoa bermatzeko diseinatutako gure erabilera-baldintzak betetzea onartzen duzu.",
+    "cookies_title": "Cookie Politika",
+    "cookies_p1": "Geure eta hirugarrenen cookie-ak (Google AdSense adibidez) erabiltzen ditugu zure esperientzia hobetzeko eta plataforma doan mantentzen laguntzen duten iragarki garrantzitsuak erakusteko."
+  },
+  "seo": {
+    "home_title": "Mus Manager | Mus Txapelketak Kudeatzeko Plataforma",
+    "home_desc": "Kudeatu zure mus txapelketak modu profesional eta doakoan. Koadro automatikoak, zuzeneko sailkapenak eta askoz gehiago.",
+    "features_title": "Ezaugarriak eta Funtzioak | Mus Manager",
+    "features_desc": "Ezagutu nola profesionalizatu zure mus peña gure kudeaketa-tresnekin.",
+    "tournaments_title": "Zuzeneko Txapelketak | Lehiatu Mus komunitatean",
+    "tournaments_desc": "Kontsultatu hurrengo mus txapelketak eta bat egin lehiaketara.",
+    "about_title": "Guri Buruz | Mus Managerren Misioa",
+    "privacy_title": "Pribatutasun Politika | Datuen Segurtasuna Mus Manager-en",
+    "terms_title": "Erabilera Baldintzak eta Baldintzak"
   },
   "tournaments_page": {
-    "title": "Zuzeneko Txapelketak",
-    "subtitle": "Hurrengo Ekitaldiak",
+    "title": "Txapelketak",
+    "title_all": "Txapelketa Guztiak",
+    "title_active": "Abian diren Txapelketak",
+    "title_pending": "Hurrengo Txapelketak",
+    "title_finished": "Amaitutako Txapelketak",
+    "subtitle": "Esploratu Mus txapelketa onenak eta bat egin lehiara.",
     "view_details": "Ikusi Xehetasunak",
     "empty": "Ez dago txapelketarik zain une honetan.",
     "active": "Abian",
     "pending": "Izen-ematea Zabalik",
     "coming_soon": "Laster",
     "players_count": "{count} Jokalari",
-    "pairs_count": "{count} Bikote"
+    "pairs_count": "{count} Bikote",
+    "filters": {
+      "all": "Guztiak",
+      "active": "Abian",
+      "pending": "Izen-emateak",
+      "finished": "Amaituak"
+    }
   },
   "tournament_form": {
     "create_title": "Txapelketa Berria",
@@ -272,7 +324,10 @@
     "active_matches_desc": "Gorde partiden emaitzak sailkapena eguneratzeko",
     "match_edit": {
       "title": "Sartu Emaitza",
-      "save": "Gorde Emaitza"
+      "save": "Gorde Emaitza",
+      "local": "Etxekoa",
+      "visitor": "Kanpokoa",
+      "rule_summary": "{games} umeko eta {points} tantoko partida"
     },
     "activity": {
       "title": "Azken Jarduera",
