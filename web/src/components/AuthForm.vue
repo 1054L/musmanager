@@ -95,7 +95,7 @@ const handleSubmit = async () => {
           <i class="pi pi-envelope input-icon"></i>
           <input v-model="email" type="email" required 
                  class="mus-input-field" 
-                 :placeholder="t('auth.emailPlaceholder')">
+                  :placeholder="t('auth.emailPlaceholder')">
         </div>
       </div>
 
@@ -105,7 +105,7 @@ const handleSubmit = async () => {
           <i class="pi pi-lock input-icon"></i>
           <input v-model="password" type="password" required 
                  class="mus-input-field" 
-                 placeholder="••••••••">
+                 :placeholder="t('auth.passwordPlaceholder')">
         </div>
       </div>
 

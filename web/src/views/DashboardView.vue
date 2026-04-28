@@ -50,7 +50,7 @@ const confirmDelete = (event, tournament) => {
         outlined: true
     },
     acceptProps: {
-        label: t('common.loading') === 'Kargatzen...' ? 'Ezabatu' : (t('common.loading') === 'Loading...' ? 'Delete' : 'Eliminar'),
+        label: t('common.delete'),
         severity: 'danger'
     },
     accept: async () => {
@@ -339,7 +339,7 @@ onMounted(() => {
                <!-- Delete -->
                <button class="row-action-btn hover:!bg-rose-500/10 hover:!text-rose-500 hover:!border-rose-500/20"
                        @click="confirmDelete($event, slotProps.data)"
-                       v-tooltip.top="t('common.loading') === 'Kargatzen...' ? 'Ezabatu' : (t('common.loading') === 'Loading...' ? 'Delete' : 'Eliminar')">
+                       v-tooltip.top="t('common.delete')">
                  <i class="pi pi-trash"></i>
                </button>
              </div>

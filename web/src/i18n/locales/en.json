@@ -4,7 +4,8 @@
     "user": "User",
     "save": "Save",
     "success": "Success",
-    "error": "Error"
+    "error": "Error",
+    "delete": "Delete"
   },
   "nav": {
     "features": "Features",
@@ -96,7 +97,9 @@
     "join": "Join",
     "registerDesc": "Register your Mus Manager user",
     "email": "Email",
+    "emailPlaceholder": "E.g.: john@mus.com",
     "password": "Password",
+    "passwordPlaceholder": "Minimum 6 characters",
     "confirm": "Confirm Password",
     "submitLogin": "Login",
     "submitRegister": "Register",
@@ -139,6 +142,10 @@
     "empty_title": "Your dashboard is empty",
     "empty_cta": "Create your first tournament",
     "empty_subtitle": "Start your legacy as a Mus Manager organizer today.",
+    "my_tournaments": "My Tournaments",
+    "copy_link": "Copy Link",
+    "copy_link_help": "Share this link with participants",
+    "link_copied": "Link copied!",
     "view_poster": "View poster",
     "poster": "Poster",
     "category": "Category",

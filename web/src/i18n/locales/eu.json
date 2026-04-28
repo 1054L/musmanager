@@ -4,7 +4,8 @@
     "user": "Erabiltzailea",
     "save": "Gorde",
     "success": "Arrakasta",
-    "error": "Errorea"
+    "error": "Errorea",
+    "delete": "Ezabatu"
   },
   "nav": {
     "features": "Ezaugarriak",
@@ -96,7 +97,9 @@
     "join": "Bat egin",
     "registerDesc": "Erregistratu zure Mus Manager erabiltzailea",
     "email": "Emaila",
+    "emailPlaceholder": "Adib.: pello@mus.com",
     "password": "Pasahitza",
+    "passwordPlaceholder": "Gutxienez 6 karaktere",
     "confirm": "Errepikatu pasahitza",
     "submitLogin": "Sartu",
     "submitRegister": "Erregistratu",
@@ -139,6 +142,10 @@
     "empty_title": "Zure arbela hutsik dago",
     "empty_cta": "Sortu zure lehen txapelketa",
     "empty_subtitle": "Hasi zure ondarea Mus Manager antolatzaile gisa gaur bertan.",
+    "my_tournaments": "Nire Txapelketak",
+    "copy_link": "Kopiatu Esteka",
+    "copy_link_help": "Partekatu esteka hau parte-hartzaileen artean",
+    "link_copied": "Esteka kopiatua!",
     "view_poster": "Ikusi kartela",
     "poster": "Kartela",
     "category": "Kategoria",
