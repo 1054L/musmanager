@@ -106,7 +106,10 @@
     "createAccount": "Create your account here",
     "haveAccount": "Already have an account?",
     "loginHere": "Login here",
-    "passwordMismatch": "Passwords do not match"
+    "passwordMismatch": "Passwords do not match",
+    "role": "User Type",
+    "roleUser": "Player",
+    "roleAdmin": "Organizer"
   },
   "profile": {
     "title": "My Profile",

@@ -106,7 +106,10 @@
     "createAccount": "Sortu zure kontua hemen",
     "haveAccount": "Baduzu kontua?",
     "loginHere": "Hasi saioa hemen",
-    "passwordMismatch": "Pasahitzak ez datoz bat"
+    "passwordMismatch": "Pasahitzak ez datoz bat",
+    "role": "Erabiltzaile Mota",
+    "roleUser": "Jokalaria",
+    "roleAdmin": "Antolatzailea"
   },
   "profile": {
     "title": "Nire Profila",

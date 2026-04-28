@@ -24,11 +24,11 @@ export const authService = {
     return authData;
   },
 
-  async register(email, password) {
+  async register(email, password, role = 'user') {
     const response = await fetch(`${API_URL}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, role })
     });
 
     if (!response.ok) {
