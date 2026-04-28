@@ -87,7 +87,7 @@ provide('openAuthModal', openAuthModal)
          <p class="footer-copy" v-html="$t('footer.rights').replace('Mus Manager', '<span class=\'mus-gold-text\'>Mus Manager</span>')"></p>
          <div class="footer-status">
             <span class="status-dot"></span>
-            <span class="status-text">System OK</span>
+            <span class="status-text">System Online</span>
          </div>
       </div>
     </footer>
