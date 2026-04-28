@@ -59,6 +59,9 @@ class Tournament
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $location = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $private = false;
+
     /**
      * @var Collection<int, User>
      */
@@ -320,6 +323,17 @@ class Tournament
     public function setLocation(?string $location): static
     {
         $this->location = $location;
+        return $this;
+    }
+
+    public function isPrivate(): bool
+    {
+        return $this->private;
+    }
+
+    public function setPrivate(bool $private): static
+    {
+        $this->private = $private;
         return $this;
     }
 }

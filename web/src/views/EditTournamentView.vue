@@ -22,7 +22,8 @@ const form = ref({
   ruleGames: 3,
   tablesCount: null,
   location: '',
-  poster: null // Holds the NEW file to upload
+  poster: null, // Holds the NEW file to upload
+  private: false
 })
 const existingPosterPath = ref(null) // Holds the CURRENT path from API
 const posterPreview = ref(null) // Holds the local preview of the NEW file
@@ -89,7 +90,8 @@ onMounted(async () => {
       ruleGames: data.ruleGames || 3,
       tablesCount: data.tablesCount,
       location: data.location || '',
-      poster: null
+      poster: null,
+      private: data.private || false
     }
     existingPosterPath.value = data.posterPath
     
@@ -181,6 +183,7 @@ const handleSave = async () => {
     if (form.value.tablesCount !== null) formData.append('tablesCount', form.value.tablesCount)
     if (form.value.location) formData.append('location', form.value.location)
     if (form.value.poster) formData.append('poster', form.value.poster)
+    formData.append('private', form.value.private)
 
     await tournamentService.updateTournament(uuid, formData)
     success.value = true
@@ -292,6 +295,18 @@ const handlePublish = async () => {
               <div class="radio-check"></div>
               <span class="radio-label">{{ opt.label }}</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Privacidad -->
+        <div class="form-group" v-if="!error">
+          <label class="mus-label">
+            {{ $t('tournament_form.labels.private') }}
+            <i class="pi pi-question-circle ml-1 cursor-help text-[#0fb361]" v-tooltip="t('tournament_form.tooltips.private')"></i>
+          </label>
+          <div @click="form.private = !form.private" class="radio-item" :class="{ active: form.private }">
+            <div class="radio-check"></div>
+            <span class="radio-label">{{ t('tournament_form.labels.private_desc') || 'Torneo Privado (no aparecerá en el listado público)' }}</span>
           </div>
         </div>
 

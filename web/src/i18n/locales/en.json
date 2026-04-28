@@ -258,14 +258,19 @@
       "rulePoints": "Points",
       "ruleGames": "Sets",
       "tablesCount": "Number of Tables",
-      "rules_section": "Rules & Management",
-      "other": "Other"
+      "rules_section": "Rules and Management",
+      "other": "Other",
+      "private": "Privacy",
+      "private_desc": "Private Tournament (won't appear in public listing)"
     },
     "placeholders": {
       "name": "E.g.: Great Spring Tournament",
       "location": "E.g.: Casino de Madrid, Calle Mayor 1",
       "customPoints": "Specify points",
       "customGames": "Specify sets"
+    },
+    "tooltips": {
+      "private": "If you check this box, the tournament won't be visible in the public search or home page. Only those with the direct link will be able to access it."
     },
     "types": {
       "eliminatory": "Single Elimination",

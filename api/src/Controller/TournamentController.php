@@ -48,6 +48,7 @@ class TournamentController extends AbstractController
                 'posterPath' => $t->getPosterPath(),
                 'teamsCount' => count($t->getTournamentTeams()),
                 'hasMatches' => count($t->getMatches()) > 0,
+                'private' => $t->isPrivate(),
             ];
         }, $tournaments));
     }
@@ -84,6 +85,8 @@ class TournamentController extends AbstractController
         if ($request->request->has('tablesCount')) {
             $tournament->setTablesCount($request->request->get('tablesCount') !== null ? (int) $request->request->get('tablesCount') : null);
         }
+
+        $tournament->setPrivate($request->request->get('private') === 'true' || $request->request->get('private') === '1');
         
         $posterFile = $request->files->get('poster');
         if ($posterFile) {
@@ -101,6 +104,7 @@ class TournamentController extends AbstractController
             'status'     => $tournament->getStatus(),
             'statusDescription' => $tournament->getStatusDescription(),
             'type'       => $tournament->getType(),
+            'private'    => $tournament->isPrivate(),
             'startDate'  => $tournament->getStartDate() ? $tournament->getStartDate()->format(\DateTimeInterface::ATOM) : null,
             'endDate'    => $tournament->getEndDate() ? $tournament->getEndDate()->format(\DateTimeInterface::ATOM) : null,
             'ruleKings'  => $tournament->getRuleKings(),
@@ -162,6 +166,9 @@ class TournamentController extends AbstractController
         if ($requestData->has('tablesCount')) {
             $tournament->setTablesCount($requestData->get('tablesCount') !== "" ? (int) $requestData->get('tablesCount') : null);
         }
+        if ($requestData->has('private')) {
+            $tournament->setPrivate($requestData->get('private') === 'true' || $requestData->get('private') === '1');
+        }
 
         $posterFile = $request->files->get('poster');
         if ($posterFile) {
@@ -178,6 +185,7 @@ class TournamentController extends AbstractController
             'status'     => $tournament->getStatus(),
             'statusDescription' => $tournament->getStatusDescription(),
             'type'       => $tournament->getType(),
+            'private'    => $tournament->isPrivate(),
             'startDate'  => $tournament->getStartDate() ? $tournament->getStartDate()->format(\DateTimeInterface::ATOM) : null,
             'endDate'    => $tournament->getEndDate() ? $tournament->getEndDate()->format(\DateTimeInterface::ATOM) : null,
             'ruleKings'  => $tournament->getRuleKings(),
@@ -269,6 +277,7 @@ class TournamentController extends AbstractController
             'tablesCount' => $tournament->getTablesCount(),
             'location' => $tournament->getLocation(),
             'posterPath' => $tournament->getPosterPath(),
+            'private' => $tournament->isPrivate(),
             'uuid' => $tournament->getUuidAccessToken(),
             'teamsCount' => count($tournament->getTournamentTeams()),
             'tournamentTeams' => array_map(function($tt) {
@@ -485,7 +494,10 @@ class TournamentController extends AbstractController
     #[Route('/api/public/tournaments', name: 'app_tournament_list_public_api', methods: ['GET'])]
     public function listPublic(TournamentRepository $tournamentRepository): JsonResponse
     {
-        $tournaments = $tournamentRepository->findBy(['status' => ['active', 'pending', 'finished']], ['id' => 'DESC']);
+        $tournaments = $tournamentRepository->findBy([
+            'status' => ['active', 'pending', 'finished'],
+            'private' => false
+        ], ['id' => 'DESC']);
         $user = $this->getUser();
         $isSuperAdmin = $user && in_array('ROLE_SUPER_ADMIN', $user->getRoles());
 
@@ -505,6 +517,7 @@ class TournamentController extends AbstractController
                 'location' => $t->getLocation(),
                 'teamsCount' => count($t->getTournamentTeams()),
                 'playerCount' => 24,
+                'private' => $t->isPrivate(),
             ];
 
             if ($isSuperAdmin) {

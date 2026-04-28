@@ -263,13 +263,18 @@
       "ruleGames": "Chicos",
       "tablesCount": "Nº de Mesas",
       "rules_section": "Reglas y Gestión",
-      "other": "Otro"
+      "other": "Otro",
+      "private": "Privacidad",
+      "private_desc": "Torneo Privado (no aparecerá en el listado público)"
     },
     "placeholders": {
       "name": "Ej: Gran Torneo de Primavera",
       "location": "Ej: Casino de Madrid, Calle Mayor 1",
       "customPoints": "Especificar tantos",
       "customGames": "Especificar chicos"
+    },
+    "tooltips": {
+      "private": "Si activas esta casilla, el torneo no será visible en el buscador público ni en la página de inicio. Solo podrán acceder quienes tengan el enlace directo del torneo."
     },
     "types": {
       "eliminatory": "Eliminación Directa",

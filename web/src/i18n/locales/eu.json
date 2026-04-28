@@ -259,13 +259,18 @@
       "ruleGames": "Umeak",
       "tablesCount": "Mahai Kopurua",
       "rules_section": "Arauak eta Kudeaketa",
-      "other": "Beste bat"
+      "other": "Beste bat",
+      "private": "Pribatutasuna",
+      "private_desc": "Txapelketa Pribatua (ez da zerrenda publikoan agertuko)"
     },
     "placeholders": {
       "name": "Adib.: Udaberriko Txapelketa Handia",
       "location": "Adib.: Madrilgo Kasinoa, Mayor Kalea 1",
       "customPoints": "Zehaztu tantuak",
       "customGames": "Zehaztu umeak"
+    },
+    "tooltips": {
+      "private": "Kutxa hau markatzen baduzu, txapelketa ez da bilatzaile publikoan edo hasierako orrian agertuko. Lotura zuzena dutenek bakarrik sartu ahal izango dira."
     },
     "types": {
       "eliminatory": "Kanporaketa Zuzena",

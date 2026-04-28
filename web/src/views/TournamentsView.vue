@@ -33,8 +33,8 @@ const dynamicTitle = computed(() => {
 
 const filteredTournaments = computed(() => {
   return tournaments.value.filter(tny => {
-    // CRITICAL: Always exclude drafts from public view
-    if (tny.status === 'draft') return false
+    // CRITICAL: Always exclude private or draft tournaments from public view
+    if (tny.private || tny.status === 'draft') return false
     
     if (filterStatus.value === 'all') return true
     

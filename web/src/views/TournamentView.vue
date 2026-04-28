@@ -192,8 +192,9 @@ const openPoster = () => {
           
           <div class="relative z-10 flex flex-column md:flex-row justify-content-between align-items-center gap-6">
             <div class="flex-1">
-              <div class="flex align-items-center gap-3 mb-2">
+              <div class="flex align-items-center gap-2 mb-2">
                 <Tag :value="t('tournament_form.statuses.' + tournament.status)" severity="success" class="italic font-black uppercase text-[8px] tracking-widest" />
+                <Tag v-if="tournament.private" :value="t('tournament_form.labels.private')" severity="danger" class="italic font-black uppercase text-[8px] tracking-widest" />
               </div>
               <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight italic uppercase leading-tight m-0">{{ tournament.name }}</h1>
               <p class="text-slate-500 text-xs font-bold uppercase tracking-widest m-0 flex flex-wrap align-items-center gap-4">

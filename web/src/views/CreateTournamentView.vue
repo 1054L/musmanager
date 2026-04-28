@@ -27,7 +27,8 @@ const form = ref({
   ruleGames: 3,
   tablesCount: null,
   location: '',
-  poster: null
+  poster: null,
+  private: false
 })
 const posterPreview = ref(null)
 const loading = ref(false)
@@ -65,7 +66,8 @@ const types = [
 const statuses = [
   { value: 'draft', label: t('tournament_form.statuses.draft') },
   { value: 'pending', label: t('tournament_form.statuses.pending') },
-  { value: 'active', label: t('tournament_form.statuses.active') }
+  { value: 'active', label: t('tournament_form.statuses.active') },
+  { value: 'finished', label: t('tournament_form.statuses.finished') }
 ]
 
 const onFileChange = (e) => {
@@ -97,6 +99,7 @@ const handleCreate = async () => {
     if (form.value.tablesCount !== null) formData.append('tablesCount', form.value.tablesCount)
     if (form.value.location) formData.append('location', form.value.location)
     if (form.value.poster) formData.append('poster', form.value.poster)
+    formData.append('private', form.value.private)
 
     await tournamentService.createTournament(formData)
     router.push('/dashboard')
@@ -190,6 +193,18 @@ const handleCreate = async () => {
               <div class="radio-check"></div>
               <span class="radio-label">{{ opt.label }}</span>
             </div>
+          </div>
+        </div>
+        
+        <!-- Privacidad -->
+        <div class="form-group">
+          <label class="mus-label">
+            {{ $t('tournament_form.labels.private') }}
+            <i class="pi pi-question-circle ml-1 cursor-help text-[#0fb361]" v-tooltip="t('tournament_form.tooltips.private')"></i>
+          </label>
+          <div @click="form.private = !form.private" class="radio-item" :class="{ active: form.private }">
+            <div class="radio-check"></div>
+            <span class="radio-label">{{ t('tournament_form.labels.private_desc') || 'Torneo Privado (no aparecerá en el listado público)' }}</span>
           </div>
         </div>
 
