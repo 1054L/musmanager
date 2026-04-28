@@ -1,0 +1,275 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { authService } from '../services/api'
+import { useI18n } from 'vue-i18n'
+import { useToast } from 'primevue/usetoast'
+import MusLoader from '../components/MusLoader.vue'
+
+const { t } = useI18n()
+const toast = useToast()
+
+const loading = ref(true)
+const saving = ref(false)
+const userProfile = ref({
+  firstName: '',
+  lastName: '',
+  email: ''
+})
+
+const passwords = ref({
+  newPassword: '',
+  confirmPassword: ''
+})
+
+const loadProfile = async () => {
+  try {
+    const user = authService.getUser()
+    // Fetch full profile from API to get the latest firstName/lastName
+    const response = await fetch('/api/me', {
+      headers: authService.getAuthHeader()
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      userProfile.value = {
+        firstName: data.firstName || '',
+        lastName: data.lastName || '',
+        email: data.email || ''
+      }
+    }
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: t('common.error'), life: 3000 })
+  } finally {
+    loading.value = false
+  }
+}
+
+const updateProfile = async () => {
+  if (passwords.value.newPassword && passwords.value.newPassword !== passwords.value.confirmPassword) {
+    toast.add({ severity: 'error', summary: 'Error', detail: t('auth.passwordMismatch') || 'Las contraseñas no coinciden', life: 3000 })
+    return
+  }
+
+  saving.value = true
+  try {
+    const data = {
+      firstName: userProfile.value.firstName,
+      lastName: userProfile.value.lastName
+    }
+    
+    if (passwords.value.newPassword) {
+      data.password = passwords.value.newPassword
+    }
+
+    await authService.updateProfile(data)
+    
+    // Update local storage if password changed
+    if (data.password) {
+      const currentLocalUser = authService.getUser();
+      currentLocalUser.password = data.password;
+      localStorage.setItem('user', JSON.stringify(currentLocalUser));
+    }
+    
+    toast.add({ severity: 'success', summary: t('common.success'), detail: t('profile.updated') || 'Perfil actualizado', life: 3000 })
+    passwords.value.newPassword = ''
+    passwords.value.confirmPassword = ''
+  } catch (error) {
+    toast.add({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 })
+  } finally {
+    saving.value = false
+  }
+}
+
+onMounted(() => {
+  loadProfile()
+})
+</script>
+
+<template>
+  <div class="profile-container animate-in fade-in duration-500">
+    <div class="profile-header text-center mb-12">
+      <h1 class="mus-title">{{ t('profile.title') || 'Mi Perfil' }}</h1>
+      <p class="mus-subtitle">{{ t('profile.desc') || 'Gestiona tu información personal y credenciales' }}</p>
+    </div>
+
+    <MusLoader v-if="loading" />
+
+    <div v-else class="max-w-2xl mx-auto mus-glass rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden border border-white/5">
+      <!-- Background Glow Effects -->
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#0fb361]/10 blur-[80px] rounded-full pointer-events-none"></div>
+      
+      <form @submit.prevent="updateProfile" class="space-y-8 relative z-10">
+        
+        <div class="section-block">
+          <h2 class="section-title"><i class="pi pi-user mr-2"></i>{{ t('profile.personalInfo') || 'Información Personal' }}</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="input-group">
+              <label class="input-label">{{ t('profile.firstName') || 'Nombre' }}</label>
+              <div class="input-wrapper">
+                <i class="pi pi-id-card input-icon"></i>
+                <input v-model="userProfile.firstName" type="text" class="mus-input-field" :placeholder="t('profile.firstNamePlaceholder') || 'Tu nombre'">
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">{{ t('profile.lastName') || 'Apellidos' }}</label>
+              <div class="input-wrapper">
+                <i class="pi pi-id-card input-icon"></i>
+                <input v-model="userProfile.lastName" type="text" class="mus-input-field" :placeholder="t('profile.lastNamePlaceholder') || 'Tus apellidos'">
+              </div>
+            </div>
+          </div>
+          
+          <div class="input-group mt-6">
+            <label class="input-label">{{ t('auth.email') }}</label>
+            <div class="input-wrapper opacity-50 cursor-not-allowed">
+              <i class="pi pi-envelope input-icon"></i>
+              <input v-model="userProfile.email" type="email" disabled class="mus-input-field" title="El correo electrónico no se puede cambiar">
+            </div>
+            <span class="text-[10px] text-slate-500 mt-1 ml-2">{{ t('profile.emailHelp') || 'El correo electrónico se usa para iniciar sesión y no se puede modificar.' }}</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-block">
+          <h2 class="section-title"><i class="pi pi-lock mr-2"></i>{{ t('profile.security') || 'Seguridad' }}</h2>
+          <p class="text-xs text-slate-400 mb-6">{{ t('profile.passwordHelp') || 'Deja los campos en blanco si no deseas cambiar la contraseña.' }}</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="input-group">
+              <label class="input-label">{{ t('profile.newPassword') || 'Nueva Contraseña' }}</label>
+              <div class="input-wrapper">
+                <i class="pi pi-key input-icon"></i>
+                <input v-model="passwords.newPassword" type="password" class="mus-input-field" placeholder="••••••••">
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">{{ t('auth.confirm') }}</label>
+              <div class="input-wrapper">
+                <i class="pi pi-shield input-icon"></i>
+                <input v-model="passwords.confirmPassword" type="password" class="mus-input-field" placeholder="••••••••">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-6 flex justify-end">
+          <button type="submit" :disabled="saving" class="mus-button-primary group">
+            <span class="font-black uppercase tracking-widest text-sm">
+              <i v-if="saving" class="pi pi-spin pi-spinner mr-2"></i>
+              {{ t('common.save') }}
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.profile-container {
+  padding: 2rem 1rem;
+}
+
+.mus-title {
+  font-size: 3rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  font-style: italic;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: white;
+}
+
+.mus-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 12px;
+}
+
+.section-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 900;
+  color: #0fb361;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  margin: 32px 0;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: #94a3b8;
+  margin-left: 12px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #475569;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.mus-input-field:focus + .input-icon {
+  color: #0fb361;
+}
+
+.mus-input-field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 18px 24px 18px 56px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mus-input-field:focus {
+  outline: none;
+  border-color: #0fb361;
+  background: rgba(15, 179, 97, 0.02);
+  box-shadow: 0 0 0 4px rgba(15, 179, 97, 0.05);
+}
+
+.mus-input-field:disabled {
+  background: rgba(0, 0, 0, 0.2);
+  color: #64748b;
+  border-color: rgba(255, 255, 255, 0.02);
+}
+</style>

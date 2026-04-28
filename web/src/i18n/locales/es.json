@@ -1,7 +1,10 @@
 {
   "common": {
     "loading": "Cargando...",
-    "user": "Usuario"
+    "user": "Usuario",
+    "save": "Guardar",
+    "success": "Éxito",
+    "error": "Error"
   },
   "nav": {
     "features": "Características",
@@ -102,7 +105,22 @@
     "noAccount": "¿Nuevo en la élite?",
     "createAccount": "Crea tu cuenta aquí",
     "haveAccount": "¿Ya tienes cuenta?",
-    "loginHere": "Inicia sesión"
+    "loginHere": "Inicia sesión",
+    "passwordMismatch": "Las contraseñas no coinciden"
+  },
+  "profile": {
+    "title": "Mi Perfil",
+    "desc": "Gestiona tu información personal y credenciales",
+    "personalInfo": "Información Personal",
+    "firstName": "Nombre",
+    "firstNamePlaceholder": "Tu nombre",
+    "lastName": "Apellidos",
+    "lastNamePlaceholder": "Tus apellidos",
+    "emailHelp": "El correo electrónico se usa para iniciar sesión y no se puede modificar.",
+    "security": "Seguridad",
+    "passwordHelp": "Deja los campos en blanco si no deseas cambiar la contraseña.",
+    "newPassword": "Nueva Contraseña",
+    "updated": "Perfil actualizado correctamente"
   },
   "dashboard": {
     "title": "Tus",

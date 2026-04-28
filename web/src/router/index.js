@@ -25,6 +25,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('../views/ProfileView.vue'),
+    meta: { requiresAuth: true, titleKey: 'profile.title', descKey: 'profile.desc' }
+  },
+  {
     path: '/admin/tournament/create',
     name: 'CreateTournament',
     component: () => import('../views/CreateTournamentView.vue'),

@@ -96,6 +96,7 @@ provide('openAuthModal', openAuthModal)
     <AuthModal 
       :isOpen="showAuthModal" 
       :initialMode="authModalMode" 
+      redirect="/dashboard"
       @close="showAuthModal = false"
     />
   </div>

@@ -39,6 +39,24 @@ export const authService = {
     return response.json();
   },
 
+  async updateProfile(data) {
+    const response = await fetch(`${API_URL}/me/update`, {
+      method: 'POST',
+      headers: { 
+        ...this.getAuthHeader(),
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Error al actualizar el perfil');
+    }
+
+    return response.json();
+  },
+
   logout() {
     localStorage.removeItem('user');
   },

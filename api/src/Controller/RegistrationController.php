@@ -32,7 +32,13 @@ class RegistrationController extends AbstractController
 
         $user = new User();
         $user->setEmail($data['email']);
-        $user->setRoles(['ROLE_ADMIN']);
+        
+        $role = $data['role'] ?? 'user';
+        if ($role === 'admin') {
+            $user->setRoles(['ROLE_ADMIN']);
+        } else {
+            $user->setRoles(['ROLE_USER']);
+        }
         
         $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
         $user->setPassword($hashedPassword);

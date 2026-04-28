@@ -26,6 +26,8 @@ services:
       DATABASE_URL: mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${MYSQL_DATABASE:-app}?serverVersion=8.0.32&charset=utf8mb4
       APP_ENV: dev
       APP_SECRET: abcdefg123456
+      DEFAULT_URI: http://localhost:5173
+      MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=0
     volumes:
       - ./api:/var/www/html
       - api_vendor:/var/www/html/vendor

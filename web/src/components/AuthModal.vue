@@ -6,6 +6,10 @@ const props = defineProps({
   initialMode: {
     type: String,
     default: 'login' // 'login' or 'register'
+  },
+  redirect: {
+    type: String,
+    default: '/dashboard'
   }
 })
 
@@ -44,7 +48,7 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
         <div class="modal-inner">
           <AuthForm 
             :initialMode="initialMode" 
-            :redirect="null" 
+            :redirect="redirect" 
             @success="handleSuccess" 
           />
         </div>

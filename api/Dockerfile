@@ -30,6 +30,7 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 # Permissions
+RUN mkdir -p /var/www/html/var
 RUN chown -R www-data:www-data /var/www/html/var
 
 EXPOSE 80

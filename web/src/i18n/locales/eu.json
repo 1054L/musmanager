@@ -1,7 +1,10 @@
 {
   "common": {
     "loading": "Kargatzen...",
-    "user": "Erabiltzailea"
+    "user": "Erabiltzailea",
+    "save": "Gorde",
+    "success": "Arrakasta",
+    "error": "Errorea"
   },
   "nav": {
     "features": "Ezaugarriak",
@@ -102,7 +105,22 @@
     "noAccount": "Berria elitean?",
     "createAccount": "Sortu zure kontua hemen",
     "haveAccount": "Baduzu kontua?",
-    "loginHere": "Hasi saioa hemen"
+    "loginHere": "Hasi saioa hemen",
+    "passwordMismatch": "Pasahitzak ez datoz bat"
+  },
+  "profile": {
+    "title": "Nire Profila",
+    "desc": "Kudeatu zure informazio pertsonala eta egiaztagiriak",
+    "personalInfo": "Informazio Pertsonala",
+    "firstName": "Izena",
+    "firstNamePlaceholder": "Zure izena",
+    "lastName": "Abizenak",
+    "lastNamePlaceholder": "Zure abizenak",
+    "emailHelp": "Helbide elektronikoa saioa hasteko erabiltzen da eta ezin da aldatu.",
+    "security": "Segurtasuna",
+    "passwordHelp": "Utzi eremuak hutsik pasahitza aldatu nahi ez baduzu.",
+    "newPassword": "Pasahitz Berria",
+    "updated": "Profila ongi eguneratu da"
   },
   "dashboard": {
     "title": "Zure",

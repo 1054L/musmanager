@@ -77,7 +77,10 @@ const handleLogout = () => {
            <router-link to="/dashboard" class="mus-button-primary scale-90">
             {{ t('nav.dashboard') }}
           </router-link>
-          <button @click="handleLogout" class="logout-btn">
+          <router-link to="/profile" class="nav-link-subtle-btn scale-90 p-2" title="Mi Perfil">
+            <i class="pi pi-user text-lg"></i>
+          </router-link>
+          <button @click="handleLogout" class="logout-btn ml-2">
             <i class="pi pi-power-off"></i>
           </button>
         </template>

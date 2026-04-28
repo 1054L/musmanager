@@ -22,6 +22,8 @@ class UserController extends AbstractController
         return new JsonResponse([
             'id' => $user->getId(),
             'email' => $user->getEmail(),
+            'firstName' => $user->getFirstName(),
+            'lastName' => $user->getLastName(),
             'roles' => $user->getRoles(),
             'player' => $player ? [
                 'id' => $player->getId(),
@@ -29,5 +31,32 @@ class UserController extends AbstractController
                 'email' => $player->getEmail(),
             ] : null
         ]);
+    }
+
+    #[Route('/api/me/update', name: 'app_user_update_api', methods: ['POST', 'PUT'])]
+    #[IsGranted('ROLE_USER')]
+    public function updateProfile(
+        \Symfony\Component\HttpFoundation\Request $request,
+        \Doctrine\ORM\EntityManagerInterface $entityManager,
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordHasher
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        $data = json_decode($request->getContent(), true);
+
+        if (isset($data['firstName'])) {
+            $user->setFirstName($data['firstName']);
+        }
+        if (isset($data['lastName'])) {
+            $user->setLastName($data['lastName']);
+        }
+        if (!empty($data['password'])) {
+            $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
+            $user->setPassword($hashedPassword);
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Profile updated successfully']);
     }
 }

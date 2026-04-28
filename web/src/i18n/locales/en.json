@@ -1,7 +1,10 @@
 {
   "common": {
     "loading": "Loading...",
-    "user": "User"
+    "user": "User",
+    "save": "Save",
+    "success": "Success",
+    "error": "Error"
   },
   "nav": {
     "features": "Features",
@@ -102,7 +105,22 @@
     "noAccount": "New to the elite?",
     "createAccount": "Create your account here",
     "haveAccount": "Already have an account?",
-    "loginHere": "Login here"
+    "loginHere": "Login here",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "profile": {
+    "title": "My Profile",
+    "desc": "Manage your personal information and credentials",
+    "personalInfo": "Personal Information",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Your first name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Your last name",
+    "emailHelp": "The email address is used to log in and cannot be changed.",
+    "security": "Security",
+    "passwordHelp": "Leave fields blank if you do not want to change the password.",
+    "newPassword": "New Password",
+    "updated": "Profile updated successfully"
   },
   "dashboard": {
     "title": "Your",
