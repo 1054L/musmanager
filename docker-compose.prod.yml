@@ -36,6 +36,8 @@ services:
     volumes:
       - api_var:/var/www/html/var
       - uploads_data:/var/www/html/public/uploads
+    expose:
+      - "80"
     networks:
       - internal
       - proxy
@@ -47,14 +49,22 @@ services:
     restart: always
     depends_on:
       - api
+    expose:
+      - "80"
     networks:
-      - proxy
+      internal:
+        aliases:
+          - mus-web-internal
+      proxy:
+        aliases:
+          - mus-web
 
 networks:
   internal:
     driver: bridge
   proxy:
     external: true
+    name: mus_proxy
 
 volumes:
   db_data:
