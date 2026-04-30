@@ -97,7 +97,7 @@
     "join": "Bat egin",
     "registerDesc": "Erregistratu zure Mus Manager erabiltzailea",
     "email": "Emaila",
-    "emailPlaceholder": "Adib.: pello@mus.com",
+    "emailPlaceholder": "Adib.: pello{'@'}mus.com",
     "password": "Pasahitza",
     "passwordPlaceholder": "Gutxienez 6 karaktere",
     "confirm": "Errepikatu pasahitza",

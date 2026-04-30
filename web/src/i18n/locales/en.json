@@ -97,7 +97,7 @@
     "join": "Join",
     "registerDesc": "Register your Mus Manager user",
     "email": "Email",
-    "emailPlaceholder": "E.g.: john@mus.com",
+    "emailPlaceholder": "E.g.: john{'@'}mus.com",
     "password": "Password",
     "passwordPlaceholder": "Minimum 6 characters",
     "confirm": "Confirm Password",
