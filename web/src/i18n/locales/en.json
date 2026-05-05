@@ -14,8 +14,10 @@
     "login": "Login",
     "getStarted": "Get Started",
     "dashboard": "Dashboard",
+    "home": "Home",
     "logout": "Logout",
-    "about": "About Us"
+    "about": "About Us",
+    "howItWorks": "How it Works"
   },
   "hero": {
     "partner": "Official Mus Partner",
@@ -28,55 +30,58 @@
     "tracking": "Tracking Tournament #{id}"
   },
   "features": {
-    "title": "Everything you need to manage your mus tournaments",
-    "desc": "From creation to awards ceremony, Mus Manager has it all covered.",
+    "title": "Technical excellence in Mus management",
+    "desc": "From creating the first bracket to the award ceremony in the grand final, Mus Manager provides you with an arsenal of tools designed so that nothing fails.",
     "banner": {
       "title1": "Mus is tradition.",
-      "title2": "Management should be too.",
-      "desc": "Mus Manager is not just an application; it is the ultimate ally to safeguard the essence of Mus while embracing modernity. Our platform is born from the real need of organizers: to leave behind the chaos of infinite spreadsheets, lost papers, and endless WhatsApp threads. Whether you manage a small neighborhood club, a flash tournament among friends, or a large professional league with hundreds of participants, Mus Manager offers you a centralized, robust, and elegant environment. Everything you need —tournaments, player records, live results, and historical standings— is now in the palm of your hand, accessible from anywhere and optimized for every device. It's time for you to worry only about what matters: betting 'envido' and enjoying the game."
+      "title2": "Management is precision.",
+      "desc": "Mus Manager is the ultimate ally to safeguard the essence of Mus while embracing modernity. Our platform is born from the real need of organizers: to leave behind the chaos of infinite spreadsheets and lost papers. Whether you manage a small neighborhood club or a large national league, Mus Manager offers you a centralized, robust, and elegant environment. Everything —tournaments, player records, results, and standings— is now in the palm of your hand."
     },
     "management": {
-      "title": "Organize tournaments effortlessly",
-      "desc": "Create tournaments in minutes, define phases, pair teams, and track every match in real-time. No errors, no paper, no chaos.",
+      "title": "Versatile Formats",
+      "desc": "No matter how you play in your area; Mus Manager adapts to your regulations with unprecedented flexibility in the sector.",
       "points": [
-        "Comprehensive management of knockouts and leagues",
-        "Automatic generation of brackets and matchups",
-        "Full control of tables and timing"
+        "Direct knockouts with re-entry",
+        "Round-robin leagues by points",
+        "Group stage + knockout systems",
+        "Advanced 'zeros' and lives management"
       ]
     },
     "registration": {
-      "title": "Your community, well managed",
-      "desc": "Register teams and pairs, check who participates in each tournament, and always have the history at hand. Perfect from a small social group to a club with hundreds of members.",
+      "title": "Participant Control",
+      "desc": "Keep a centralized database of your players and pairs. Forget errors in names and duplicate registrations.",
       "points": [
-        "Centralized player database",
-        "Detailed participation history",
-        "Management of teams and regular pairs"
+        "Historical records of each player",
+        "Quick registration of pairs and teams",
+        "Payment and registration status control",
+        "Global participant search"
       ]
     },
     "results": {
-      "title": "Rankings always up to date",
-      "desc": "Standings update automatically after each result. All participants can consult them at any time, from any device.",
+      "title": "Live Technology",
+      "desc": "Your players can follow the standings from their own mobile. Total transparency generates a healthier and more exciting competitive atmosphere.",
       "points": [
-        "Real-time point updates",
-        "Public access to live standings",
-        "Victory and performance statistics"
+        "Instant standings updates",
+        "Table and game time management",
+        "Automatic digital match record generation",
+        "Real-time bracket visualization"
       ]
     },
     "how_it_works": {
-      "title": "How it works?",
-      "step1_title": "1. Create your community",
-      "step1_desc": "Sign up, name your group, and start adding players. Your community is ready to play in less than five minutes.",
-      "step2_title": "2. Organize a tournament",
-      "step2_desc": "Define the format (league or knockout), add participating teams, and Mus Manager generates the bracket automatically.",
-      "step3_title": "3. Record results",
-      "step3_desc": "After each match, enter the score from any mobile or tablet. Standings are updated instantly.",
-      "step4_title": "4. Check the ranking",
-      "step4_desc": "Your players can follow the standings in real-time and review the tournament history without installing anything."
+      "title": "How does it work?",
+      "step1_title": "1. Community",
+      "step1_desc": "Register and define your game environment.",
+      "step2_title": "2. Tournament",
+      "step2_desc": "Configure the rules and add teams.",
+      "step3_title": "3. Results",
+      "step3_desc": "Enter scores after each match.",
+      "step4_title": "4. Success",
+      "step4_desc": "Check the ranking and celebrate the final."
     },
-    "stats_labels": {
-      "digital": "Digital & Cloud",
-      "cost": "Free for Groups",
-      "access": "Universal Access"
+    "detailed_section": {
+      "title": "Power under the hood",
+      "p1": "Mus Manager is not just a pretty face; it is a calculation engine optimized for the complex scenarios of Mus. We have invested hundreds of hours ensuring that matching algorithms respect traditional rules, preventing pairs from the same club from facing each other prematurely or ensuring an equitable table distribution.",
+      "p2": "Our cloud architecture ensures that data is secure and accessible 24/7. If your battery runs out or you lose connection, the system automatically saves the tournament's last state. Furthermore, our API is ready to integrate with giant screens in game venues, allowing a 'Stadium' experience that will leave your members speechless."
     }
   },
   "stats": {
@@ -160,7 +165,11 @@
     },
     "delete_confirm_title": "Delete Tournament",
     "delete_confirm_msg": "Are you sure you want to delete this tournament? All associated data (teams, matches) will be permanently lost. This action cannot be undone.",
-    "delete_success": "Tournament successfully deleted"
+    "delete_success": "Tournament successfully deleted",
+    "invalid_groups": "Invalid number of groups",
+    "groups_success": "Groups generated successfully",
+    "matches_success": "Matches generated successfully",
+    "enroll_success": "Team enrolled successfully"
   },
   "footer": {
     "desc": "The leading tournament management platform for the competitive Mus community. Precision, elegance, and passion.",
@@ -174,6 +183,7 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "cookies": "Cookies",
+    "system_online": "System Online",
     "about_us": "About Us",
     "history": "Our History",
     "platform": "The Platform"
@@ -181,41 +191,119 @@
   "about": {
     "title": "About Mus Manager",
     "subtitle": "Passion for tradition, precision for the game.",
-    "p1": "Mus Manager was born from a need shared by thousands of fans: to professionalize the management of one of the most emblematic games of our culture. What started as an internal tool for small social clubs has become the leading platform for organizing Mus tournaments worldwide.",
+    "p1": "Mus Manager was born from a need shared by thousands of fans: to professionalize the management of one of the most emblematic games of our culture. What started as an internal tool for small neighborhood clubs has become the leading platform for organizing Mus tournaments worldwide today. Our story begins at a small wooden table, between bids and 'órdagos', where we realized that the complexity of organizing a tournament —brackets, matchups, points, and tiebreakers— often took time away from what's truly important: enjoying the game and the company. We then decided to apply the latest technology to create an environment where tradition and modernity join hands in an elegant and robust way.",
     "mission_title": "Our Mission",
-    "mission_text": "Our mission is to preserve the essence of Mus by providing organizers with modern digital tools that eliminate the chaos of paper and spreadsheets. We want the players' only focus to be the game, the bid, and the strategy.",
+    "mission_text": "Our mission is to preserve the essence of Mus by providing organizers with modern digital tools that eliminate the chaos of paper and spreadsheets. We want the players' only focus to be the game, the bid, and the strategy. We firmly believe that Mus is much more than just a card game; it is a social rite that fosters friendship and healthy competition. By digitizing management, we not only facilitate the organizer's work but also elevate the player's experience, allowing them to follow their progress in real-time, consult historical statistics, and feel part of a professional and passionate community.",
     "why_title": "Why choose us?",
-    "why_text": "Unlike other generic tools, Mus Manager is specifically designed for Mus scenarios: zero management, club leagues, direct knockouts, and real-time standings adapted to traditional rules.",
+    "why_text": "Unlike other generic sports management tools, Mus Manager is specifically designed for the unique scenarios of Mus: zero management, club leagues with their particular rules, direct knockouts with traditional tiebreaker systems, and real-time standings adapted to each regulation. We don't try to adapt tennis or football software to cards; we've built this platform from scratch with the 'musolari' in mind. Our interface is clean, fast, and optimized for mobile devices, because we know a tournament is better lived with a smartphone in one hand and cards in the other. Furthermore, we maintain an unwavering commitment to being free for groups of friends and non-profit clubs.",
     "tradition_title": "Mus: More than a game",
-    "tradition_text": "We understand that Mus is a social rite, an excuse to gather and compete with nobility. That's why our platform is 100% free for social clubs and groups of friends, ensuring no one is left out of the digital table."
+    "tradition_text": "We understand that Mus is a social rite, an excuse to gather and compete with nobility. That's why our platform is 100% free for social clubs and groups of friends, ensuring no one is left out of the digital table. At Mus Manager, we respect the history of the game, its gestures, its signs, and its unique language. Our technology doesn't replace the organizer but empowers them. We want the clubs that have been organizing tournaments on paper for decades to find in us a natural, simple, and satisfying transition. At the end of the day, what we seek is for Mus to remain alive, strong, and adapted to the 21st century, allowing new generations to discover the magic of this game with the tools that are already part of their daily lives.",
+    "vision_title": "Our Long-Term Vision",
+    "vision_text": "We aspire to become the global management standard for all mental sports and traditional board games. We want to create an interconnected network where players can have a unique profile, accumulate merits in different tournaments and federations, and where organizers can professionalize their events regardless of their scale. Technology should be a bridge, not a barrier, and Mus Manager is the first step toward a global, transparent, and technologically advanced Mus community."
   },
   "legal": {
     "privacy_title": "Privacy Policy",
-    "privacy_last_updated": "Last updated: April 2026",
-    "privacy_p1": "At Mus Manager, we value your privacy. This policy details how we collect and protect your personal data when using our tournament management platform.",
+    "privacy_last_updated": "Last updated: May 1, 2026",
+    "privacy_p1": "At musmanager.com (hereinafter, 'the Platform'), we take the protection of your personal data very seriously. This Privacy Policy describes how we collect, use, and protect your information in accordance with the General Data Protection Regulation (GDPR) and current Spanish regulations.",
     "privacy_sections": [
       {
-        "title": "Data Collection",
-        "text": "We collect basic information such as username and email for account management and tournament ranking."
+        "title": "1. Data Controller",
+        "text": "The controller of the data collected on this website is Mus Manager, with address for notification purposes at [POSTAL ADDRESS IN SPAIN] and contact email: legal{'@'}musmanager.com."
       },
       {
-        "title": "Use of Information",
-        "text": "Your data is used exclusively to validate your participation in events and generate game statistics."
+        "title": "2. Data We Collect",
+        "text": "We collect the following types of data: (a) Registration data: email and username to create your account. (b) Participation data: team names and match results. (c) Navigation data: IP address, browser type, and analytical/advertising cookies."
+      },
+      {
+        "title": "3. Purpose of Processing",
+        "text": "We process your data to: (a) Manage your user account and allow you to organize or participate in tournaments. (b) Generate public rankings and game statistics. (c) Maintain the security of the platform. (d) Show relevant advertising to fund the free service."
+      },
+      {
+        "title": "4. Legal Basis",
+        "text": "The legal basis for processing is the user's consent upon registration, the execution of a contract (terms of use), and legitimate interest in improving our services and displaying advertising to maintain the gratuity of the site."
+      },
+      {
+        "title": "5. Your Rights",
+        "text": "You have the right to: Access your data, rectify inaccurate data, request deletion when no longer necessary, object to processing, and request data portability. You can exercise these rights by sending an email to legal{'@'}musmanager.com attaching a copy of your ID or equivalent document."
+      },
+      {
+        "title": "6. Data Retention",
+        "text": "Your account data will be kept as long as you maintain your profile active. Data from finished tournaments form part of the statistical history and will be kept indefinitely unless you explicitly request its deletion."
       }
     ],
-    "terms_title": "Terms and Conditions",
-    "terms_p1": "By accessing Mus Manager, you agree to comply with our terms of use designed to ensure a fair and respectful gaming environment.",
+    "terms_title": "Terms and Conditions of Use",
+    "terms_last_updated": "Last updated: May 2026",
+    "terms_p1": "Welcome to musmanager.com. By using our platform, you agree to the following terms and conditions. Please read them carefully.",
+    "terms_sections": [
+      {
+        "title": "1. Subject of Service",
+        "text": "Mus Manager provides a digital tool for the organization, management, and visualization of mus tournaments. The service is offered 'as is' and free of charge to the end user."
+      },
+      {
+        "title": "2. Registration and Responsibility",
+        "text": "The user is responsible for maintaining the confidentiality of their credentials. Registration of minors under 14 without tutorial consent is prohibited. The user guarantees that the information entered is truthful."
+      },
+      {
+        "title": "3. Prohibited Use",
+        "text": "It is strictly prohibited to use Mus Manager for: (a) Organizing illegal gambling or fraudulent activities. (b) Introducing offensive, violent, or discriminatory content. (c) Performing reverse engineering or damaging the technological infrastructure of the web."
+      },
+      {
+        "title": "4. Disclaimer",
+        "text": "Mus Manager does not intervene in physical bets or tournament prizes organized by third parties. We are not responsible for disputes between players or organizers nor for service malfunctions due to causes beyond our control."
+      },
+      {
+        "title": "5. Modifications",
+        "text": "We reserve the right to modify these terms at any time. Continued use of the platform after changes implies acceptance of the new terms."
+      }
+    ],
     "cookies_title": "Cookies Policy",
-    "cookies_p1": "We use our own and third-party cookies (such as Google AdSense) to improve your experience and serve relevant ads that fund the free maintenance of the platform."
+    "cookies_p1": "At musmanager.com we use cookies to improve your browsing experience and show you personalized advertising. Below we detail what they are and which ones we use.",
+    "cookies_sections": [
+      {
+        "title": "What is a Cookie?",
+        "text": "A cookie is a small text file that the website stores in your browser to remember information about your visit, preferences, and settings."
+      }
+    ],
+    "cookies_table_headers": {
+      "type": "Type",
+      "purpose": "Purpose",
+      "expiry": "Expiry"
+    },
+    "cookies_list": [
+      {
+        "name": "Technical (Necessary)",
+        "purpose": "Allow login and basic platform functionality.",
+        "expiry": "Session"
+      },
+      {
+        "name": "Personalization",
+        "purpose": "Remember your preferred language and interface settings.",
+        "expiry": "1 year"
+      },
+      {
+        "name": "Analysis (Google Analytics)",
+        "purpose": "Help us understand how the web is used to improve it.",
+        "expiry": "2 years"
+      },
+      {
+        "name": "Advertising (Google AdSense)",
+        "purpose": "Show ads based on your interests and previous visits.",
+        "expiry": "Variable"
+      }
+    ],
+    "cookies_footer": "You can configure or reject cookies through your browser settings. Please note that disabling technical cookies may affect the functioning of the user account."
   },
   "seo": {
     "home_title": "Mus Manager | The Mus Tournament Management Platform",
-    "home_desc": "Manage your mus tournaments professionally and for free. Automatic brackets, live standings and much more.",
+    "home_desc": "Manage your mus tournaments professionally and for free. Automatic brackets, live standings, and much more.",
     "features_title": "Features and Functions | Mus Manager",
-    "features_desc": "Discover how to professionalize your mus club with our management tools.",
+    "features_desc": "Discover how to professionalize your mus club with our management tools. Table management, automatic brackets, and live rankings.",
+    "how_it_works_title": "How it Works | Mus Manager Usage Guide",
+    "how_it_works_desc": "Learn step-by-step how to create and manage your Mus tournaments. From registration to the grand final, we explain the whole process.",
     "tournaments_title": "Live Tournaments | Compete in the Mus community",
-    "tournaments_desc": "Check the upcoming mus tournaments and join the competition.",
+    "tournaments_desc": "Check upcoming mus tournaments and join the competition.",
     "about_title": "About Us | The Mission of Mus Manager",
+    "about_desc": "Discover the history, mission, and vision of Mus Manager. We work to professionalize the game of Mus while maintaining its traditional essence.",
     "privacy_title": "Privacy Policy | Data Security at Mus Manager",
     "terms_title": "Terms and Conditions of Use"
   },
@@ -400,5 +488,30 @@
     "groups_count_label": "Number of Groups",
     "draw_groups": "Draw Groups",
     "generate_matches": "Generate Match Schedule"
+  },
+  "how_it_works_page": {
+    "title": "Your Tournament, Step by Step",
+    "subtitle": "Discover how easy it is to professionalize your Mus club.",
+    "intro": "Organizing a Mus tournament shouldn't be a math exam. At Mus Manager, we've simplified the process so that anyone, regardless of their technical knowledge, can launch a successful event in minutes. Here we explain the path from registration to the podium.",
+    "step1": {
+      "title": "Community Setup",
+      "desc": "The first step is to create the home for your tournaments. A community can be your lifelong club, a bar, a gastronomic society, or simply your Thursday group of friends. By creating it, you can invite other organizers and start registering the player database that will regularly participate."
+    },
+    "step2": {
+      "title": "Event Creation",
+      "desc": "Click on 'Create New Tournament' and fill in the basic details: name, date, location, and poster. The most important thing here is choosing the game system (league, knockout, groups, zeros) and defining the specific rules (points, sets, kings). Mus Manager will handle adapting all the tournament logic to these preferences."
+    },
+    "step3": {
+      "title": "Registration and Draw",
+      "desc": "Add participating teams. You can do it manually or allow players to pre-register. Once you have all the brave ones, click the 'Generate Bracket' button. The system will perform the draw automatically, assigning tables and matchups in a fair and transparent way."
+    },
+    "step4": {
+      "title": "Live Management",
+      "desc": "During the tournament, your main task will be entering results. After each match, find the corresponding table on your panel and note the score (e.g., 3-1). At that precise moment, the general standing is recalculated, and the knockout bracket advances. Players can consult this from their own mobiles by scanning the tournament's QR code."
+    },
+    "step5": {
+      "title": "History and Statistics",
+      "desc": "When the tournament ends, the data is not lost. Mus Manager keeps a detailed history of all matches played, allowing you to consult who is the historical champion of your club or how many times a particular pair has won. Data is your community's legacy."
+    }
   }
 }

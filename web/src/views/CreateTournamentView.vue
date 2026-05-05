@@ -204,7 +204,7 @@ const handleCreate = async () => {
           </label>
           <div @click="form.private = !form.private" class="radio-item" :class="{ active: form.private }">
             <div class="radio-check"></div>
-            <span class="radio-label">{{ t('tournament_form.labels.private_desc') || 'Torneo Privado (no aparecerá en el listado público)' }}</span>
+            <span class="radio-label">{{ t('tournament_form.labels.private_desc') }}</span>
           </div>
         </div>
 

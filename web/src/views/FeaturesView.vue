@@ -93,6 +93,57 @@ const benefits = [
       <GoogleAd :key="'bottom-features'" />
     </div>
     
+    <section class="detailed-info px-2 md:px-4">
+      <div class="mus-glass p-6 md:p-20 rounded-[2rem] md:rounded-[5rem] border-[#0fb361]/10 overflow-hidden relative">
+        <!-- Decorative Glow -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#0fb361]/10 blur-[100px] rounded-full"></div>
+        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-[#0fb361]/5 blur-[100px] rounded-full"></div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center relative z-10">
+          <div class="lg:col-span-7">
+            <h2 class="mus-h2 italic mb-8">{{ t('features.detailed_section.title') }}</h2>
+            <div class="flex flex-column gap-6">
+              <p class="mus-p opacity-70 leading-relaxed">{{ t('features.detailed_section.p1') }}</p>
+              <p class="mus-p opacity-70 leading-relaxed">{{ t('features.detailed_section.p2') }}</p>
+            </div>
+          </div>
+          
+          <div class="lg:col-span-5 flex flex-col gap-4">
+             <!-- Technical Highlights -->
+             <div class="p-6 bg-white/5 rounded-3xl border border-white/5 flex items-center gap-6 group hover:border-[#0fb361]/30 transition-all duration-500 hover:bg-[#0fb361]/5">
+                <div class="w-12 h-12 rounded-2xl bg-[#0fb361] flex items-center justify-center shadow-[0_0_20px_rgba(15,179,97,0.4)] group-hover:scale-110 transition-transform">
+                   <i class="pi pi-server text-black font-bold"></i>
+                </div>
+                <div>
+                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">Infraestructura</h4>
+                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Cloud 24/7 Autoscale</p>
+                </div>
+             </div>
+             
+             <div class="p-6 bg-white/5 rounded-3xl border border-white/5 flex items-center gap-6 group hover:border-[#0fb361]/30 transition-all duration-500 hover:bg-[#0fb361]/5">
+                <div class="w-12 h-12 rounded-2xl bg-[#0fb361] flex items-center justify-center shadow-[0_0_20px_rgba(15,179,97,0.4)] group-hover:scale-110 transition-transform">
+                   <i class="pi pi-lock text-black font-bold"></i>
+                </div>
+                <div>
+                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">Seguridad</h4>
+                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">AES-256 Encryption</p>
+                </div>
+             </div>
+
+             <div class="p-6 bg-white/5 rounded-3xl border border-white/5 flex items-center gap-6 group hover:border-[#0fb361]/30 transition-all duration-500 hover:bg-[#0fb361]/5">
+                <div class="w-12 h-12 rounded-2xl bg-[#0fb361] flex items-center justify-center shadow-[0_0_20px_rgba(15,179,97,0.4)] group-hover:scale-110 transition-transform">
+                   <i class="pi pi-bolt text-black font-bold"></i>
+                </div>
+                <div>
+                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">Rendimiento</h4>
+                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Real-time Event Bus</p>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="deep-dive mus-glass">
       <div class="dive-content">
         <h2 class="mus-h2 italic">{{ t('hero.title') }}</h2>
@@ -132,8 +183,15 @@ const benefits = [
 
 .benefits-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .benefits-grid {
+    gap: 40px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
 }
 
 .benefit-card {
@@ -175,10 +233,17 @@ const benefits = [
 }
 
 .deep-dive {
-  padding: 100px;
-  border-radius: 60px;
+  padding: 40px 24px;
+  border-radius: 40px;
   background: linear-gradient(135deg, rgba(15, 179, 97, 0.05) 0%, transparent 100%);
   text-align: center;
+}
+
+@media (min-width: 768px) {
+  .deep-dive {
+    padding: 100px;
+    border-radius: 60px;
+  }
 }
 
 .dive-content {

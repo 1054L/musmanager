@@ -257,7 +257,7 @@ const openPoster = () => {
               </button>
               <button v-if="tournament.isManager" @click="activeTab = 'admin'" 
                       class="mus-tab-btn border-l border-white/5 pl-4 ml-auto" :class="{ active: activeTab === 'admin' }">
-                <i class="pi pi-cog mr-2"></i> {{ t('tournament_view.tabs.admin') || 'Admin' }}
+                <i class="pi pi-cog mr-2"></i> {{ t('tournament_view.tabs.admin') }}
               </button>
            </div>
 
@@ -403,7 +403,7 @@ const openPoster = () => {
                  <table class="w-full text-left border-collapse">
                    <thead>
                      <tr class="bg-white/5 text-[10px] uppercase font-black tracking-widest text-slate-500">
-                       <th class="p-4 w-5/12 min-w-[200px]">{{ t('tournament_view.classification.team') }}</th>
+                       <th class="p-4 w-5/12 min-w-[150px]">{{ t('tournament_view.classification.team') }}</th>
                        <th class="p-4 text-center">{{ t('tournament_view.classification.played') }}</th>
                        <th class="p-4 text-center">{{ t('tournament_view.classification.won') }}</th>
                        <th class="p-4 text-center">{{ t('tournament_view.classification.lost') }}</th>
@@ -441,12 +441,12 @@ const openPoster = () => {
                      <div class="flex-1 flex flex-column justify-content-around gap-6">
                         <div v-for="(m, i) in col.matches" :key="i" class="card bg-[#0a0a0a] border border-white/10 p-4 rounded-xl relative hover:border-[#0fb361]/50 cursor-pointer transition-colors" @click="tournament.isManager ? openEditModal(m) : null">
                           <div class="flex align-items-center justify-content-between mb-3">
-                            <span class="text-white font-bold text-sm truncate pr-2 w-10/12" :title="m.teamA">{{ m.teamA || 'Por decidir' }}</span>
+                            <span class="text-white font-bold text-sm truncate pr-2 w-10/12" :title="m.teamA">{{ m.teamA || t('tournament_view.knockout.deciding') }}</span>
                             <span class="font-black text-lg" :class="m.scoreA > m.scoreB ? 'text-[#0fb361]' : 'text-slate-500'">{{ m.scoreA }}</span>
                           </div>
                           <div class="h-px bg-white/10 w-full my-3"></div>
                           <div class="flex align-items-center justify-content-between">
-                            <span class="text-white font-bold text-sm truncate pr-2 w-10/12" :title="m.teamB">{{ m.teamB || 'Por decidir' }}</span>
+                            <span class="text-white font-bold text-sm truncate pr-2 w-10/12" :title="m.teamB">{{ m.teamB || t('tournament_view.knockout.deciding') }}</span>
                             <span class="font-black text-lg" :class="m.scoreB > m.scoreA ? 'text-[#0fb361]' : 'text-slate-500'">{{ m.scoreB }}</span>
                           </div>
                           
@@ -459,15 +459,15 @@ const openPoster = () => {
 
                 <!-- 3er y 4o Puesto -->
                 <div v-if="thirdPlaceMatch" class="mt-8 border-t border-white/10 pt-8 max-w-md mx-auto">
-                  <h4 class="text-center font-black uppercase tracking-widest text-slate-500 text-xs mb-4">3er y 4º Puesto</h4>
+                  <h4 class="text-center font-black uppercase tracking-widest text-slate-500 text-xs mb-4">{{ t('tournament_view.knockout.third_place') }}</h4>
                   <div class="card bg-[#0a0a0a] border border-[#f4d125]/30 p-4 rounded-xl cursor-pointer hover:border-[#f4d125]" @click="tournament.isManager ? openEditModal(thirdPlaceMatch) : null">
                      <div class="flex align-items-center justify-content-between mb-3">
-                       <span class="text-white font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamA">{{ thirdPlaceMatch.teamA || 'Por decidir' }}</span>
+                       <span class="text-white font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamA">{{ thirdPlaceMatch.teamA || t('tournament_view.knockout.deciding') }}</span>
                        <span class="font-black text-lg" :class="thirdPlaceMatch.scoreA > thirdPlaceMatch.scoreB ? 'text-[#f4d125]' : 'text-slate-500'">{{ thirdPlaceMatch.scoreA }}</span>
                      </div>
                      <div class="h-px bg-white/10 w-full my-3"></div>
                      <div class="flex align-items-center justify-content-between">
-                       <span class="text-white font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamB">{{ thirdPlaceMatch.teamB || 'Por decidir' }}</span>
+                       <span class="text-white font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamB">{{ thirdPlaceMatch.teamB || t('tournament_view.knockout.deciding') }}</span>
                        <span class="font-black text-lg" :class="thirdPlaceMatch.scoreB > thirdPlaceMatch.scoreA ? 'text-[#f4d125]' : 'text-slate-500'">{{ thirdPlaceMatch.scoreB }}</span>
                      </div>
                   </div>
@@ -507,7 +507,7 @@ const openPoster = () => {
               <div class="mb-6 flex align-items-center justify-between">
                 <div>
                    <h3 class="text-white font-black uppercase italic tracking-tight m-0">{{ t('tournament_view.match_edit.title') }}</h3>
-                   <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">{{ t('tournament_view.active_matches_desc') || 'Registra los resultados de los enfrentamientos' }}</p>
+                   <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">{{ t('tournament_view.active_matches_desc') }}</p>
                 </div>
               </div>
 
@@ -679,7 +679,11 @@ const openPoster = () => {
   box-shadow: 0 0 10px #0fb361;
 }
 
-.mus-table-wrapper { background: rgba(0,0,0,0.2); }
+.mus-table-wrapper { 
+  background: rgba(0,0,0,0.2); 
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 th { border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 .rule-icon-item {

@@ -2,6 +2,7 @@
 import { ref, provide } from 'vue'
 import MusNavbar from './MusNavbar.vue'
 import AuthModal from '../components/AuthModal.vue'
+import CookieBanner from '../components/CookieBanner.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Toast from 'primevue/toast'
 
@@ -22,6 +23,7 @@ provide('openAuthModal', openAuthModal)
   <div class="mus-layout">
     <Toast />
     <ConfirmDialog />
+    <CookieBanner />
     
     <!-- Background Elements -->
     <div class="bg-elements">
@@ -59,16 +61,16 @@ provide('openAuthModal', openAuthModal)
         <div class="footer-links-col">
            <h4 class="footer-h4">{{ $t('footer.product') }}</h4>
             <ul class="footer-ul">
-              <li><router-link to="/features" class="footer-link">{{ $t('nav.features') }}</router-link></li>
+              <li><router-link to="/caracteristicas" class="footer-link">{{ $t('nav.features') }}</router-link></li>
+              <li><router-link to="/como-funciona" class="footer-link">{{ $t('features.how_it_works.title') }}</router-link></li>
               <li><router-link :to="{ path: '/tournaments', query: { status: 'active' } }" class="footer-link">{{ $t('nav.tournaments') }}</router-link></li>
-              <li><router-link to="/about" class="footer-link">{{ $t('footer.about_us') }}</router-link></li>
             </ul>
         </div>
 
         <div class="footer-links-col">
            <h4 class="footer-h4">{{ $t('footer.company') }}</h4>
            <ul class="footer-ul">
-             <li>{{ $t('footer.about') }}</li>
+             <li><router-link to="/sobre-nosotros" class="footer-link">{{ $t('footer.about') }}</router-link></li>
              <li>{{ $t('footer.contact') }}</li>
            </ul>
         </div>
@@ -76,8 +78,8 @@ provide('openAuthModal', openAuthModal)
         <div class="footer-links-col">
            <h4 class="footer-h4">{{ $t('footer.legal') }}</h4>
             <ul class="footer-ul">
-              <li><router-link to="/privacy" class="footer-link">{{ $t('footer.privacy') }}</router-link></li>
-              <li><router-link to="/terms" class="footer-link">{{ $t('footer.terms') }}</router-link></li>
+              <li><router-link to="/privacidad" class="footer-link">{{ $t('footer.privacy') }}</router-link></li>
+              <li><router-link to="/terminos" class="footer-link">{{ $t('footer.terms') }}</router-link></li>
               <li><router-link to="/cookies" class="footer-link">{{ $t('footer.cookies') }}</router-link></li>
             </ul>
         </div>
@@ -87,7 +89,7 @@ provide('openAuthModal', openAuthModal)
          <p class="footer-copy" v-html="$t('footer.rights').replace('Mus Manager', '<span class=\'mus-gold-text\'>Mus Manager</span>')"></p>
          <div class="footer-status">
             <span class="status-dot"></span>
-            <span class="status-text">System Online v1.0.1</span>
+            <span class="status-text">{{ $t('footer.system_online') }} v1.0.1</span>
          </div>
       </div>
     </footer>

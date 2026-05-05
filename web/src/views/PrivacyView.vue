@@ -7,22 +7,20 @@ const { t, tm } = useI18n()
 <template>
   <div class="legal-view mus-container py-20 max-w-4xl mx-auto">
     <header class="text-center mb-16 animate-fade-in">
-      <h1 class="mus-h1 mb-4">{{ t('legal.terms_title') }}</h1>
-      <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">{{ t('legal.terms_last_updated') }}</p>
+      <h1 class="mus-h1 mb-4">{{ t('legal.privacy_title') }}</h1>
+      <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">{{ t('legal.privacy_last_updated') }}</p>
       <div class="mus-divider mx-auto mt-8"></div>
     </header>
     
     <div class="mus-glass p-8 md:p-12 rounded-[40px] mb-12 border-emerald-500/10">
       <p class="mus-p mb-12 text-lg leading-relaxed">
-        {{ t('legal.terms_p1') }}
+        {{ t('legal.privacy_p1') }}
       </p>
 
-      <div v-for="(section, i) in tm('legal.terms_sections')" :key="i" class="mb-12 last:mb-0 group">
+      <div v-for="(section, i) in tm('legal.privacy_sections')" :key="i" class="mb-12 last:mb-0 group">
         <div class="flex items-start gap-6">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-500/5 flex items-center justify-center text-emerald-500 font-black italic group-hover:bg-emerald-500 group-hover:text-black transition-all">
-            {{ i + 1 }}
-          </div>
-          <div class="flex-1">
+          <div class="w-1 h-8 bg-emerald-500/20 group-hover:bg-emerald-500 transition-colors rounded-full mt-1"></div>
+          <div>
             <h2 class="mus-h3 mb-4 text-white group-hover:text-emerald-400 transition-colors">{{ section.title }}</h2>
             <p class="mus-p text-slate-400 text-base leading-relaxed">{{ section.text }}</p>
           </div>

@@ -14,8 +14,10 @@
     "login": "Sartu",
     "getStarted": "Hasi",
     "dashboard": "Dashboard",
+    "home": "Hasiera",
     "logout": "Irten",
-    "about": "Guri Buruz"
+    "about": "Guri Buruz",
+    "howItWorks": "Nola Funtzionatzen Du?"
   },
   "hero": {
     "partner": "Mus Elkarte Ofiziala",
@@ -28,55 +30,58 @@
     "tracking": "#{id} Txapelketa jarraitzen"
   },
   "features": {
-    "title": "Zure mus txapelketak kudeatzeko behar duzun guztia",
-    "desc": "Sorkuntzatik sari banaketara arte, Mus Managerrek dena estaltzen du.",
+    "title": "Bikaintasun teknikoa Musaren kudeaketan",
+    "desc": "Lehen koadroa sortzen denetik final handiko sari banaketara arte, Mus Managerrek ezerk huts egin ez dezan diseinatutako tresna-arsenala eskaintzen dizu.",
     "banner": {
       "title1": "Musa tradizioa da.",
-      "title2": "Kudeaketa ere bai.",
-      "desc": "Mus Manager ez da aplikazio bat soilik; Musaren esentzia babesteko eta modernitatea besarkatzeko azken aliatua da. Gure plataforma antolatzaileen benetako beharretik jaio da: kalkulu-orri infinituen, galtzen diren paperen eta WhatsApp bidezko mezu bukaezinen kaosetik ihes egiteko. Auzoko elkarte txiki bat, lagun arteko txapelketa azkar bat edo ehunka parte-hartzaile dituen liga profesional handi bat kudeatzen baduzu, Mus Managerrek ingurune zentralizatua, sendoa eta dotorea eskaintzen dizu. Behar duzun guztia —txapelketak, jokalarien fitxak, zuzeneko emaitzak eta sailkapen historikoak— orain zure esku dago, edozein lekutatik eskuragarri eta gailu bakoitzerako optimizatuta. Orain, benetan garrantzia duenaz soilik arduratzeko unea da: 'envido' jotzea eta partidaz gozatzea."
+      "title2": "Kudeaketa zehaztasuna da.",
+      "desc": "Mus Manager Musaren esentzia babesteko eta modernitatea besarkatzeko azken aliatua da. Gure plataforma antolatzaileen benetako beharretik jaio da: kalkulu-orri infinituen eta galtzen diren paperen kaosa alde batera utziz. Auzoko elkarte txiki bat edo liga nazional handi bat kudeatzen baduzu, Mus Managerrek ingurune zentralizatua, sendoa eta dotorea eskaintzen dizu. Dena —txapelketak, jokalarien fitxak, emaitzak eta sailkapenak— orain zure esku dago."
     },
     "management": {
-      "title": "Antolatu txapelketak esfortzurik gabe",
-      "desc": "Sortu txapelketak minututan, definitu faseak, parekatu taldeak eta kontrolatu partida bakoitza denbora errealean. Akatsik gabe, paperik gabe, kaoserik gabe.",
+      "title": "Formatu Anitzak",
+      "desc": "Ez du axola nola jokatzen duzuen zure inguruan; Mus Manager zure erreglamentura egokitzen da sektorean aurrekaririk ez duen malgutasunarekin.",
       "points": [
-        "Kanporaketa eta ligen kudeaketa integrala",
-        "Koadroen eta gurutzaketen sorrera automatikoa",
-        "Mahaien eta denboren kontrol osoa"
+        "Kanporaketa zuzenak reengantxearekin",
+        "Guztiak guztien aurkako ligak puntuka",
+        "Taldeen fasea + kanporaketa sistemak",
+        "Zeroen eta bizitzen kudeaketa aurreratua"
       ]
     },
     "registration": {
-      "title": "Zure komunitatea, ondo kudeatua",
-      "desc": "Erregistratu taldeak eta bikoteak, kontsultatu nork hartzen duen parte txapelketa bakoitzean eta izan beti historia eskura. Perfektua auzo-elkarte txiki batetik ehunka bazkide dituen klub bateraino.",
+      "title": "Parte-hartzaileen Kontrola",
+      "desc": "Mantendu zure jokalari eta bikoteen datu-base zentralizatua. Ahaztu izenetako akatsak eta inskripzio bikoiztuak.",
       "points": [
-        "Jokalarien datu-base zentralizatua",
-        "Parte-hartzeen historia zehatza",
-        "Ohiko talde eta bikoteen kudeaketa"
+        "Jokalari bakoitzaren fitxa historikoak",
+        "Bikote eta taldeen erregistro azkarra",
+        "Ordainketen eta inskripzio-egoeren kontrola",
+        "Parte-hartzaileen bilatzaile globala"
       ]
     },
     "results": {
-      "title": "Sailkapenak beti egunean",
-      "desc": "Sailkapenak automatikoki eguneratzen dira emaitza bakoitzaren ondoren. Parte-hartzaile guztiek edozein unetan kontsulta ditzakete, edozein gailutatik.",
+      "title": "Teknologia Zuzenean",
+      "desc": "Zure jokalariek sailkapena euren mugikorretik jarraitu ahal izango dute. Gardentasun osoak lehiaketa giro osasuntsuagoa eta zirraragarriagoa sortzen du.",
       "points": [
-        "Puntuen eguneratzea denbora errealean",
-        "Zuzeneko sailkapenetarako sarbide publikoa",
-        "Garaipenen eta errendimenduaren estatistikak"
+        "Sailkapenen berehalako eguneratzea",
+        "Mahaien eta joko-denboren kudeaketa",
+        "Akta digital automatikoen sorrera",
+        "Koadroen bistaratzea denbora errealean"
       ]
     },
     "how_it_works": {
       "title": "Nola funtzionatzen du?",
-      "step1_title": "1. Sortu zure komunitatea",
-      "step1_desc": "Eman izena, jarri izena zure taldeari eta hasi jokalariak gehitzen. Bost minutu baino gutxiagoan zure komunitatea jokatzeko prest dago.",
-      "step2_title": "2. Antolatu txapelketa bat",
-      "step2_desc": "Definitu formatua (liga edo kanporaketa), gehitu parte hartzen duten taldeak eta Mus Managerrek koadroa automatikoki sortzen du.",
-      "step3_title": "3. Erregistratu emaitzak",
-      "step3_desc": "Partida bakoitzaren ondoren, sartu markagailua edozein mugikor edo tabletetik. Sailkapenak berehala eguneratzen dira.",
-      "step4_title": "4. Kontsultatu rankinga",
-      "step4_desc": "Zure jokalariek sailkapena denbora errealean jarrai dezakete eta txapelketaren historia berrikusi dezakete ezer instalatu gabe."
+      "step1_title": "1. Komunitatea",
+      "step1_desc": "Erregistratu eta definitu zure joko-ingurunea.",
+      "step2_title": "2. Txapelketa",
+      "step2_desc": "Konfiguratu arauak eta gehitu taldeak.",
+      "step3_title": "3. Emaitzak",
+      "step3_desc": "Sartu markagailuak partida bakoitzaren ondoren.",
+      "step4_title": "4. Arrakasta",
+      "step4_desc": "Kontsultatu rankinga eta ospatu finala."
     },
-    "stats_labels": {
-      "digital": "Digital & Cloud",
-      "cost": "Doan Elkarteentzat",
-      "access": "Sarbide Unibertsala"
+    "detailed_section": {
+      "title": "Potentzia kapotaren azpian",
+      "p1": "Mus Manager ez da aurpegi polit bat soilik; Musaren kasuistika konplexuetarako optimizatutako kalkulu-motorra da. Ehunka ordu inbertitu ditugu parekatze-algoritmoek arau tradizionalak errespeta ditzaten ziurtatzeko, klub bereko bikoteak goizegi aurrez aurre egon ez daitezen edo mahaien banaketa ekitatiboa bermatuz.",
+      "p2": "Gure hodeiko arkitekturak datuak seguru eta eskuragarri egotea bermatzen du 24/7. Bateria agortzen bazaizu edo konexioa galtzen baduzu, sistemak automatikoki gordetzen du txapelketaren azken egoera. Gainera, gure APIa joko-aretoetako pantaila erraldoiekin integratzeko prest dago, zure bazkideak aho zabalik utziko dituen 'Estadio' esperientzia ahalbidetuz."
     }
   },
   "stats": {
@@ -160,7 +165,11 @@
     },
     "delete_confirm_title": "Txapelketa Ezabatu",
     "delete_confirm_msg": "Ziur al zaude txapelketa hau ezabatu nahi duzula? Lotutako datu guztiak (bikoteak, partidak) betiko galduko dira. Ekintza hau ezin da desegin.",
-    "delete_success": "Txapelketa ongi ezabatu da"
+    "delete_success": "Txapelketa ongi ezabatu da",
+    "invalid_groups": "Talde kopuru baliogabea",
+    "groups_success": "Taldeak ongi sortu dira",
+    "matches_success": "Partiden egutegia ongi sortu da",
+    "enroll_success": "Bikotea ongi izena eman du"
   },
   "footer": {
     "desc": "Mus komunitate lehiakorrarentzako txapelketak kudeatzeko plataforma nagusia. Zehaztasuna, dotorezia eta pasioa.",
@@ -174,6 +183,7 @@
     "privacy": "Pribatutasuna",
     "terms": "Baldintzak",
     "cookies": "Cookie-ak",
+    "system_online": "Sistema Online",
     "about_us": "Guri Buruz",
     "history": "Gure Historia",
     "platform": "Plataforma"
@@ -181,41 +191,119 @@
   "about": {
     "title": "Mus Manager-i Buruz",
     "subtitle": "Tradizioarekiko pasioa, jokoarekiko zehaztasuna.",
-    "p1": "Mus Manager milaka zalek partekatutako behar batetik jaio zen: gure kulturako joko enblematikoenetako baten kudeaketa profesionalizatzea. Peña txikientzako barne-tresna gisa hasi zena, mundu osoko Mus txapelketak antolatzeko plataforma nagusi bihurtu da.",
+    "p1": "Mus Manager milaka zalek partekatutako behar batetik jaio zen: gure kulturako joko enblematikoenetako baten kudeaketa profesionalizatzea. Auzoko peña txikientzako barne-tresna gisa hasi zena, gaur egun mundu osoko Mus txapelketak antolatzeko plataforma nagusi bihurtu da. Gure historia egurrezko mahai txiki batean hasten da, hordago eta inguruen artean, non txapelketa bat antolatzearen konplexutasuna —koadroak, gurutzaketak, puntuak eta berdinketak— sarritan benetan garrantzitsua denari denbora kentzen ziola konturatu ginen: jokoaz eta konpainiaz gozatzea. Orduan erabaki genuen azken teknologia aplikatzea tradizioak eta modernitateak modu dotore eta sendoan bat egiten duten ingurune bat sortzeko.",
     "mission_title": "Gure Misioa",
-    "mission_text": "Gure misioa Musaren esentzia babestea da, antolatzaileei tresna digital modernoak eskainiz, paperaren eta kalkulu-orrien kaosa alde batera utziz. Jokalarien arreta bakarra partida, hordagoa eta estrategia izatea nahi dugu.",
+    "mission_text": "Gure misioa Musaren esentzia babestea da, antolatzaileei tresna digital modernoak eskainiz, paperaren eta kalkulu-orrien kaosa alde batera utziz. Jokalarien arreta bakarra partida, hordagoa eta estrategia izatea nahi dugu. Sendo sinesten dugu Musa karta joko bat baino askoz gehiago dela; adiskidetasuna eta lehiaketa osasuntsua sustatzen dituen erritu sozial bat da. Kudeaketa digitalizatuz, antolatzailearen lana errazteaz gain, jokalariaren esperientzia ere goratzen dugu, bere aurrerapena denbora errealean jarraitu, estatistika historikoak kontsultatu eta komunitate profesional eta apasionatu baten parte dela sentitu dezan.",
     "why_title": "Zergatik aukeratu gu?",
-    "why_text": "Beste tresna orokor batzuek ez bezala, Mus Manager Musaren kasuistiketarako berariaz diseinatuta dago: zeroen kudeaketa, peña ligak, kanporaketa zuzenak eta arau tradizionaletara egokitutako sailkapenak denbora errealean.",
+    "why_text": "Beste kudeaketa-tresna orokor batzuek ez bezala, Mus Manager Musaren kasuistika berezietarako berariaz diseinatuta dago: zeroen kudeaketa, peña ligak beren arau partikularrekin, kanporaketa zuzenak berdinketa-sistema tradizionalekin eta sailkapenak denbora errealean erreglamentu bakoitzera egokituta. Ez dugu saiatzen tenis edo futbol software bat kartetara egokitzen; plataforma hau hutsetik eraiki dugu 'musolari'engan pentsatuz. Gure interfazea garbia, azkarra eta gailu mugikorretarako optimizatua dago, badakigulako txapelketa bat hobeto bizi dela smartphone bat esku batean eta kartak bestean dituzula. Gainera, lagun taldeentzat eta irabazi-asmorik gabeko peñentzat doakoa izateko konpromiso sendoa mantentzen dugu.",
     "tradition_title": "Musa: Joko bat baino gehiago",
-    "tradition_text": "Musa erritu sozial bat dela ulertzen dugu, elkartzeko eta nobleziaz lehiatzeko aitzakia bat. Horregatik, gure plataforma %100 doakoa da peña eta lagun taldeentzat, inor mahai digitaletik kanpo geratuko ez dela ziurtatuz."
+    "tradition_text": "Musa erritu sozial bat dela ulertzen dugu, elkartzeko eta nobleziaz lehiatzeko aitzakia bat. Horregatik, gure plataforma %100 doakoa da peña eta lagun taldeentzat, inor mahai digitaletik kanpo geratuko ez dela ziurtatuz. Mus Manager-en jokoaren historia, gestoak, zeinuak eta bere hizkuntza berezia errespetatzen ditugu. Gure teknologiak ez du antolatzailea ordezkatzen, ahalmendu egiten du. Hamarkadak paperetan txapelketak antolatzen daramatzaten peñek guregan trantsizio natural, sinple eta pozgarri bat aurkitzea nahi dugu. Egunaren amaieran, Musa bizirik, indartsu eta XXI. mendera egokituta egotea da bilatzen duguna, belaunaldi berriek joko honen magia deskubritu dezaten euren eguneroko bizitzaren parte diren tresnekin.",
+    "vision_title": "Gure Epe Luzerako Ikuspegia",
+    "vision_text": "Kirol mental guztientzako eta mahai-joko tradizional guztientzako kudeaketa-estandar global bihurtu nahi dugu. Sarea konektatu bat sortu nahi dugu, non jokalariek profil bakarra izan dezaketen, txapelketa eta federazio ezberdinetan merituak pilatu, eta antolatzaileek euren ekitaldiak profesionalizatu ditzaketen, beren eskala edozein dela ere. Teknologiak zubi bat izan behar du, ez oztopo bat, eta Mus Manager Mus komunitate global, garden eta teknologikoki aurreratu baterako lehen urratsa da."
   },
   "legal": {
     "privacy_title": "Pribatutasun Politika",
-    "privacy_last_updated": "Azken eguneratzea: 2026ko apirila",
-    "privacy_p1": "Mus Manager-en, zure pribatutasuna baloratzen dugu. Politika honek xehetasunez azaltzen du nola biltzen eta babesten ditugun zure datu pertsonalak gure txapelketak kudeatzeko plataforma erabiltzean.",
+    "privacy_last_updated": "Azken eguneratzea: 2026ko maiatzaren 1a",
+    "privacy_p1": "musmanager.com-en (aurrerantzean, 'Plataforma'), oso serio hartzen dugu zure datu pertsonalen babesa. Pribatutasun Politika honek azaltzen du nola biltzen, erabiltzen eta babesten dugun zure informazioa, Datuen Babeserako Erregelamendu Orokorraren (DBEO) eta indarrean dagoen Espainiako araudiaren arabera.",
     "privacy_sections": [
       {
-        "title": "Datu Bilketa",
-        "text": "Oinarrizko informazioa biltzen dugu, hala nola erabiltzaile-izena eta helbide elektronikoa, kontuak kudeatzeko eta txapelketen rankinga egiteko."
+        "title": "1. Tratamenduaren Arduraduna",
+        "text": "Webgune honetan biltzen diren datuen tratamenduaren arduraduna Mus Manager da, jakinarazpen-ondorioetarako helbidea [DIRECCIÓN POSTAL EN ESPAÑA]-n duena eta harremanetarako posta elektronikoa legal{'@'}musmanager.com izanik."
       },
       {
-        "title": "Informazioaren Erabilera",
-        "text": "Zure datuak ekitaldietan parte hartzea balioztatzeko eta joko-estatistikak sortzeko soilik erabiltzen dira."
+        "title": "2. Biltzen ditugun Datuak",
+        "text": "Honako datu mota hauek biltzen ditugu: (a) Erregistroko datuak: posta elektronikoa eta erabiltzaile-izena zure kontua sortzeko. (b) Parte hartzeko datuak: taldeen izenak eta partiden emaitzak. (c) Nabigazio-datuak: IP helbidea, nabigatzaile mota eta cookie analitikoak/publizitarioak."
+      },
+      {
+        "title": "3. Tratamenduaren Helburua",
+        "text": "Zure datuak honetarako tratatzen ditugu: (a) Zure erabiltzaile-kontua kudeatzeko eta txapelketak antolatzeko edo parte hartzeko. (b) Ranking publikoak eta joko-estatistikak sortzeko. (c) Plataformaren segurtasuna mantentzeko. (d) Doako zerbitzua finantzatzeko iragarki garrantzitsuak erakusteko."
+      },
+      {
+        "title": "4. Oinarri Legala",
+        "text": "Tratamenduaren oinarri legala erabiltzailearen adostasuna da erregistratzean, kontratu bat gauzatzea (erabilera-baldintzak) eta gure zerbitzuak hobetzeko eta webgunea doan mantentzeko publizitatea erakusteko interes legitimoa."
+      },
+      {
+        "title": "5. Zure Eskubideak",
+        "text": "Eskubide hauek dituzu: Zure datuetara sartzea, datu okerrak zuzentzea, beharrezkoak ez direnean ezabatzeko eskatzea, tratamenduari aurka egitea eta zure datuen eramangarritasuna eskatzea. Eskubide hauek legal{'@'}musmanager.com helbidera mezu bat bidaliz erabil ditzakezu, zure NANaren edo baliokidearen kopia bat erantsiz."
+      },
+      {
+        "title": "6. Datuak Kontserbatzea",
+        "text": "Zure kontuko datuak zure profila aktibo mantentzen duzun bitartean gordeko dira. Amaitutako txapelketen datuak historia estatistikoaren parte dira eta mugarik gabe gordeko dira, berariaz ezabatzeko eskatzen ez baduzu."
       }
     ],
-    "terms_title": "Baldintzak eta Baldintzak",
-    "terms_p1": "Mus Manager-en sartzean, joko-ingurune zuzen eta errespetuzkoa bermatzeko diseinatutako gure erabilera-baldintzak betetzea onartzen duzu.",
+    "terms_title": "Erabilera Baldintzak eta Baldintzak",
+    "terms_last_updated": "Azken eguneratzea: 2026ko maiatza",
+    "terms_p1": "Ongi etorri musmanager.com-era. Gure plataforma erabiltzean, honako baldintza hauek onartzen dituzu. Mesedez, irakurri arretaz.",
+    "terms_sections": [
+      {
+        "title": "1. Zerbitzuaren Helburua",
+        "text": "Mus Manager-ek mus txapelketak antolatzeko, kudeatzeko eta bistaratzeko tresna digital bat eskaintzen du. Zerbitzua 'dagoen bezala' eta doan eskaintzen zaio azken erabiltzaileari."
+      },
+      {
+        "title": "2. Erregistroa eta Erantzukizuna",
+        "text": "Erabiltzailea da bere kredentzialen konfidentzialtasuna mantentzearen arduraduna. Debekatuta dago 14 urtetik beherakoak erregistratzea tutorearen baimenik gabe. Erabiltzaileak ziurtatzen du sartutako informazioa egiazkoa dela."
+      },
+      {
+        "title": "3. Debekatutako Erabilera",
+        "text": "Zertarako debekatuta dago Mus Manager erabiltzea: (a) Legez kanpoko apustuak edo iruzurrezko jarduerak antolatzeko. (b) Eduki iraingarria, bortitza edo diskriminatzailea sartzeko. (c) Ingeniaritza alderantzikatua egiteko edo webgunearen azpiegitura teknologikoa kaltetzeko."
+      },
+      {
+        "title": "4. Erantzukizunetik Salbuestea",
+        "text": "Mus Manager-ek ez du parte hartzen hirugarrenek antolatutako txapelketetako apustu fisikoetan edo sarietan. Ez gara jokalarien edo antolatzaileen arteko gatazken erantzule, ezta gure kontroletik kanpoko kausengatik zerbitzuak gaizki funtzionatzearen erantzule ere."
+      },
+      {
+        "title": "5. Aldaketak",
+        "text": "Edozein unetan baldintza hauek aldatzeko eskubidea dugu. Aldaketen ondoren plataforma erabiltzen jarraitzeak baldintza berriak onartzea dakar."
+      }
+    ],
     "cookies_title": "Cookie Politika",
-    "cookies_p1": "Geure eta hirugarrenen cookie-ak (Google AdSense adibidez) erabiltzen ditugu zure esperientzia hobetzeko eta plataforma doan mantentzen laguntzen duten iragarki garrantzitsuak erakusteko."
+    "cookies_p1": "musmanager.com-en cookie-ak erabiltzen ditugu zure nabigazio-esperientzia hobetzeko eta publizitate pertsonalizatua erakusteko. Jarraian, zer diren eta zeintzuk erabiltzen ditugun azaltzen dugu.",
+    "cookies_sections": [
+      {
+        "title": "Zer da Cookie bat?",
+        "text": "Cookie bat testu-fitxategi txiki bat da, webguneak zure nabigatzailean gordetzen duena zure bisitari, lehentasunei eta ezarpenei buruzko informazioa gogoratzeko."
+      }
+    ],
+    "cookies_table_headers": {
+      "type": "Mota",
+      "purpose": "Helburua",
+      "expiry": "Iraungitzea"
+    },
+    "cookies_list": [
+      {
+        "name": "Teknikoak (Beharrezkoak)",
+        "purpose": "Saioa hasteko eta plataformaren oinarrizko funtzionamendurako aukera ematen dute.",
+        "expiry": "Saioa"
+      },
+      {
+        "name": "Pertsonalizazioa",
+        "purpose": "Zure hizkuntza gogokoena eta interfaze-ezarpenak gogoratzen dituzte.",
+        "expiry": "Urte 1"
+      },
+      {
+        "name": "Analisia (Google Analytics)",
+        "purpose": "Webgunea nola erabiltzen den ulertzen laguntzen digute hobetzeko.",
+        "expiry": "2 urte"
+      },
+      {
+        "name": "Publizitatea (Google AdSense)",
+        "purpose": "Zure interesetan eta aurreko bisitetan oinarritutako iragarkiak erakusten dituzte.",
+        "expiry": "Aldakorra"
+      }
+    ],
+    "cookies_footer": "Cookie-ak zure nabigatzailearen ezarpenen bidez konfiguratu edo baztertu ditzakezu. Kontuan izan cookie teknikoak desgaitzeak erabiltzaile-kontuaren funtzionamenduan eragina izan dezakeela."
   },
   "seo": {
     "home_title": "Mus Manager | Mus Txapelketak Kudeatzeko Plataforma",
     "home_desc": "Kudeatu zure mus txapelketak modu profesional eta doakoan. Koadro automatikoak, zuzeneko sailkapenak eta askoz gehiago.",
     "features_title": "Ezaugarriak eta Funtzioak | Mus Manager",
-    "features_desc": "Ezagutu nola profesionalizatu zure mus peña gure kudeaketa-tresnekin.",
+    "features_desc": "Ezagutu nola profesionalizatu zure mus peña gure kudeaketa-tresnekin. Mahaien kudeaketa, koadro automatikoak eta zuzeneko rankingak.",
+    "how_it_works_title": "Nola Funtzionatzen Du | Mus Manager Erabilera Gida",
+    "how_it_works_desc": "Ikasi pausoz pauso nola sortu eta kudeatu zure Mus txapelketak. Erregistrotik hasi eta final handira arte, prozesu osoa azaltzen dizugu.",
     "tournaments_title": "Zuzeneko Txapelketak | Lehiatu Mus komunitatean",
     "tournaments_desc": "Kontsultatu hurrengo mus txapelketak eta bat egin lehiaketara.",
     "about_title": "Guri Buruz | Mus Managerren Misioa",
+    "about_desc": "Ezagutu Mus Managerren historia, misioa eta ikuspegia. Mus jokoa profesionalizatzeko lan egiten dugu, bere esentzia tradizionala mantenduz.",
     "privacy_title": "Pribatutasun Politika | Datuen Segurtasuna Mus Manager-en",
     "terms_title": "Erabilera Baldintzak eta Baldintzak"
   },
@@ -400,5 +488,30 @@
     "groups_count_label": "Talde Kopurua",
     "draw_groups": "Taldeen Zozketa",
     "generate_matches": "Sortu Partiden Egutegia"
+  },
+  "how_it_works_page": {
+    "title": "Zure Txapelketa, Pausoz Pauso",
+    "subtitle": "Ezagutu zein erraza den zure Mus peña profesionalizatzea.",
+    "intro": "Mus txapelketa bat antolatzeak ez luke matematika azterketa bat izan behar. Mus Manager-en prozesua sinplifikatu dugu, edozein pertsonak, bere ezagutza teknologikoak kontuan hartu gabe, ekitaldi arrakastatsu bat abiarazi dezan minututan. Hemen azaltzen dizugu bidea erregistrotik podioraino.",
+    "step1": {
+      "title": "Komunitatearen Konfigurazioa",
+      "desc": "Lehen urratsa zure txapelketen etxea sortzea da. Komunitate bat zure betiko peña, taberna bat, elkarte gastronomiko bat edo, besterik gabe, ostegunetako lagun taldea izan daiteke. Sortzean, beste antolatzaile batzuk gonbidatu ahal izango dituzu eta ohiko jokalarien datu-basea erregistratzen hasi."
+    },
+    "step2": {
+      "title": "Ekitaldiaren Sorkuntza",
+      "desc": "Egin klik 'Sortu Txapelketa Berria' botoian eta bete oinarrizko datuak: izena, data, lekua eta kartela. Garrantzitsuena hemen joko-sistema aukeratzea da (liga, kanporaketa, taldeak, zeroak) eta arau espezifikoak definitzea (tantuak, umeak, erregeak). Mus Manager txapelketaren logika guztia lehentasun hauetara egokitzeaz arduratuko da."
+    },
+    "step3": {
+      "title": "Inskripzioak eta Zozketa",
+      "desc": "Gehitu parte hartzen duten taldeak. Eskuz egin dezakezu edo jokalariei aurre-inskribatzeko baimena eman. Behin ausart guztiak dituzunean, sakatu 'Sortu Koadroa' botoia. Sistemak zozketa automatikoki egingo du, mahaiak eta norgehiagokak modu zuzen eta gardenean esleituz."
+    },
+    "step4": {
+      "title": "Zuzeneko Kudeaketa",
+      "desc": "Txapelketan zehar, zure lan nagusia emaitzak sartzea izango da. Partida bakoitzaren ondoren, bilatu dagokion mahaia zure panelean eta idatzi markagailua (adibidez: 3-1). Une horretan bertan, sailkapen orokorra birkalkulatu egiten da eta kanporaketa koadroak aurrera egiten du. Jokalariek hau euren mugikorretatik kontsulta dezakete txapelketaren QR kodea eskaneatuz."
+    },
+    "step5": {
+      "title": "Historikoa eta Estatistikak",
+      "desc": "Txapelketa amaitzean, datuak ez dira galtzen. Mus Manager-ek jokatutako partida guztien historiko zehatza gordetzen du, zure peñako 'txapeldun' historikoa nor den edo bikote jakin batek zenbat aldiz irabazi duen kontsultatzeko aukera emanez. Datuak zure komunitatearen ondarea dira."
+    }
   }
 }

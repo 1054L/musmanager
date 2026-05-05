@@ -179,23 +179,40 @@ onMounted(() => {
   border-radius: 99px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   gap: 4px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.filter-bar::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }
 
 .filter-btn {
   background: transparent;
   border: none;
   color: #64748b;
-  padding: 10px 24px;
+  padding: 10px 16px;
   border-radius: 99px;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.1em;
   cursor: pointer;
   transition: all 0.3s;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .filter-btn {
+    padding: 10px 24px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    gap: 8px;
+  }
 }
 
 .filter-btn:hover {
@@ -227,8 +244,15 @@ onMounted(() => {
 
 .tournaments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .tournaments-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 40px;
+  }
 }
 
 .t-card {

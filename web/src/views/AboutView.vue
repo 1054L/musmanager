@@ -21,31 +21,32 @@ const { t } = useI18n()
         <p class="mus-p text-lg leading-relaxed mb-8">
           {{ t('about.p1') }}
         </p>
+        <h3 class="mus-h3 mb-6 text-[#0fb361] italic">{{ t('footer.history') }}</h3>
         <p class="mus-p text-lg leading-relaxed">
           {{ t('about.tradition_text') }}
         </p>
       </div>
-      <div class="mus-glass p-8 rounded-3xl animate-slide-right">
+      <div class="mus-glass p-8 rounded-3xl animate-slide-right flex items-center justify-center">
         <img src="/logo.png" alt="Mus Manager" class="w-full h-auto max-w-sm mx-auto filter drop-shadow-2xl" />
       </div>
     </div>
 
     <section class="grid md:grid-cols-3 gap-12 mb-32">
-      <div class="mus-card p-10 hover:bg-emerald-500/5 border-emerald-500/10 transition-all cursor-default">
-         <h3 class="mus-h3 mb-4 text-[#0fb361]">{{ t('about.mission_title') }}</h3>
-         <p class="mus-p-small leading-relaxed">{{ t('about.mission_text') }}</p>
+      <div class="mus-card p-10 hover:bg-emerald-500/5 border-emerald-500/10 transition-all cursor-default group">
+         <h3 class="mus-h3 mb-4 text-[#0fb361] group-hover:translate-x-2 transition-transform">{{ t('about.mission_title') }}</h3>
+         <p class="mus-p-small leading-relaxed opacity-80">{{ t('about.mission_text') }}</p>
       </div>
-      <div class="mus-card p-10 hover:bg-emerald-500/5 border-emerald-500/10 transition-all cursor-default">
-         <h3 class="mus-h3 mb-4 text-[#0fb361]">{{ t('about.why_title') }}</h3>
-         <p class="mus-p-small leading-relaxed">{{ t('about.why_text') }}</p>
+      <div class="mus-card p-10 hover:bg-emerald-500/5 border-emerald-500/10 transition-all cursor-default group">
+         <h3 class="mus-h3 mb-4 text-[#0fb361] group-hover:translate-x-2 transition-transform">{{ t('about.why_title') }}</h3>
+         <p class="mus-p-small leading-relaxed opacity-80">{{ t('about.why_text') }}</p>
       </div>
-      <div class="mus-card p-10 hover:bg-emerald-500/5 border-emerald-500/10 transition-all cursor-default">
-         <h3 class="mus-h3 mb-4 text-[#0fb361]">{{ t('about.tradition_title') }}</h3>
-         <p class="mus-p-small leading-relaxed">{{ t('about.tradition_text') }}</p>
+      <div class="mus-card p-10 hover:bg-emerald-500/5 border-emerald-500/10 transition-all cursor-default group">
+         <h3 class="mus-h3 mb-4 text-[#0fb361] group-hover:translate-x-2 transition-transform">{{ t('about.vision_title') }}</h3>
+         <p class="mus-p-small leading-relaxed opacity-80">{{ t('about.vision_text') }}</p>
       </div>
     </section>
 
-    <section class="mus-glass p-16 rounded-[4rem] text-center border-emerald-500/20 bg-emerald-500/5">
+    <section class="mus-glass p-16 rounded-[4rem] text-center border-emerald-500/20 bg-emerald-500/5 mb-32">
        <h2 class="mus-h2 mb-8 italic">{{ t('cta.title') }}</h2>
        <p class="mus-p mb-12 max-w-2xl mx-auto">{{ t('cta.desc') }}</p>
        <router-link to="/register" class="mus-btn-primary">

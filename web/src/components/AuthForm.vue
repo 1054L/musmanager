@@ -48,7 +48,7 @@ const handleSubmit = async () => {
   try {
     if (mode.value === 'register') {
       if (password.value !== confirmPassword.value) {
-        throw new Error(t('auth.passwordMismatch') || "Las contraseñas no coinciden")
+        throw new Error(t('auth.passwordMismatch'))
       }
       await authService.register(email.value, password.value, role.value)
     }
@@ -123,20 +123,20 @@ const handleSubmit = async () => {
 
       <Transition name="expand">
         <div v-if="!isLogin" class="input-group">
-          <label class="input-label">{{ t('auth.role') || 'Rol de Usuario' }}</label>
+          <label class="input-label">{{ t('auth.role') }}</label>
           <div class="flex gap-4">
             <label class="flex-1 cursor-pointer">
               <input type="radio" v-model="role" value="user" class="hidden peer">
               <div class="mus-glass p-3 rounded-xl border border-white/5 text-center transition-all peer-checked:border-[#0fb361] peer-checked:bg-[#0fb361]/10">
                 <i class="pi pi-user text-xs mb-1 block"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">{{ t('auth.roleUser') || 'Usuario' }}</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider">{{ t('auth.roleUser') }}</span>
               </div>
             </label>
             <label class="flex-1 cursor-pointer">
               <input type="radio" v-model="role" value="admin" class="hidden peer">
               <div class="mus-glass p-3 rounded-xl border border-white/5 text-center transition-all peer-checked:border-[#0fb361] peer-checked:bg-[#0fb361]/10">
                 <i class="pi pi-star text-xs mb-1 block"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">{{ t('auth.roleAdmin') || 'Administrador' }}</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider">{{ t('auth.roleAdmin') }}</span>
               </div>
             </label>
           </div>

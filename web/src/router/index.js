@@ -61,10 +61,16 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
-    path: '/features',
+    path: '/caracteristicas',
     name: 'Features',
     component: () => import('../views/FeaturesView.vue'),
     meta: { titleKey: 'seo.features_title', descKey: 'seo.features_desc' }
+  },
+  {
+    path: '/como-funciona',
+    name: 'HowItWorks',
+    component: () => import('../views/HowItWorksView.vue'),
+    meta: { titleKey: 'seo.how_it_works_title', descKey: 'seo.how_it_works_desc' }
   },
   {
     path: '/tournaments',
@@ -73,19 +79,19 @@ const routes = [
     meta: { titleKey: 'seo.tournaments_title', descKey: 'seo.tournaments_desc' }
   },
   {
-    path: '/about',
+    path: '/sobre-nosotros',
     name: 'About',
     component: () => import('../views/AboutView.vue'),
-    meta: { titleKey: 'seo.about_title', descKey: 'seo.home_desc' }
+    meta: { titleKey: 'seo.about_title', descKey: 'seo.about_desc' }
   },
   {
-    path: '/privacy',
+    path: '/privacidad',
     name: 'Privacy',
-    component: () => import('../views/PrivacyPolicyView.vue'),
+    component: () => import('../views/PrivacyView.vue'),
     meta: { titleKey: 'seo.privacy_title', descKey: 'legal.privacy_p1' }
   },
   {
-    path: '/terms',
+    path: '/terminos',
     name: 'Terms',
     component: () => import('../views/TermsView.vue'),
     meta: { titleKey: 'seo.terms_title', descKey: 'legal.terms_p1' }

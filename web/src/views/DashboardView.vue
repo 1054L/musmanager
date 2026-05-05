@@ -86,14 +86,14 @@ const handleGenerateGroups = async (tournament) => {
   
   const groupsCount = parseInt(count)
   if (isNaN(groupsCount) || groupsCount < 1) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Número de grupos inválido', life: 3000 })
+    toast.add({ severity: 'error', summary: 'Error', detail: t('dashboard.invalid_groups'), life: 3000 })
     return
   }
 
   processingUuid.value = tournament.uuid
   try {
     await tournamentService.generateGroups(tournament.uuid, groupsCount)
-    toast.add({ severity: 'success', summary: t('tournament_mgmt.draw_groups'), detail: 'Grupos generados con éxito', life: 3000 })
+    toast.add({ severity: 'success', summary: t('tournament_mgmt.draw_groups'), detail: t('dashboard.groups_success'), life: 3000 })
     await fetchTournaments()
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
@@ -106,7 +106,7 @@ const handleGenerateMatches = async (tournament) => {
   processingUuid.value = tournament.uuid
   try {
     await tournamentService.generateMatches(tournament.uuid)
-    toast.add({ severity: 'success', summary: t('tournament_mgmt.generate_matches'), detail: 'Calendario generado con éxito', life: 3000 })
+    toast.add({ severity: 'success', summary: t('tournament_mgmt.generate_matches'), detail: t('dashboard.matches_success'), life: 3000 })
     await fetchTournaments()
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
@@ -156,7 +156,7 @@ const openEnroll = (event, tournament) => {
 }
 
 const handleEnrollSuccess = () => {
-  toast.add({ severity: 'success', summary: t('tournament_mgmt.enroll'), detail: 'Pareja inscrita correctamente', life: 3000 })
+  toast.add({ severity: 'success', summary: t('tournament_mgmt.enroll'), detail: t('dashboard.enroll_success'), life: 3000 })
   enrollOp.value.hide()
   fetchTournaments()
 }
