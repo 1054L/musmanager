@@ -22,11 +22,11 @@ const form = ref({
   ruleGames: 3,
   tablesCount: null,
   location: '',
-  poster: null, // Holds the NEW file to upload
+  poster: null,
   private: false
 })
-const existingPosterPath = ref(null) // Holds the CURRENT path from API
-const posterPreview = ref(null) // Holds the local preview of the NEW file
+const existingPosterPath = ref(null)
+const posterPreview = ref(null)
 const loading = ref(true)
 const saving = ref(false)
 const error = ref(null)
@@ -37,9 +37,6 @@ const enrollmentTeamId = ref(null)
 const groupsCount = ref(2)
 const generating = ref(false)
 
-
-
-// Rules state for "Otro"
 const isOtherPoints = ref(false)
 const isOtherGames = ref(false)
 
@@ -74,7 +71,6 @@ const statuses = [
   { value: 'finished', label: t('tournament_form.statuses.finished') }
 ]
 
-// Load existing tournament data
 onMounted(async () => {
   try {
     const data = await tournamentService.getTournament(uuid)
@@ -95,19 +91,13 @@ onMounted(async () => {
     }
     existingPosterPath.value = data.posterPath
     
-    // Check if points/games are "Other"
-    if (![20, 30, 40].includes(form.value.rulePoints)) {
-      isOtherPoints.value = true
-    }
-    if (![3, 4, 5].includes(form.value.ruleGames)) {
-      isOtherGames.value = true
-    }
+    if (![20, 30, 40].includes(form.value.rulePoints)) isOtherPoints.value = true
+    if (![3, 4, 5].includes(form.value.ruleGames)) isOtherGames.value = true
 
     await loadEnrolledTeams()
     await loadAvailableTeams()
   } catch (e) {
     error.value = t('tournament_form.messages.load_error', { uuid: uuid, error: e.message })
-    console.error('Error loading tournament:', e)
   } finally {
     loading.value = false
   }
@@ -194,281 +184,153 @@ const handleSave = async () => {
     saving.value = false
   }
 }
-
-const handlePublish = async () => {
-  form.value.status = 'pending'
-  await handleSave()
-}
 </script>
 
 <template>
   <div class="form-page">
-    <header class="form-header">
-      <button @click="router.push('/dashboard')" class="back-link">
-        <i class="pi pi-arrow-left"></i>
-        {{ $t('tournament_form.back_dashboard') }}
-      </button>
-      <h1 class="mus-h1 italic mt-8">{{ $t('tournament_form.edit_title') }}</h1>
-      <p class="uuid-badge">{{ $t('tournament_view.uuid') }}: {{ uuid }}</p>
+    <header class="form-header mb-8">
+      <h1 class="mus-h1 italic text-2xl mb-1">
+        EDITAR <span class="mus-gold-text">TORNEO</span>
+      </h1>
+      <p class="uuid-badge opacity-40">{{ $t('tournament_view.uuid') }}: {{ uuid }}</p>
     </header>
 
-    <!-- Loading skeleton -->
     <div v-if="loading" class="form-card mus-glass flex items-center justify-center" style="min-height:600px;">
       <MusLoader />
     </div>
 
     <div v-else class="form-card mus-glass relative overflow-hidden">
-      <!-- Saving Overlay -->
       <div v-if="saving" class="absolute inset-0 z-50 flex flex-column items-center justify-center bg-black/60 backdrop-blur-sm rounded-3xl">
         <MusLoader />
-        <p class="mt-4 text-[#0fb361] font-black italic uppercase tracking-widest text-xs animate-pulse">
+        <p class="mt-4 text-secondary font-black italic uppercase tracking-widest text-xs animate-pulse">
           {{ t('tournament_form.actions.saving') }}
         </p>
       </div>
+
       <form @submit.prevent="handleSave" class="mus-form">
-        <div v-if="error" class="error-msg">{{ error }}</div>
-        <div v-if="success" class="success-msg">
+        <div v-if="error" class="error-msg mb-8">{{ error }}</div>
+        <div v-if="success" class="success-msg mb-8">
           <i class="pi pi-check-circle mr-2"></i> {{ $t('tournament_form.messages.save_success') }}
         </div>
 
-        <!-- Nombre -->
-        <div class="form-group" v-if="!error">
-          <label class="mus-label">{{ $t('tournament_form.labels.name') }} <span class="required">*</span></label>
-          <input v-model="form.name" type="text" required class="mus-input">
-        </div>
+        <div class="dual-column-grid">
+          <!-- COLUMN 1: BASIS & LOGISTICS -->
+          <div class="column">
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-info-circle mr-2"></i> Identidad & Ubicación</h3>
+              <div class="form-group-wrapper">
+                <div class="form-group">
+                  <label class="mus-label">{{ $t('tournament_form.labels.name') }} *</label>
+                  <input v-model="form.name" type="text" required class="mus-input">
+                </div>
+                <div class="form-group">
+                  <label class="mus-label">{{ $t('tournament_form.labels.location') }}</label>
+                  <input v-model="form.location" type="text" class="mus-input">
+                </div>
+              </div>
+            </section>
 
-        <!-- Ubicación -->
-        <div class="form-group" v-if="!error">
-          <label class="mus-label">{{ $t('tournament_form.labels.location') }}</label>
-          <div class="relative">
-            <i class="pi pi-map-marker absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-            <input v-model="form.location" type="text" :placeholder="t('tournament_form.placeholders.location')" class="mus-input pl-12">
-          </div>
-        </div>
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-calendar mr-2"></i> Cronograma</h3>
+              <div class="date-grid">
+                <div class="form-group">
+                  <input v-model="form.startDate" type="datetime-local" class="mus-input date-input">
+                </div>
+                <div class="form-group">
+                  <input v-model="form.endDate" type="datetime-local" class="mus-input date-input">
+                </div>
+              </div>
+            </section>
 
-        <!-- Fechas -->
-        <div class="grid" v-if="!error">
-          <div class="col-12 md:col-6">
-            <div class="form-group">
-              <label class="mus-label">{{ $t('tournament_form.labels.startDate') }}</label>
-              <input v-model="form.startDate" type="datetime-local" class="mus-input date-input">
-            </div>
-          </div>
-          <div class="col-12 md:col-6">
-            <div class="form-group">
-              <label class="mus-label">{{ $t('tournament_form.labels.endDate') }}</label>
-              <input v-model="form.endDate" type="datetime-local" class="mus-input date-input">
-            </div>
-          </div>
-        </div>
-        
-
-        <!-- Subida de Cartel -->
-        <div class="form-group" v-if="!error">
-          <label class="mus-label">{{ $t('tournament_form.labels.poster') }}</label>
-          <div class="file-upload-wrapper" :class="{ 'has-file': form.poster || existingPosterPath }">
-            <input type="file" @change="onFileChange" accept="image/*,application/pdf" id="poster-upload" class="hidden-input">
-            <label for="poster-upload" class="file-upload-label">
-              <i class="pi" :class="form.poster ? 'pi-file-pdf' : 'pi-cloud-upload'"></i>
-              <span>{{ form.poster ? form.poster.name : (existingPosterPath ? $t('tournament_form.labels.posterChange') : $t('tournament_form.labels.posterSelect')) }}</span>
-            </label>
-          </div>
-          
-          <!-- Preview -->
-          <div v-if="posterPreview" class="poster-preview">
-            <p class="preview-tag">{{ $t('tournament_form.labels.newPoster') }}</p>
-            <img :src="posterPreview" alt="Preview nuevo cartel">
-          </div>
-          <div v-else-if="existingPosterPath && !form.poster" class="poster-preview">
-            <p class="preview-tag">{{ $t('tournament_form.labels.currentPoster') }}</p>
-            <img :src="existingPosterPath" alt="Cartel actual">
-          </div>
-        </div>
-
-        <!-- Sistema de Juego -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('tournament_form.labels.gameSystem') }} <span class="required">*</span></label>
-          <div class="radio-group">
-            <div v-for="opt in types" :key="opt.value"
-                 @click="form.type = opt.value"
-                 class="radio-item" :class="{ active: form.type === opt.value }">
-              <div class="radio-check"></div>
-              <span class="radio-label">{{ opt.label }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Privacidad -->
-        <div class="form-group" v-if="!error">
-          <label class="mus-label">
-            {{ $t('tournament_form.labels.private') }}
-            <i class="pi pi-question-circle ml-1 cursor-help text-[#0fb361]" v-tooltip="t('tournament_form.tooltips.private')"></i>
-          </label>
-          <div @click="form.private = !form.private" class="radio-item" :class="{ active: form.private }">
-            <div class="radio-check"></div>
-            <span class="radio-label">{{ t('tournament_form.labels.private_desc') || 'Torneo Privado (no aparecerá en el listado público)' }}</span>
-          </div>
-        </div>
-
-        <!-- Gestión de Equipos e Inscripciones -->
-        <div class="management-section p-6 mus-glass-dark rounded-3xl border-white/5 mb-8" v-if="!error">
-          <h3 class="text-lg font-black text-white italic uppercase tracking-tight mb-6 flex align-items-center justify-content-between">
-            <span><i class="pi pi-users mr-2 text-[#0fb361]"></i> {{ t('tournament_mgmt.team_mgmt') }}</span>
-            <span class="text-xs font-bold text-slate-500 tracking-widest">{{ t('tournament_mgmt.enrolled_count', { count: enrolledTeams.length }) }}</span>
-          </h3>
-
-          <!-- Inscribir Equipo -->
-          <div class="flex gap-4 mb-8">
-            <div class="flex-1">
-              <select v-model="enrollmentTeamId" class="mus-input">
-                <option :value="null" disabled>{{ t('tournament_mgmt.select_team') }}</option>
-                <option v-for="team in availableTeams" :key="team.id" :value="team.id">
-                  {{ team.name }}
-                </option>
-              </select>
-            </div>
-            <button type="button" @click="handleEnrollTeam" class="mus-btn-primary px-8" :disabled="!enrollmentTeamId">
-              {{ t('tournament_mgmt.enroll') }}
-            </button>
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-image mr-2"></i> Cartel</h3>
+              <div class="file-upload-wrapper" :class="{ 'has-file': form.poster || existingPosterPath }">
+                <input type="file" @change="onFileChange" accept="image/*,application/pdf" id="poster-upload" class="hidden-input">
+                <label for="poster-upload" class="file-upload-label">
+                  <i class="pi" :class="form.poster ? 'pi-file-pdf' : 'pi-cloud-upload'"></i>
+                  <span>{{ form.poster ? form.poster.name : (existingPosterPath ? $t('tournament_form.labels.posterChange') : $t('tournament_form.labels.posterSelect')) }}</span>
+                </label>
+              </div>
+              <div v-if="posterPreview || existingPosterPath" class="poster-preview mt-4">
+                <img :src="posterPreview || existingPosterPath" alt="Cartel">
+              </div>
+            </section>
           </div>
 
-          <!-- Tabla de Inscritos -->
-          <div v-if="enrolledTeams.length > 0" class="enrolled-list mb-8">
-            <div v-for="tt in enrolledTeams" :key="tt.id" 
-                 class="flex align-items-center justify-content-between p-3 border-b border-white/5 last:border-0">
-              <span class="font-bold text-white">{{ tt.team.name }}</span>
-              <span class="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-slate-800 text-slate-400">
-                {{ tt.groupName || t('tournament_mgmt.no_group') }}
-              </span>
-            </div>
-          </div>
+          <!-- COLUMN 2: TEAMS & RULES -->
+          <div class="column">
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-users mr-2"></i> {{ t('tournament_mgmt.team_mgmt') }}</h3>
+              <div class="management-box p-6 mus-glass-dark rounded-3xl border-white/5">
+                <div class="flex gap-2 mb-6">
+                  <select v-model="enrollmentTeamId" class="mus-input flex-1 text-xs">
+                    <option :value="null" disabled>{{ t('tournament_mgmt.select_team') }}</option>
+                    <option v-for="team in availableTeams" :key="team.id" :value="team.id">{{ team.name }}</option>
+                  </select>
+                  <button type="button" @click="handleEnrollTeam" class="mus-btn-gold-small" :disabled="!enrollmentTeamId">
+                    <i class="pi pi-plus"></i>
+                  </button>
+                </div>
 
-          <!-- Acciones de Generación -->
-          <div class="flex flex-column gap-4 border-t border-white/5 pt-6">
-            <div class="flex align-items-center gap-4">
-              <div class="flex-1">
-                <label class="mus-label mb-2 block">{{ t('tournament_mgmt.groups_count_label') }}</label>
-                <div class="flex gap-2">
-                  <button type="button" v-for="n in [2, 4, 8]" :key="n"
-                          @click="groupsCount = n"
-                          class="mus-btn-small" :class="{ active: groupsCount === n }">
-                    {{ n }}
+                <div v-if="enrolledTeams.length > 0" class="max-h-[180px] overflow-y-auto mb-6 pr-2 custom-scrollbar">
+                   <div v-for="tt in enrolledTeams" :key="tt.id" class="flex justify-between items-center p-3 border-b border-white/5 last:border-0 text-xs">
+                      <span class="font-bold text-white">{{ tt.team.name }}</span>
+                      <span class="opacity-40 uppercase font-black text-[9px]">{{ tt.groupName || t('tournament_mgmt.no_group') }}</span>
+                   </div>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                  <button type="button" @click="handleGenerateGroups" class="mus-btn-secondary" :disabled="generating || enrolledTeams.length < 2">
+                    <i class="pi pi-sitemap mr-2"></i> {{ t('tournament_mgmt.draw_groups') }}
+                  </button>
+                  <button type="button" @click="handleGenerateMatches" class="mus-btn-secondary" :disabled="generating || enrolledTeams.length < 2">
+                    <i class="pi pi-calendar mr-2"></i> {{ t('tournament_mgmt.generate_matches') }}
                   </button>
                 </div>
               </div>
-              <button type="button" @click="handleGenerateGroups" class="mus-btn-secondary" :disabled="generating || enrolledTeams.length < 2">
-                <i class="pi" :class="generating ? 'pi-spin pi-spinner' : 'pi-sitemap'"></i>
-                {{ t('tournament_mgmt.draw_groups') }}
-              </button>
-            </div>
-            <button type="button" @click="handleGenerateMatches" class="mus-btn-secondary w-full" :disabled="generating || enrolledTeams.length < 2">
-                <i class="pi" :class="generating ? 'pi-spin pi-spinner' : 'pi-calendar'"></i>
-                {{ t('tournament_mgmt.generate_matches') }}
-            </button>
+            </section>
+
+            <section class="form-section">
+               <h3 class="section-title"><i class="pi pi-cog mr-2"></i> Reglas & Sistema</h3>
+               <div class="grid grid-cols-2 gap-3 mb-4">
+                  <div v-for="opt in types" :key="opt.value" @click="form.type = opt.value" class="option-card" :class="{ active: form.type === opt.value }">
+                    <span class="option-label text-[10px]">{{ opt.label }}</span>
+                  </div>
+               </div>
+               <div class="rules-box p-6 mus-glass-dark rounded-3xl border-white/5 flex flex-col gap-6">
+                  <div class="form-group">
+                    <label class="mus-label">Puntos por juego</label>
+                    <div class="flex gap-2">
+                       <button type="button" v-for="val in [30, 40]" :key="val" @click="setPoints(val)" class="compact-btn flex-1" :class="{ active: !isOtherPoints && form.rulePoints === val }">{{ val }}</button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="mus-label">Juegos por chico</label>
+                    <div class="flex gap-2">
+                       <button type="button" v-for="val in [3, 4]" :key="val" @click="setGames(val)" class="compact-btn flex-1" :class="{ active: !isOtherGames && form.ruleGames === val }">{{ val }}</button>
+                    </div>
+                  </div>
+               </div>
+            </section>
+
+            <section class="form-section">
+               <h3 class="section-title"><i class="pi pi-eye mr-2"></i> Estado & Privacidad</h3>
+               <div class="flex flex-wrap gap-2 mb-4">
+                  <button type="button" v-for="opt in statuses" :key="opt.value" @click="form.status = opt.value" class="status-pill" :class="{ active: form.status === opt.value }">{{ opt.label }}</button>
+               </div>
+               <div @click="form.private = !form.private" class="option-card" :class="{ active: form.private }">
+                  <span class="option-label text-[10px]">{{ t('tournament_form.labels.private_desc') }}</span>
+               </div>
+            </section>
           </div>
         </div>
 
-        <!-- Reglas y Gestión -->
-        <div class="rules-section p-4 mus-glass-dark rounded-xl border-white/5 mb-8" v-if="!error">
-          <h3 class="text-sm font-black text-[#0fb361] uppercase tracking-widest mb-4 flex align-items-center">
-            <i class="pi pi-cog mr-2"></i> {{ $t('tournament_form.labels.rules_section') }}
-          </h3>
-          
-          <div class="grid">
-            <!-- Reyes -->
-            <div class="col-12 md:col-4">
-              <div class="form-group">
-                <label class="mus-label">{{ $t('tournament_form.labels.ruleKings') }}</label>
-                <div class="flex gap-2">
-                  <button type="button" v-for="val in [4, 8]" :key="val"
-                          @click="form.ruleKings = val"
-                          class="mus-btn-small" :class="{ active: form.ruleKings === val }">
-                    {{ val }}
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Tantos (Puntos) -->
-            <div class="col-12 md:col-6">
-              <div class="form-group">
-                <label class="mus-label">{{ $t('tournament_form.labels.rulePoints') }}</label>
-                <div class="flex flex-wrap gap-2 mb-3">
-                  <button type="button" v-for="val in [20, 30, 40]" :key="val"
-                          @click="setPoints(val)"
-                          class="mus-btn-small" :class="{ active: !isOtherPoints && form.rulePoints === val }">
-                    {{ val }}
-                  </button>
-                  <button type="button" @click="setPoints('other')" 
-                          class="mus-btn-small" :class="{ active: isOtherPoints }">
-                    {{ t('tournament_form.labels.other') }}
-                  </button>
-                </div>
-                <input v-if="isOtherPoints" v-model.number="form.rulePoints" type="number" 
-                       class="mus-input py-3 text-sm" :placeholder="t('tournament_form.placeholders.customPoints')">
-              </div>
-            </div>
-
-            <!-- Chicos (Juegos) -->
-            <div class="col-12 md:col-6">
-              <div class="form-group">
-                <label class="mus-label">{{ $t('tournament_form.labels.ruleGames') }}</label>
-                <div class="flex flex-wrap gap-2 mb-3">
-                  <button type="button" v-for="val in [3, 4, 5]" :key="val"
-                          @click="setGames(val)"
-                          class="mus-btn-small" :class="{ active: !isOtherGames && form.ruleGames === val }">
-                    {{ val }}
-                  </button>
-                  <button type="button" @click="setGames('other')" 
-                          class="mus-btn-small" :class="{ active: isOtherGames }">
-                    {{ t('tournament_form.labels.other') }}
-                  </button>
-                </div>
-                <input v-if="isOtherGames" v-model.number="form.ruleGames" type="number" 
-                       class="mus-input py-3 text-sm" :placeholder="t('tournament_form.placeholders.customGames')">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Estado -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('tournament_form.labels.status') }}</label>
-          <div class="radio-group">
-            <div v-for="opt in statuses" :key="opt.value"
-                 @click="form.status = opt.value"
-                 class="radio-item" :class="{ active: form.status === opt.value }">
-              <div class="radio-check"></div>
-              <span class="radio-label">{{ opt.label }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Información de Estado -->
-        <div class="form-group" v-if="!error">
-          <label class="mus-label">{{ $t('tournament_form.labels.statusDescription') }}</label>
-          <textarea v-model="form.statusDescription" 
-                    :placeholder="$t('tournament_form.labels.statusDescriptionPlaceholderEdit')" 
-                    class="mus-input min-h-[100px] py-4"></textarea>
-        </div>
-
-        <div class="form-actions mt-8 flex flex-column md:flex-row gap-4">
-          <button type="button" @click="router.push('/dashboard')" class="cancel-btn flex-1 md:flex-initial">
-            {{ $t('tournament_form.actions.cancel') }}
+        <div class="form-actions mt-12 pt-10 border-t border-white/5 flex gap-4">
+          <button type="button" @click="router.push('/dashboard')" class="cancel-btn">Cancelar</button>
+          <button type="submit" :disabled="saving || success" class="mus-btn-gold-large flex-1">
+            <i class="pi" :class="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+            <span>{{ saving ? t('tournament_form.actions.saving') : t('tournament_form.actions.save') }}</span>
           </button>
-          
-          <div class="flex-1 flex gap-4">
-            <button type="submit" :disabled="saving || success" class="mus-btn-primary flex-1">
-              <i class="pi" :class="saving ? 'pi-spin pi-spinner opacity-0' : 'pi-save'"></i>
-              <span>{{ saving ? t('tournament_form.actions.saving') : t('tournament_form.actions.save') }}</span>
-            </button>
-            
-            <button v-if="form.status === 'draft'" type="button" @click="handlePublish" 
-                    class="mus-btn-secondary flex-1" :disabled="saving || success">
-              <i class="pi pi-send"></i>
-              <span>{{ $t('tournament_form.statuses.publish') }}</span>
-            </button>
-          </div>
         </div>
       </form>
     </div>
@@ -476,181 +338,38 @@ const handlePublish = async () => {
 </template>
 
 <style scoped>
-.form-page { max-width: 640px; margin: 0 auto; }
-
-.back-link {
-  background: none; border: none; color: #64748b;
-  font-size: 10px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.1em; display: flex; align-items: center; gap: 10px;
-  cursor: pointer; transition: color 0.3s;
-}
-.back-link:hover { color: white; }
-
-.uuid-badge {
-  font-size: 9px; font-weight: 700; color: #1e293b;
-  letter-spacing: 0.1em; margin-top: 8px; font-family: monospace;
-}
-
-.form-card { padding: 48px; border-radius: 32px; }
-.mus-form { display: flex; flex-direction: column; gap: 32px; }
-
-.form-group { display: flex; flex-direction: column; gap: 12px; }
-
-.mus-label {
-  font-size: 10px; font-weight: 900; text-transform: uppercase;
-  letter-spacing: 0.2em; color: #475569; margin-left: 4px;
-}
-.required { color: #0fb361; }
-
-.mus-input {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px; padding: 16px 24px; color: white;
-  font-size: 14px; font-weight: 500; outline: none; transition: all 0.3s;
-  width: 100%; box-sizing: border-box;
-}
-.mus-input:focus { border-color: rgba(15,179,97,0.5); background: rgba(255,255,255,0.05); }
-
-.file-upload-wrapper {
-  position: relative;
-  border: 2px dashed rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 24px;
-  text-align: center;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-.file-upload-wrapper:hover {
-  border-color: rgba(15, 179, 97, 0.5);
-  background: rgba(255, 255, 255, 0.02);
-}
-.file-upload-wrapper.has-file {
-  border-style: solid;
-  border-color: #0fb361;
-  background: rgba(15, 179, 97, 0.05);
-}
-
-.hidden-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-
-.file-upload-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-}
-.file-upload-label i {
-  font-size: 24px;
-  color: #475569;
-}
-.file-upload-wrapper.has-file i {
-  color: #0fb361;
-}
-.file-upload-label span {
-  font-size: 13px;
-  font-weight: 600;
-  color: #94a3b8;
-}
-.file-upload-wrapper.has-file span {
-  color: white;
-}
-
-.preview-tag {
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: #475569;
-  letter-spacing: 0.1em;
-  margin-bottom: 8px;
-  margin-left: 4px;
-}
-
-.date-input { color-scheme: dark; }
-
-.poster-preview {
-  margin-top: 8px; border-radius: 12px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08); max-height: 180px;
-}
-.poster-preview img { width: 100%; height: 180px; object-fit: cover; display: block; }
-
-.radio-group { display: flex; flex-direction: column; gap: 10px; }
-.radio-item {
-  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-  padding: 14px 20px; border-radius: 14px; display: flex; align-items: center;
-  gap: 16px; cursor: pointer; transition: all 0.3s;
-}
-.radio-item:hover { background: rgba(255,255,255,0.04); }
-.radio-item.active { border-color: rgba(15,179,97,0.4); background: rgba(15,179,97,0.05); }
-
-.radio-check {
-  width: 16px; height: 16px; border: 2px solid #1e293b;
-  border-radius: 50%; position: relative; flex-shrink: 0;
-}
-.radio-item.active .radio-check { border-color: #0fb361; }
-.radio-item.active .radio-check::after {
-  content: ''; position: absolute; inset: 3px;
-  background: #0fb361; border-radius: 50%;
-}
-.radio-label { font-size: 12px; font-weight: 700; color: #94a3b8; }
-.radio-item.active .radio-label { color: white; }
-
-.form-actions {
-  display: flex; gap: 16px; justify-content: flex-end; margin-top: 8px;
-}
-.cancel-btn {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.1em; border-radius: 16px; padding: 14px 28px; cursor: pointer;
-  transition: all 0.3s;
-}
-.cancel-btn:hover { background: rgba(255,255,255,0.06); color: white; }
-
-.error-msg {
-  background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.2);
-  color: #fb7185; padding: 16px; border-radius: 16px;
-  font-size: 12px; font-weight: 600; text-align: center;
-}
-.success-msg {
-  background: rgba(15,179,97,0.1); border: 1px solid rgba(15,179,97,0.2);
-  color: #0fb361; padding: 16px; border-radius: 16px;
-  font-size: 12px; font-weight: 700; text-align: center;
-  display: flex; align-items: center; justify-content: center;
-}
-
-.mus-btn-small {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  color: #64748b; font-size: 11px; font-weight: 800; border-radius: 8px;
-  padding: 8px 16px; cursor: pointer; transition: all 0.3s;
-}
-.mus-btn-small:hover { background: rgba(255,255,255,0.06); color: white; }
-.mus-btn-small.active { background: #0fb361; color: black; border-color: #0fb361; }
-
-.mus-btn-primary {
-  background: #0fb361; border: none; border-radius: 16px;
-  padding: 16px 24px; color: black; font-size: 14px; font-weight: 900;
-  text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  transition: all 0.3s;
-}
-.mus-btn-primary:hover { background: #0ca358; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(15,179,97,0.4); }
-.mus-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-.mus-btn-secondary {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px; padding: 16px 24px; color: white; font-size: 14px;
-  font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  gap: 10px; transition: all 0.3s;
-}
-.mus-btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: white; }
-
-@keyframes rotate { to { transform: rotate(360deg); } }
+.form-page { max-width: 1400px; margin: 0 auto; padding: 0 40px 80px 40px; }
+.form-card { padding: 80px; border-radius: 40px; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); }
+.dual-column-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+.column { display: flex; flex-direction: column; gap: 48px; }
+.form-section { display: flex; flex-direction: column; gap: 20px; }
+.section-title { font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.3em; color: var(--secondary); opacity: 0.8; margin: 0; }
+.form-group-wrapper { display: flex; flex-direction: column; gap: 24px; }
+.date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.mus-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin-bottom: 8px; }
+.mus-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px 24px; color: white; font-size: 14px; width: 100%; box-sizing: border-box; }
+.mus-input:focus { border-color: var(--secondary); }
+.file-upload-wrapper { border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 40px; text-align: center; cursor: pointer; }
+.file-upload-wrapper.has-file { border-style: solid; border-color: var(--secondary); background: rgba(233, 195, 73, 0.05); }
+.hidden-input { position: absolute; visibility: hidden; }
+.file-upload-label { display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; }
+.file-upload-label i { font-size: 24px; color: #475569; }
+.file-upload-wrapper.has-file i { color: var(--secondary); }
+.file-upload-label span { font-size: 12px; font-weight: 700; color: #94a3b8; }
+.poster-preview img { width: 100%; height: 250px; object-fit: cover; border-radius: 20px; }
+.option-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); padding: 16px; border-radius: 16px; text-align: center; cursor: pointer; }
+.option-card.active { border-color: var(--secondary); background: rgba(233, 195, 73, 0.1); }
+.option-label { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #94a3b8; }
+.option-card.active .option-label { color: white; }
+.compact-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); color: #64748b; font-size: 10px; font-weight: 900; border-radius: 12px; padding: 12px; cursor: pointer; }
+.compact-btn.active { background: var(--secondary); color: black; border-color: var(--secondary); }
+.status-pill { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); padding: 10px 20px; border-radius: 99px; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #64748b; cursor: pointer; }
+.status-pill.active { background: var(--secondary); color: black; }
+.mus-btn-gold-large { background: var(--secondary); border: none; border-radius: 24px; padding: 24px; color: black; font-size: 16px; font-weight: 950; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.mus-btn-gold-small { background: var(--secondary); border: none; border-radius: 12px; padding: 12px 20px; color: black; cursor: pointer; }
+.mus-btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px; color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+.cancel-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #64748b; border-radius: 16px; padding: 18px 32px; font-size: 12px; font-weight: 900; cursor: pointer; }
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+@media (max-width: 1024px) { .dual-column-grid { grid-template-columns: 1fr; gap: 40px; } .form-card { padding: 40px; } .form-page { padding: 0 20px 40px 20px; } }
 </style>

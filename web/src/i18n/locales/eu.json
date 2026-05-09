@@ -160,7 +160,7 @@
     "quick_actions": {
       "new_tournament": "Txapelketa Berria",
       "new_tournament_desc": "Abian jarri lehiaketa berri bat",
-      "new_team": "Talde Berria",
+      "new_team": "Bikote Berria",
       "new_team_desc": "Erregistratu parte hartuko duen bikote bat"
     },
     "delete_confirm_title": "Txapelketa Ezabatu",
@@ -329,8 +329,9 @@
     }
   },
   "tournament_form": {
-    "create_title": "Txapelketa Berria",
-    "edit_title": "Txapelketa",
+    "create_title": "Txapelketa Sortu",
+    "create_desc": "Konfiguratu zure lehiaketa berriaren arauak eta xehetasunak",
+    "edit_title": "Editatu Txapelketa",
     "back_dashboard": "Itzuli Dashboard-era",
     "labels": {
       "name": "Txapelketaren Izena",
@@ -471,7 +472,7 @@
     }
   },
   "team_form": {
-    "title": "Talde Berria",
+    "title": "Bikote Berria",
     "name": "Bikotearen Izena",
     "name_placeholder": "Adib.: Garaiezinak",
     "tournament": "Txapelketa",

@@ -127,8 +127,8 @@ const stats = [
   align-items: center;
   gap: 12px;
   padding: 8px 16px;
-  background: rgba(15, 179, 97, 0.1);
-  border: 1px solid rgba(15, 179, 97, 0.2);
+  background: var(--primary-glow);
+  border: 1px solid var(--border);
   border-radius: 99px;
   width: fit-content;
 }
@@ -136,38 +136,28 @@ const stats = [
 .mus-dot {
   width: 6px;
   height: 6px;
-  background: #0fb361;
+  background: var(--primary);
   border-radius: 99px;
-  box-shadow: 0 0 10px #0fb361;
+  box-shadow: 0 0 10px var(--primary);
 }
 
 .mus-badge-text {
   font-size: 9px;
-  font-weight: 900;
-  color: #0fb361;
   text-transform: uppercase;
   letter-spacing: 0.3em;
 }
 
 .mus-h1 {
-  font-size: clamp(2rem, 8vw, 4rem);
-  font-weight: 900;
-  line-height: 0.95;
-  text-transform: uppercase;
-  font-style: italic;
-  letter-spacing: -0.05em;
+  font-size: clamp(2.5rem, 8vw, 5rem);
 }
 
 .mus-h2 {
-  font-size: clamp(1.5rem, 6vw, 3rem);
-  font-weight: 900;
-  text-transform: uppercase;
-  font-style: italic;
+  font-size: clamp(1.75rem, 6vw, 3rem);
 }
 
 .mus-p {
   font-size: 1.125rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.6;
 }
 
@@ -178,24 +168,6 @@ const stats = [
   padding-top: 24px;
 }
 
-.mus-btn-primary {
-  padding: 20px 48px;
-  background: #0fb361;
-  color: #050505;
-  font-weight: 900;
-  text-transform: uppercase;
-  border-radius: 99px;
-  text-decoration: none;
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  transition: all 0.3s;
-  box-shadow: 0 15px 40px rgba(15, 179, 97, 0.3);
-}
-
-.mus-btn-primary:hover {
-  transform: translateY(-2px);
-  background: #12d674;
-}
 
 .mus-btn-secondary {
   display: flex;
@@ -211,7 +183,7 @@ const stats = [
 }
 
 .mus-btn-secondary:hover {
-  color: white;
+  color: var(--primary);
 }
 
 .mus-hero-visual {
@@ -221,11 +193,11 @@ const stats = [
 }
 
 .mus-visual-card {
-  background: rgba(15, 179, 97, 0.03);
+  background: var(--surface);
   backdrop-filter: blur(20px);
   padding: 12px;
   border-radius: 3rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
   transform: rotate(1deg);
   transition: transform 0.7s;
 }
@@ -247,16 +219,17 @@ const stats = [
 }
 
 .mus-card {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface);
   padding: 40px;
   border-radius: 3.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
   transition: transform 0.3s;
 }
 
 .mus-card:hover {
   transform: translateY(-10px);
-  background: rgba(15, 179, 97, 0.05);
+  background: var(--surface-hover);
+  border-color: var(--secondary);
 }
 
 .mus-icon {
@@ -274,7 +247,7 @@ const stats = [
 
 .mus-p-small {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--text-muted);
   line-height: 1.6;
 }
 
@@ -282,7 +255,7 @@ const stats = [
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 40px;
-  background: rgba(15, 179, 97, 0.05);
+  background: var(--primary-glow);
   padding: 80px 48px;
   border-radius: 4rem;
   text-align: center;
@@ -301,29 +274,31 @@ const stats = [
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  color: #0fb361;
+  color: var(--primary);
 }
 
 .mus-cta-banner {
-  background: #0fb361;
+  background: var(--surface);
+  border: 2px solid var(--secondary);
   padding: 80px 40px;
-  border-radius: 5rem;
+  border-radius: 12px;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 40px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-gold);
 }
 
 .mus-dark {
-  color: #050505 !important;
+  color: var(--text-main) !important;
 }
 
 .mus-btn-black {
   display: inline-block;
-  background: #050505;
-  color: #0fb361;
+  background: var(--action);
+  color: var(--text-on-action);
   padding: 24px 64px;
   border-radius: 99px;
   font-weight: 900;
@@ -350,7 +325,7 @@ const stats = [
 .mus-divider {
   width: 64px;
   height: 4px;
-  background: #0fb361;
+  background: var(--primary);
   border-radius: 99px;
 }
 </style>

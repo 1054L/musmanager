@@ -14,10 +14,8 @@ export const authService = {
 
     const user = await response.json();
     const authData = {
-      email,
-      password, // Storing for Basic Auth simulation
-      roles: user.roles,
-      id: user.id
+      ...user,
+      password // Storing for Basic Auth simulation
     };
 
     localStorage.setItem('user', JSON.stringify(authData));
@@ -49,12 +47,16 @@ export const authService = {
       body: JSON.stringify(data)
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Error al actualizar el perfil');
+    const updatedUser = await response.json();
+    const currentLocalUser = this.getUser();
+    if (currentLocalUser) {
+      const newAuthData = {
+        ...currentLocalUser,
+        ...updatedUser
+      };
+      localStorage.setItem('user', JSON.stringify(newAuthData));
     }
-
-    return response.json();
+    return updatedUser;
   },
 
   logout() {

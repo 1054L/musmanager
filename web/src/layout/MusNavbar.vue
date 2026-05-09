@@ -3,15 +3,20 @@ import { authService } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ref, inject } from 'vue'
-
 const { t, locale } = useI18n()
 const router = useRouter()
-const user = ref(authService.getUser())
+const user = inject('user')
+const handleLogout = inject('logout')
 const showLangMenu = ref(false)
 const isMobileMenuOpen = ref(false)
 
 // Inject Global Auth Modal Trigger
 const openAuthModal = inject('openAuthModal')
+const isSidebarOpen = inject('isSidebarOpen', ref(true))
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
 
 const languages = [
   { code: 'es', name: 'Español' },
@@ -33,27 +38,27 @@ const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
 }
 
-const handleLogout = () => {
-  authService.logout()
-  user.value = null
-  router.push('/')
-}
+// Remove local handleLogout as it's injected
 </script>
 
 <template>
-  <header class="navbar-wrapper">
+  <header class="navbar-wrapper" :class="{ 'with-sidebar': user, 'sidebar-collapsed': !isSidebarOpen }">
     <div class="navbar-container" :class="{ 'menu-open': isMobileMenuOpen }">
-      
+      <!-- Sidebar Toggle (Desktop - Only Logged In) -->
+      <button v-if="user" @click="toggleSidebar" class="sidebar-toggle-desktop hide-mobile">
+        <i class="pi" :class="isSidebarOpen ? 'pi-align-left' : 'pi-align-justify'"></i>
+      </button>
+
       <!-- Logo -->
-      <router-link to="/" class="logo-area" @click="closeMobileMenu">
+      <router-link :to="user ? '/dashboard' : '/'" class="logo-area" @click="closeMobileMenu">
         <img src="/logo.png" class="logo-image" alt="Mus Manager Logo" />
         <div class="logo-text">
           <span class="logo-title mus-gold-text">Mus Manager</span>
         </div>
       </router-link>
 
-      <!-- Nav Links (Desktop) -->
-      <nav class="nav-links">
+      <!-- Nav Links (Desktop - Only Guest) -->
+      <nav v-if="!user" class="nav-links">
         <router-link :to="{ path: '/tournaments', query: { status: 'active' } }" class="nav-item">{{ t('nav.tournaments') }}</router-link>
         <router-link to="/como-funciona" class="nav-item">{{ t('nav.howItWorks') }}</router-link>
         <router-link to="/caracteristicas" class="nav-item">{{ t('nav.features') }}</router-link>
@@ -73,24 +78,19 @@ const handleLogout = () => {
           </div>
         </div>
 
+
         <!-- Auth -->
         <div class="auth-actions">
           <template v-if="!user">
-            <button @click="openAuthModal('login')" class="nav-link-subtle-btn hide-mobile">
-              {{ t('nav.login') }}
-            </button>
             <button @click="openAuthModal('register')" class="mus-button-primary scale-90 btn-compact">
               {{ t('nav.getStarted') }}
             </button>
+            <button @click="openAuthModal('login')" class="login-icon-btn hide-mobile" v-tooltip.bottom="t('nav.login')">
+              <i class="pi pi-user"></i>
+            </button>
           </template>
           <template v-else>
-            <router-link to="/dashboard" class="mus-button-primary scale-90 btn-compact">
-              {{ t('nav.dashboard') }}
-            </router-link>
-            <router-link to="/profile" class="nav-link-subtle-btn scale-90 p-2 hide-mobile" title="Mi Perfil">
-              <i class="pi pi-user text-lg"></i>
-            </router-link>
-            <button @click="handleLogout" class="logout-btn ml-2 hide-mobile">
+            <button @click="handleLogout" class="logout-btn hide-mobile" v-tooltip.bottom="t('nav.logout')">
               <i class="pi pi-power-off"></i>
             </button>
           </template>
@@ -129,6 +129,7 @@ const handleLogout = () => {
               </button>
             </div>
 
+
             <div class="mobile-divider"></div>
             
             <!-- Extra Auth (Mobile) -->
@@ -162,11 +163,9 @@ const handleLogout = () => {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 12px;
   z-index: 1000;
   display: flex;
   justify-content: center;
-  transition: padding 0.3s;
 }
 
 @media (min-width: 768px) {
@@ -175,25 +174,42 @@ const handleLogout = () => {
   }
 }
 
+.navbar-wrapper.with-sidebar {
+  left: 280px;
+  width: calc(100% - 280px);
+  justify-content: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 24px 0 0 0; /* Align top but keep sides flush with content area */
+}
+
+.navbar-wrapper.with-sidebar.sidebar-collapsed {
+  left: 80px;
+  width: calc(100% - 80px);
+}
+
+@media (max-width: 767px) {
+  .navbar-wrapper.with-sidebar {
+    left: 0;
+    width: 100%;
+  }
+}
+
 .navbar-container {
   width: 100%;
-  max-width: 1280px;
-  background: rgba(15, 179, 97, 0.05);
-  backdrop-filter: blur(30px);
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  max-width: 1440px;
+  background: var(--surface);
+  padding: 12px 24px;
+  border-bottom: 2px solid var(--secondary);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s;
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
 .navbar-container.menu-open {
-  border-radius: 32px;
-  background: rgba(10, 10, 10, 0.95);
+  background: var(--surface);
 }
 
 @media (min-width: 768px) {
@@ -236,7 +252,7 @@ const handleLogout = () => {
 }
 
 .logo-title {
-  color: white;
+  color: var(--text-main);
   font-weight: 900;
   font-size: 14px;
   text-transform: uppercase;
@@ -264,7 +280,7 @@ const handleLogout = () => {
 }
 
 .nav-item {
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
@@ -274,7 +290,24 @@ const handleLogout = () => {
 }
 
 .nav-item:hover {
-  color: white;
+  color: var(--secondary);
+}
+
+.nav-item.router-link-active {
+  color: var(--secondary);
+  position: relative;
+}
+
+.nav-item.router-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: var(--secondary);
+  border-radius: 99px;
+  box-shadow: 0 0 10px rgba(233, 195, 73, 0.5);
 }
 
 .nav-actions {
@@ -308,9 +341,9 @@ const handleLogout = () => {
 }
 
 .lang-btn {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
   padding: 6px 16px;
   border-radius: 99px;
   font-size: 8px;
@@ -319,18 +352,39 @@ const handleLogout = () => {
   transition: all 0.3s;
 }
 
+.theme-toggle-btn {
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  width: 36px;
+  height: 36px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--primary-glow);
+  color: var(--primary);
+  transform: rotate(12deg) scale(1.1);
+}
+
 .lang-btn:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--primary);
+  background: var(--surface-hover);
 }
 
 .lang-dropdown {
   position: absolute;
   top: 40px;
   right: 0;
-  background: rgba(10, 10, 10, 0.95);
+  background: var(--surface);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 8px;
   min-width: 120px;
@@ -341,7 +395,7 @@ const handleLogout = () => {
   padding: 8px 16px;
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--text-muted);
   text-align: left;
   font-size: 9px;
   font-weight: 900;
@@ -351,25 +405,30 @@ const handleLogout = () => {
 }
 
 .dropdown-item:hover {
-  background: rgba(15, 179, 97, 0.1);
-  color: #0fb361;
+  background: var(--primary-glow);
+  color: var(--primary);
 }
 
-.nav-link-subtle-btn {
-  background: none;
-  border: none;
-  color: #94a3b8;
-  font-size: 9px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
+.login-icon-btn {
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: color 0.3s;
-  padding: 0;
+  transition: all 0.3s;
+  margin-left: 12px;
 }
 
-.nav-link-subtle-btn:hover {
-  color: white;
+.login-icon-btn:hover {
+  color: var(--secondary);
+  border-color: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(233, 195, 73, 0.2);
 }
 
 .hide-mobile {
@@ -390,10 +449,10 @@ const handleLogout = () => {
 .logout-btn {
   width: 32px;
   height: 32px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
   border-radius: 99px;
-  color: #94a3b8;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -404,6 +463,27 @@ const handleLogout = () => {
 .logout-btn:hover {
   color: #fb7185;
   background: rgba(251, 113, 133, 0.1);
+  border-color: #fb7185;
+}
+
+.sidebar-toggle-desktop {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.sidebar-toggle-desktop:hover {
+  background: var(--surface);
+  border-color: var(--secondary);
+  box-shadow: 0 0 15px rgba(233, 195, 73, 0.2);
 }
 
 .mobile-menu-toggle {
@@ -412,10 +492,10 @@ const handleLogout = () => {
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: white;
+  color: var(--text-main);
   cursor: pointer;
   transition: all 0.3s;
 }
@@ -427,8 +507,8 @@ const handleLogout = () => {
 }
 
 .mobile-menu-toggle:hover {
-  background: rgba(15, 179, 97, 0.1);
-  border-color: #0fb361;
+  background: var(--primary-glow);
+  border-color: var(--primary);
 }
 
 /* Mobile Menu Overlay */
@@ -438,12 +518,12 @@ const handleLogout = () => {
   left: 0;
   right: 0;
   margin-top: 12px;
-  background: rgba(10, 10, 10, 0.98);
+  background: var(--surface);
   backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
   border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
@@ -458,7 +538,7 @@ const handleLogout = () => {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  color: #94a3b8;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 11px;
   font-weight: 900;
@@ -474,13 +554,14 @@ const handleLogout = () => {
 }
 
 .mobile-nav-item i {
-  color: #0fb361;
+  color: var(--primary);
   font-size: 14px;
 }
 
 .mobile-nav-item:hover, .mobile-nav-item.router-link-active {
-  background: rgba(15, 179, 97, 0.1);
-  color: white;
+  background: var(--surface-hover);
+  color: var(--secondary);
+  border-left: 4px solid var(--secondary);
 }
 
 .mobile-nav-item.logout {
@@ -493,7 +574,7 @@ const handleLogout = () => {
 
 .mobile-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--border);
   margin: 16px 0;
 }
 
@@ -505,10 +586,10 @@ const handleLogout = () => {
 
 .mobile-lang-item {
   padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
@@ -517,9 +598,9 @@ const handleLogout = () => {
 }
 
 .mobile-lang-item.active {
-  background: #0fb361;
-  color: black;
-  border-color: #0fb361;
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
 }
 
 /* Transitions */

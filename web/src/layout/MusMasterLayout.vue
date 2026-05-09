@@ -1,7 +1,9 @@
 <script setup>
 import { ref, provide } from 'vue'
 import MusNavbar from './MusNavbar.vue'
+import MusSidebar from './MusSidebar.vue'
 import AuthModal from '../components/AuthModal.vue'
+import { authService } from '../services/api'
 import CookieBanner from '../components/CookieBanner.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Toast from 'primevue/toast'
@@ -10,6 +12,9 @@ import Toast from 'primevue/toast'
 const showAuthModal = ref(false)
 const authModalMode = ref('login')
 
+const user = ref(authService.getUser())
+const isSidebarOpen = ref(true)
+
 const openAuthModal = (mode = 'login') => {
   authModalMode.value = mode
   showAuthModal.value = true
@@ -17,6 +22,15 @@ const openAuthModal = (mode = 'login') => {
 
 // Provide to all children (Navbar, HomeView, etc)
 provide('openAuthModal', openAuthModal)
+provide('isSidebarOpen', isSidebarOpen)
+provide('user', user)
+
+const handleLogout = () => {
+  authService.logout()
+  user.value = null
+  window.location.href = '/' // Force reload to clear all states
+}
+provide('logout', handleLogout)
 </script>
 
 <template>
@@ -38,15 +52,18 @@ provide('openAuthModal', openAuthModal)
     <!-- Header / Navbar -->
     <MusNavbar />
 
+    <!-- Sidebar (Logged In Only) -->
+    <MusSidebar v-if="user" :isOpen="isSidebarOpen" />
+
     <!-- Main Content -->
-    <main class="mus-main">
+    <main class="mus-main" :class="{ 'with-sidebar': user, 'sidebar-collapsed': !isSidebarOpen }">
       <div class="mus-content-wrapper">
         <slot />
       </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="mus-footer">
+    <!-- Footer (Only Guests) -->
+    <footer v-if="!user" class="mus-footer">
       <div class="mus-footer-grid">
         <div class="footer-brand">
             <div class="footer-logo">
@@ -107,11 +124,12 @@ provide('openAuthModal', openAuthModal)
 <style scoped>
 .mus-layout {
   min-height: 100vh;
-  background: #050505;
-  color: white;
-  font-family: 'Inter', sans-serif;
+  background: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--font-main);
   display: flex;
   flex-direction: column;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .bg-elements {
@@ -124,21 +142,22 @@ provide('openAuthModal', openAuthModal)
 .bg-gradient {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, #080808 0%, #020202 100%);
+  background: radial-gradient(circle at 50% 50%, var(--bg-app) 0%, #000 100%);
 }
 
 .bg-noise {
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.05;
+  opacity: 0.1;
   mix-blend-mode: overlay;
 }
 
 .bg-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, transparent 20%, rgba(0, 0, 0, 0.5) 100%);
+  background: radial-gradient(circle at 50% 50%, transparent 20%, var(--bg-app) 100%);
+  opacity: 0.4;
 }
 
 .bg-grid {
@@ -155,8 +174,9 @@ provide('openAuthModal', openAuthModal)
   right: -10%;
   width: 50%;
   height: 50%;
-  background: radial-gradient(circle, rgba(15, 179, 97, 0.05) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
   filter: blur(140px);
+  opacity: 0.05;
 }
 
 .bg-glow-2 {
@@ -165,8 +185,9 @@ provide('openAuthModal', openAuthModal)
   left: -10%;
   width: 60%;
   height: 60%;
-  background: radial-gradient(circle, rgba(15, 179, 97, 0.02) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
   filter: blur(160px);
+  opacity: 0.03;
 }
 
 .mus-main {
@@ -175,17 +196,32 @@ provide('openAuthModal', openAuthModal)
   flex: 1 0 auto;
   padding-top: 140px;
   padding-bottom: 80px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mus-main.with-sidebar {
+  padding-left: 280px;
+}
+
+.mus-main.with-sidebar.sidebar-collapsed {
+  padding-left: 80px;
+}
+
+@media (max-width: 767px) {
+  .mus-main.with-sidebar {
+    padding-left: 0;
+  }
 }
 
 .mus-content-wrapper {
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 12px;
 }
 
 @media (min-width: 768px) {
   .mus-content-wrapper {
-    padding: 0 24px;
+    padding: 0 32px;
   }
 }
 
@@ -246,7 +282,7 @@ provide('openAuthModal', openAuthModal)
 }
 
 .footer-desc {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 16px;
   line-height: 1.6;
   max-width: 320px;
@@ -272,7 +308,7 @@ provide('openAuthModal', openAuthModal)
 .footer-ul li {
   font-size: 11px;
   font-weight: 700;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -285,7 +321,7 @@ provide('openAuthModal', openAuthModal)
 }
 
 .footer-link:hover {
-  color: white;
+  color: var(--primary);
 }
 
 .footer-bottom {
@@ -310,7 +346,7 @@ provide('openAuthModal', openAuthModal)
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .footer-status {
@@ -326,14 +362,14 @@ provide('openAuthModal', openAuthModal)
 .status-dot {
   width: 6px;
   height: 6px;
-  background: #0fb361;
+  background: var(--primary);
   border-radius: 50%;
 }
 
 .status-text {
   font-size: 8px;
   font-weight: 900;
-  color: #94a3b8;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.2em;
 }

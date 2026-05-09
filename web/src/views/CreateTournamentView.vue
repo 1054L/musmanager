@@ -113,339 +113,332 @@ const handleCreate = async () => {
 
 <template>
   <div class="form-page">
-    <header class="form-header">
-      <button @click="router.push('/dashboard')" class="back-link">
-        <i class="pi pi-arrow-left"></i>
-        {{ $t('tournament_form.back_dashboard') }}
-      </button>
-      <h1 class="mus-h1 italic mt-8">{{ $t('tournament_form.create_title') }}</h1>
+    <header class="form-header mb-8">
+      <h1 class="mus-h1 italic text-2xl mb-1">
+        NUEVO <span class="mus-gold-text">TORNEO</span>
+      </h1>
+      <p class="mus-p text-sm opacity-60">
+        {{ t('tournament_form.create_desc') }}
+      </p>
     </header>
 
     <div class="form-card mus-glass relative overflow-hidden">
       <!-- Loading Overlay -->
       <div v-if="loading" class="absolute inset-0 z-50 flex flex-column items-center justify-center bg-black/60 backdrop-blur-sm rounded-3xl">
         <MusLoader />
-        <p class="mt-4 text-[#0fb361] font-black italic uppercase tracking-widest text-xs animate-pulse">
+        <p class="mt-4 text-[#e9c349] font-black italic uppercase tracking-widest text-xs animate-pulse">
           {{ t('tournament_form.actions.saving') }}
         </p>
       </div>
+
       <form @submit.prevent="handleCreate" class="mus-form">
-        <div v-if="error" class="error-msg">{{ error }}</div>
+        <div v-if="error" class="error-msg mb-8">{{ error }}</div>
 
-        <!-- Nombre -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('tournament_form.labels.name') }} <span class="required">*</span></label>
-          <input v-model="form.name" type="text" required :placeholder="t('tournament_form.placeholders.name')" class="mus-input">
-        </div>
-
-        <!-- Ubicación -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('tournament_form.labels.location') }}</label>
-          <div class="relative">
-            <i class="pi pi-map-marker absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
-            <input v-model="form.location" type="text" :placeholder="t('tournament_form.placeholders.location')" class="mus-input pl-12">
-          </div>
-        </div>
-
-        <!-- Fechas -->
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="form-group">
-              <label class="mus-label">{{ $t('tournament_form.labels.startDate') }}</label>
-              <input v-model="form.startDate" type="datetime-local" class="mus-input date-input">
-            </div>
-          </div>
-          <div class="col-12 md:col-6">
-            <div class="form-group">
-              <label class="mus-label">{{ $t('tournament_form.labels.endDate') }}</label>
-              <input v-model="form.endDate" type="datetime-local" class="mus-input date-input">
-            </div>
-          </div>
-        </div>
-
-        <!-- Subida de Cartel -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('tournament_form.labels.poster') }}</label>
-          <div class="file-upload-wrapper" :class="{ 'has-file': form.poster }">
-            <input type="file" @change="onFileChange" accept="image/*,application/pdf" id="poster-upload" class="hidden-input">
-            <label for="poster-upload" class="file-upload-label">
-              <i class="pi" :class="form.poster ? 'pi-file-pdf' : 'pi-cloud-upload'"></i>
-              <span>{{ form.poster ? form.poster.name : $t('tournament_form.labels.posterSelect') }}</span>
-            </label>
-          </div>
+        <!-- STRICT TWO COLUMN LAYOUT -->
+        <div class="dual-column-grid">
           
-          <!-- Preview -->
-          <div v-if="posterPreview" class="poster-preview">
-            <img :src="posterPreview" alt="Preview cartel">
-          </div>
-          <div v-else-if="form.poster && form.poster.type === 'application/pdf'" class="pdf-notice">
-            <i class="pi pi-file-pdf mr-2"></i> {{ $t('tournament_form.labels.posterSelected') }}
-          </div>
-        </div>
-
-        <!-- Sistema de Juego -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('tournament_form.labels.gameSystem') }} <span class="required">*</span></label>
-          <div class="radio-group flex-wrap">
-            <div v-for="opt in types" :key="opt.value"
-                 @click="form.type = opt.value"
-                 class="radio-item" :class="{ active: form.type === opt.value }">
-              <div class="radio-check"></div>
-              <span class="radio-label">{{ opt.label }}</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Privacidad -->
-        <div class="form-group">
-          <label class="mus-label">
-            {{ $t('tournament_form.labels.private') }}
-            <i class="pi pi-question-circle ml-1 cursor-help text-[#0fb361]" v-tooltip="t('tournament_form.tooltips.private')"></i>
-          </label>
-          <div @click="form.private = !form.private" class="radio-item" :class="{ active: form.private }">
-            <div class="radio-check"></div>
-            <span class="radio-label">{{ t('tournament_form.labels.private_desc') }}</span>
-          </div>
-        </div>
-
-        <!-- Reglas y Gestión -->
-        <div class="rules-section p-4 mus-glass-dark rounded-xl border-white/5 mb-8">
-          <h3 class="text-sm font-black text-[#0fb361] uppercase tracking-widest mb-4 flex align-items-center">
-            <i class="pi pi-cog mr-2"></i> {{ $t('tournament_form.labels.rules_section') }}
-          </h3>
-          
-          <div class="grid">
-            <!-- Reyes -->
-            <div class="col-12 md:col-4">
-              <div class="form-group">
-                <label class="mus-label">{{ $t('tournament_form.labels.ruleKings') }}</label>
-                <div class="flex gap-2">
-                  <button type="button" v-for="val in [4, 8]" :key="val"
-                          @click="form.ruleKings = val"
-                          class="mus-btn-small" :class="{ active: form.ruleKings === val }">
-                    {{ val }}
-                  </button>
+          <!-- COLUMN 1: BASIS & LOGISTICS -->
+          <div class="column">
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-info-circle mr-2"></i> {{ t('tournament_form.labels.name') }} & {{ t('tournament_form.labels.location') }}</h3>
+              <div class="form-group-wrapper">
+                <div class="form-group">
+                  <label class="mus-label">{{ $t('tournament_form.labels.name') }} *</label>
+                  <input v-model="form.name" type="text" required :placeholder="t('tournament_form.placeholders.name')" class="mus-input">
+                </div>
+                <div class="form-group">
+                  <label class="mus-label">{{ $t('tournament_form.labels.location') }}</label>
+                  <div class="relative">
+                    <i class="pi pi-map-marker absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input v-model="form.location" type="text" :placeholder="t('tournament_form.placeholders.location')" class="mus-input pl-12">
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <!-- Tantos (Puntos) -->
-            <div class="col-12 md:col-6">
-              <div class="form-group">
-                <label class="mus-label">{{ $t('tournament_form.labels.rulePoints') }}</label>
-                <div class="flex flex-wrap gap-2 mb-3">
-                  <button type="button" v-for="val in [20, 30, 40]" :key="val"
-                          @click="setPoints(val)"
-                          class="mus-btn-small" :class="{ active: !isOtherPoints && form.rulePoints === val }">
-                    {{ val }}
-                  </button>
-                  <button type="button" @click="setPoints('other')" 
-                          class="mus-btn-small" :class="{ active: isOtherPoints }">
-                    {{ t('tournament_form.labels.other') }}
-                  </button>
+            </section>
+
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-calendar mr-2"></i> {{ t('tournament_form.labels.startDate') }} / {{ t('tournament_form.labels.endDate') }}</h3>
+              <div class="date-grid">
+                <div class="form-group">
+                  <input v-model="form.startDate" type="datetime-local" class="mus-input date-input">
                 </div>
-                <input v-if="isOtherPoints" v-model.number="form.rulePoints" type="number" 
-                       class="mus-input py-3 text-sm" :placeholder="t('tournament_form.placeholders.customPoints')">
-              </div>
-            </div>
-            
-            <!-- Chicos (Juegos) -->
-            <div class="col-12 md:col-6">
-              <div class="form-group">
-                <label class="mus-label">{{ $t('tournament_form.labels.ruleGames') }}</label>
-                <div class="flex flex-wrap gap-2 mb-3">
-                  <button type="button" v-for="val in [3, 4, 5]" :key="val"
-                          @click="setGames(val)"
-                          class="mus-btn-small" :class="{ active: !isOtherGames && form.ruleGames === val }">
-                    {{ val }}
-                  </button>
-                  <button type="button" @click="setGames('other')" 
-                          class="mus-btn-small" :class="{ active: isOtherGames }">
-                    {{ t('tournament_form.labels.other') }}
-                  </button>
+                <div class="form-group">
+                  <input v-model="form.endDate" type="datetime-local" class="mus-input date-input">
                 </div>
-                <input v-if="isOtherGames" v-model.number="form.ruleGames" type="number" 
-                       class="mus-input py-3 text-sm" :placeholder="t('tournament_form.placeholders.customGames')">
               </div>
-            </div>
+            </section>
+
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-image mr-2"></i> {{ t('tournament_form.labels.poster') }}</h3>
+              <div class="file-upload-wrapper" :class="{ 'has-file': form.poster }">
+                <input type="file" @change="onFileChange" accept="image/*,application/pdf" id="poster-upload" class="hidden-input">
+                <label for="poster-upload" class="file-upload-label">
+                  <i class="pi" :class="form.poster ? 'pi-file-pdf' : 'pi-cloud-upload'"></i>
+                  <span>{{ form.poster ? form.poster.name : $t('tournament_form.labels.posterSelect') }}</span>
+                </label>
+              </div>
+              <div v-if="posterPreview" class="poster-preview mt-4">
+                <img :src="posterPreview" alt="Preview cartel">
+              </div>
+            </section>
+          </div>
+
+          <!-- COLUMN 2: RULES & STATE -->
+          <div class="column">
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-sitemap mr-2"></i> {{ $t('tournament_form.labels.gameSystem') }}</h3>
+              <div class="grid grid-cols-2 gap-3">
+                <div v-for="opt in types" :key="opt.value"
+                     @click="form.type = opt.value"
+                     class="option-card" :class="{ active: form.type === opt.value }">
+                  <span class="option-label">{{ opt.label }}</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-cog mr-2"></i> {{ $t('tournament_form.labels.rules_section') }}</h3>
+              <div class="rules-container p-6 mus-glass-dark rounded-3xl border-white/5">
+                <div class="flex flex-col gap-6">
+                  <div class="form-group">
+                    <label class="mus-label">{{ $t('tournament_form.labels.ruleKings') }}</label>
+                    <div class="flex gap-2">
+                      <button type="button" v-for="val in [4, 8]" :key="val"
+                              @click="form.ruleKings = val"
+                              class="compact-btn flex-1" :class="{ active: form.ruleKings === val }">
+                        {{ val }} Reyes
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label class="mus-label">{{ $t('tournament_form.labels.rulePoints') }}</label>
+                    <div class="flex gap-2">
+                      <button type="button" v-for="val in [30, 40]" :key="val"
+                              @click="setPoints(val)"
+                              class="compact-btn flex-1" :class="{ active: !isOtherPoints && form.rulePoints === val }">
+                        {{ val }}
+                      </button>
+                      <button type="button" @click="setPoints('other')" 
+                              class="compact-btn flex-1" :class="{ active: isOtherPoints }">
+                        {{ t('tournament_form.labels.other') }}
+                      </button>
+                    </div>
+                    <input v-if="isOtherPoints" v-model.number="form.rulePoints" type="number" 
+                           class="mus-input mt-2" :placeholder="t('tournament_form.placeholders.customPoints')">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="mus-label">{{ $t('tournament_form.labels.ruleGames') }}</label>
+                    <div class="flex gap-2">
+                      <button type="button" v-for="val in [3, 4]" :key="val"
+                              @click="setGames(val)"
+                              class="compact-btn flex-1" :class="{ active: !isOtherGames && form.ruleGames === val }">
+                        {{ val }}
+                      </button>
+                      <button type="button" @click="setGames('other')" 
+                              class="compact-btn flex-1" :class="{ active: isOtherGames }">
+                        {{ t('tournament_form.labels.other') }}
+                      </button>
+                    </div>
+                    <input v-if="isOtherGames" v-model.number="form.ruleGames" type="number" 
+                           class="mus-input mt-2" :placeholder="t('tournament_form.placeholders.customGames')">
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-shield mr-2"></i> {{ t('tournament_form.labels.statusInitial') }} & {{ $t('tournament_form.labels.private') }}</h3>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <button type="button" v-for="opt in statuses" :key="opt.value"
+                        @click="form.status = opt.value"
+                        class="status-pill" :class="{ active: form.status === opt.value }">
+                  {{ opt.label }}
+                </button>
+              </div>
+              <div @click="form.private = !form.private" class="option-card" :class="{ active: form.private }">
+                <span class="option-label">{{ t('tournament_form.labels.private_desc') }}</span>
+              </div>
+            </section>
           </div>
         </div>
 
-        <!-- Estado -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('tournament_form.labels.statusInitial') }}</label>
-          <div class="radio-group">
-            <div v-for="opt in statuses" :key="opt.value"
-                 @click="form.status = opt.value"
-                 class="radio-item" :class="{ active: form.status === opt.value }">
-              <div class="radio-check"></div>
-              <span class="radio-label">{{ opt.label }}</span>
-            </div>
-          </div>
+        <div class="mt-12 pt-10 border-t border-white/5">
+           <button type="submit" :disabled="loading" class="mus-btn-gold-large w-full">
+            <i v-if="!loading" class="pi pi-trophy mr-3"></i>
+            {{ loading ? t('tournament_form.actions.saving') : t('tournament_form.actions.create') }}
+          </button>
         </div>
-
-        <!-- Información de Estado -->
-        <div class="form-group">
-          <label class="mus-label">{{ $t('tournament_form.labels.statusDescription') }}</label>
-          <textarea v-model="form.statusDescription" 
-                    :placeholder="$t('tournament_form.labels.statusDescriptionPlaceholder')" 
-                    class="mus-input min-h-[100px] py-4"></textarea>
-        </div>
-
-        <button type="submit" :disabled="loading" class="mus-btn-primary w-full mt-4">
-          <i v-if="!loading" class="pi pi-trophy mr-2"></i>
-          {{ loading ? t('tournament_form.actions.saving') : t('tournament_form.actions.create') }}
-        </button>
       </form>
     </div>
   </div>
 </template>
 
 <style scoped>
-.form-page { max-width: 640px; margin: 0 auto; }
-
-.back-link {
-  background: none; border: none; color: #64748b;
-  font-size: 10px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.1em; display: flex; align-items: center; gap: 10px;
-  cursor: pointer; transition: color 0.3s;
-}
-.back-link:hover { color: white; }
-
-.form-card { padding: 48px; border-radius: 32px; }
-.mus-form { display: flex; flex-direction: column; gap: 32px; }
-
-.form-group { display: flex; flex-direction: column; gap: 12px; }
-
-.mus-label {
-  font-size: 10px; font-weight: 900; text-transform: uppercase;
-  letter-spacing: 0.2em; color: #475569; margin-left: 4px;
-}
-.required { color: #0fb361; }
-
-.mus-input {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px; padding: 16px 24px; color: white;
-  font-size: 14px; font-weight: 500; outline: none; transition: all 0.3s;
-  width: 100%; box-sizing: border-box;
-}
-.mus-input:focus { border-color: rgba(15,179,97,0.5); background: rgba(255,255,255,0.05); }
-
-.file-upload-wrapper {
-  position: relative;
-  border: 2px dashed rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 24px;
-  text-align: center;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-.file-upload-wrapper:hover {
-  border-color: rgba(15, 179, 97, 0.5);
-  background: rgba(255, 255, 255, 0.02);
-}
-.file-upload-wrapper.has-file {
-  border-style: solid;
-  border-color: #0fb361;
-  background: rgba(15, 179, 97, 0.05);
+.form-page { 
+  max-width: 1400px; 
+  margin: 0 auto; 
+  padding: 0 40px 80px 40px; 
 }
 
-.hidden-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+.form-card { 
+  padding: 80px; 
+  border-radius: 40px; 
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px);
 }
 
-.file-upload-label {
+.dual-column-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+}
+
+.column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-}
-.file-upload-label i {
-  font-size: 24px;
-  color: #475569;
-}
-.file-upload-wrapper.has-file i {
-  color: #0fb361;
-}
-.file-upload-label span {
-  font-size: 13px;
-  font-weight: 600;
-  color: #94a3b8;
-}
-.file-upload-wrapper.has-file span {
-  color: white;
+  gap: 48px;
 }
 
-.pdf-notice {
-  margin-top: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  font-size: 12px;
-  color: #94a3b8;
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-title {
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--secondary);
+  opacity: 0.8;
+  margin: 0;
   display: flex;
   align-items: center;
 }
 
-.date-input { color-scheme: dark; }
+.form-group-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
-.poster-preview {
-  margin-top: 8px; border-radius: 12px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08); max-height: 180px;
+.date-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
-.poster-preview img { width: 100%; height: 180px; object-fit: cover; display: block; }
 
-.radio-group { display: flex; flex-direction: column; gap: 10px; }
-.radio-item {
-  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-  padding: 14px 20px; border-radius: 14px; display: flex; align-items: center;
-  gap: 16px; cursor: pointer; transition: all 0.3s;
+.mus-label {
+  font-size: 9px; 
+  font-weight: 900; 
+  text-transform: uppercase;
+  letter-spacing: 0.15em; 
+  color: #64748b; 
+  margin-bottom: 8px;
+  display: block;
 }
-.radio-item:hover { background: rgba(255,255,255,0.04); }
-.radio-item.active { border-color: rgba(15,179,97,0.4); background: rgba(15,179,97,0.05); }
 
-.radio-check {
-  width: 16px; height: 16px; border: 2px solid #1e293b;
-  border-radius: 50%; position: relative; flex-shrink: 0;
+.mus-input {
+  background: rgba(255, 255, 255, 0.03); 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px; 
+  padding: 18px 24px; 
+  color: white;
+  font-size: 14px; 
+  outline: none; 
+  transition: all 0.3s;
+  width: 100%;
 }
-.radio-item.active .radio-check { border-color: #0fb361; }
-.radio-item.active .radio-check::after {
-  content: ''; position: absolute; inset: 3px;
-  background: #0fb361; border-radius: 50%;
-}
-.radio-label { font-size: 12px; font-weight: 700; color: #94a3b8; }
-.radio-item.active .radio-label { color: white; }
+.mus-input:focus { border-color: var(--secondary); background: rgba(255, 255, 255, 0.05); }
 
-.error-msg {
-  background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.2);
-  color: #fb7185; padding: 16px; border-radius: 16px;
-  font-size: 12px; font-weight: 600; text-align: center;
+.file-upload-wrapper {
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
 }
-.mus-btn-small {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  color: #64748b; font-size: 11px; font-weight: 800; border-radius: 8px;
-  padding: 8px 16px; cursor: pointer; transition: all 0.3s;
-}
-.mus-btn-small:hover { background: rgba(255,255,255,0.06); color: white; }
-.mus-btn-small.active { background: #0fb361; color: black; border-color: #0fb361; }
+.file-upload-wrapper:hover { border-color: var(--secondary); background: rgba(255, 255, 255, 0.02); }
+.file-upload-wrapper.has-file { border-style: solid; border-color: var(--secondary); background: rgba(233, 195, 73, 0.05); }
 
-.mus-btn-primary {
-  background: #0fb361; border: none; border-radius: 20px;
-  padding: 16px 32px; color: black; font-size: 14px; font-weight: 900;
-  text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  transition: all 0.3s; width: 100%;
-}
-.mus-btn-primary:hover { background: #0ca358; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(15,179,97,0.4); }
-.mus-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.hidden-input { position: absolute; visibility: hidden; }
 
-@keyframes rotate { to { transform: rotate(360deg); } }
+.file-upload-label { display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; }
+.file-upload-label i { font-size: 24px; color: #475569; }
+.file-upload-wrapper.has-file i { color: var(--secondary); }
+.file-upload-label span { font-size: 12px; font-weight: 700; color: #94a3b8; }
+
+.option-card {
+  background: rgba(255, 255, 255, 0.02); 
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px; 
+  border-radius: 16px; 
+  text-align: center; 
+  cursor: pointer; 
+  transition: 0.3s;
+}
+.option-card:hover { background: rgba(255, 255, 255, 0.05); }
+.option-card.active { border-color: var(--secondary); background: rgba(233, 195, 73, 0.1); }
+.option-label { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; }
+.option-card.active .option-label { color: white; }
+
+.compact-btn {
+  background: rgba(255, 255, 255, 0.03); 
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #64748b; 
+  font-size: 10px; 
+  font-weight: 900; 
+  border-radius: 12px; 
+  padding: 12px; 
+  cursor: pointer; 
+  transition: 0.3s;
+}
+.compact-btn:hover { color: white; background: rgba(255, 255, 255, 0.08); }
+.compact-btn.active { background: var(--secondary); color: black; border-color: var(--secondary); }
+
+.status-pill {
+  background: rgba(255, 255, 255, 0.02); 
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px 20px; 
+  border-radius: 99px; 
+  font-size: 10px; 
+  font-weight: 900; 
+  text-transform: uppercase; 
+  color: #64748b; 
+  cursor: pointer; 
+  transition: 0.3s;
+}
+.status-pill:hover { color: white; }
+.status-pill.active { background: var(--secondary); color: black; border-color: var(--secondary); }
+
+.mus-btn-gold-large {
+  background: var(--secondary); 
+  border: none; 
+  border-radius: 24px;
+  padding: 24px; 
+  color: black; 
+  font-size: 16px; 
+  font-weight: 950;
+  text-transform: uppercase; 
+  letter-spacing: 0.1em; 
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+}
+.mus-btn-gold-large:hover { transform: translateY(-3px); box-shadow: 0 15px 40px -10px rgba(233, 195, 73, 0.5); }
+.mus-btn-gold-large:disabled { opacity: 0.5; transform: none; }
+
+.poster-preview img { width: 100%; height: 250px; object-fit: cover; border-radius: 20px; }
+
+@media (max-width: 1024px) {
+  .dual-column-grid { grid-template-columns: 1fr; gap: 40px; }
+  .form-card { padding: 40px; }
+  .form-page { padding: 0 20px 40px 20px; }
+}
 </style>

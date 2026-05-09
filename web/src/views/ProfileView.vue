@@ -94,9 +94,9 @@ onMounted(() => {
 
     <MusLoader v-if="loading" />
 
-    <div v-else class="max-w-2xl mx-auto mus-glass rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden border border-white/5">
+    <div v-else class="max-w-2xl mx-auto mus-glass rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden border border-[var(--border)]">
       <!-- Background Glow Effects -->
-      <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#0fb361]/10 blur-[80px] rounded-full pointer-events-none"></div>
+      <div class="absolute -top-24 -right-24 w-64 h-64 bg-[var(--primary)] opacity-10 blur-[80px] rounded-full pointer-events-none"></div>
       
       <form @submit.prevent="updateProfile" class="space-y-8 relative z-10">
         
@@ -127,7 +127,7 @@ onMounted(() => {
               <i class="pi pi-envelope input-icon"></i>
               <input v-model="userProfile.email" type="email" disabled class="mus-input-field" title="El correo electrónico no se puede cambiar">
             </div>
-            <span class="text-[10px] text-slate-500 mt-1 ml-2">{{ t('profile.emailHelp') || 'El correo electrónico se usa para iniciar sesión y no se puede modificar.' }}</span>
+            <span class="text-[10px] text-[var(--text-muted)] mt-1 ml-2">{{ t('profile.emailHelp') || 'El correo electrónico se usa para iniciar sesión y no se puede modificar.' }}</span>
           </div>
         </div>
 
@@ -135,7 +135,7 @@ onMounted(() => {
 
         <div class="section-block">
           <h2 class="section-title"><i class="pi pi-lock mr-2"></i>{{ t('profile.security') || 'Seguridad' }}</h2>
-          <p class="text-xs text-slate-400 mb-6">{{ t('profile.passwordHelp') || 'Deja los campos en blanco si no deseas cambiar la contraseña.' }}</p>
+          <p class="text-xs text-[var(--text-muted)] mb-6">{{ t('profile.passwordHelp') || 'Deja los campos en blanco si no deseas cambiar la contraseña.' }}</p>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="input-group">
@@ -181,11 +181,11 @@ onMounted(() => {
   font-style: italic;
   letter-spacing: -0.025em;
   line-height: 1;
-  color: white;
+  color: var(--secondary);
 }
 
 .mus-subtitle {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
@@ -201,7 +201,7 @@ onMounted(() => {
 .section-title {
   font-size: 14px;
   font-weight: 900;
-  color: #0fb361;
+  color: var(--secondary);
   text-transform: uppercase;
   letter-spacing: 0.15em;
   margin-bottom: 24px;
@@ -211,7 +211,7 @@ onMounted(() => {
 
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: var(--border);
   margin: 32px 0;
 }
 
@@ -226,7 +226,7 @@ onMounted(() => {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: #94a3b8;
+  color: var(--text-muted);
   margin-left: 12px;
 }
 
@@ -239,22 +239,22 @@ onMounted(() => {
   left: 24px;
   top: 50%;
   transform: translateY(-50%);
-  color: #475569;
+  color: var(--text-muted);
   font-size: 14px;
   transition: color 0.3s;
 }
 
 .mus-input-field:focus + .input-icon {
-  color: #0fb361;
+  color: var(--secondary);
 }
 
 .mus-input-field {
   width: 100%;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 20px;
   padding: 18px 24px 18px 56px;
-  color: white;
+  color: var(--text-main);
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -262,14 +262,15 @@ onMounted(() => {
 
 .mus-input-field:focus {
   outline: none;
-  border-color: #0fb361;
-  background: rgba(15, 179, 97, 0.02);
-  box-shadow: 0 0 0 4px rgba(15, 179, 97, 0.05);
+  border-color: var(--secondary);
+  background: var(--surface-hover);
+  box-shadow: 0 0 0 4px rgba(233, 195, 73, 0.1);
 }
 
 .mus-input-field:disabled {
-  background: rgba(0, 0, 0, 0.2);
-  color: #64748b;
-  border-color: rgba(255, 255, 255, 0.02);
+  background: var(--bg-app);
+  color: var(--text-muted);
+  border-color: var(--border);
+  opacity: 0.6;
 }
 </style>

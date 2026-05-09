@@ -24,10 +24,7 @@ app.use(ConfirmationService)
 app.use(ToastService)
 app.use(PrimeVue, {
     theme: {
-        preset: Aura,
-        options: {
-            darkModeSelector: '.layout-theme-dark'
-        }
+        preset: Aura
     }
 })
 app.directive('tooltip', Tooltip)

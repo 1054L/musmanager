@@ -25,6 +25,7 @@
     "dashboard": "Dashboard",
     "home": "Inicio",
     "logout": "Salir",
+    "organizer": "Organizador",
     "about": "Sobre Nosotros",
     "howItWorks": "¿Cómo funciona?"
   },
@@ -157,6 +158,14 @@
     "empty_cta": "Crea tu primer torneo",
     "empty_subtitle": "Comienza tu legado como organizador de Mus Manager hoy mismo.",
     "my_tournaments": "Mis Torneos",
+    "my_tournaments_desc": "Gestiona tus eventos competitivos y parejas registradas",
+    "recent_tournaments": "Torneos Recientes",
+    "stats": {
+      "total_tournaments": "Torneos Totales",
+      "active_tournaments": "Torneos Activos",
+      "total_teams": "Parejas Totales",
+      "total_matches": "Partidas Jugadas"
+    },
     "copy_link": "Copiar Enlace",
     "copy_link_help": "Comparte este link entre los participantes",
     "link_copied": "¡Enlace copiado!",
@@ -169,7 +178,7 @@
     "quick_actions": {
       "new_tournament": "Nuevo Torneo",
       "new_tournament_desc": "Lanza un nuevo evento competitivo",
-      "new_team": "Nuevo Equipo",
+      "new_team": "Nueva Pareja",
       "new_team_desc": "Registra una pareja participante"
     },
     "delete_confirm_title": "Eliminar Torneo",
@@ -358,7 +367,8 @@
     }
   },
   "tournament_form": {
-    "create_title": "Nuevo Torneo",
+    "create_title": "Crear Torneo",
+    "create_desc": "Configura las reglas y detalles de tu nueva competición",
     "edit_title": "Torneo",
     "back_dashboard": "Volver al Dashboard",
     "labels": {
@@ -500,7 +510,7 @@
     }
   },
   "team_form": {
-    "title": "Nuevo Equipo",
+    "title": "Nueva Pareja",
     "name": "Nombre de la Pareja",
     "name_placeholder": "Ej: Los Invencibles",
     "tournament": "Torneo",

@@ -188,7 +188,7 @@ const openPoster = () => {
                 {{ t('tournament_view.draft_mode') }}
              </div>
           </div>
-          <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#0fb361]/5 to-transparent"></div>
+          <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#e9c349]/5 to-transparent"></div>
           
           <div class="relative z-10 flex flex-column md:flex-row justify-content-between align-items-center gap-6">
             <div class="flex-1">
@@ -199,26 +199,26 @@ const openPoster = () => {
               <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight italic uppercase leading-tight m-0">{{ tournament.name }}</h1>
               <p class="text-slate-500 text-xs font-bold uppercase tracking-widest m-0 flex flex-wrap align-items-center gap-4">
                 <span @click="openPoster" class="cursor-pointer hover:text-white transition-colors flex align-items-center gap-2">
-                  <i class="pi pi-eye text-[#0fb361]"></i>
+                  <i class="pi pi-eye text-[#e9c349]"></i>
                   {{ t('dashboard.poster') }}
                 </span>
-                <span><i class="pi pi-user mr-2 text-[#0fb361]"></i>{{ t('tournament_view.pairs_count', { count: tournament.teamsCount || 0 }) }}</span>
-                <span><i class="pi pi-calendar mr-2 text-[#0fb361]"></i>{{ tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : '...' }} - {{ tournament.endDate ? new Date(tournament.endDate).toLocaleDateString() : '...' }}</span>
-                <span v-if="tournament.location"><i class="pi pi-map-marker mr-2 text-[#0fb361]"></i>{{ tournament.location }}</span>
+                <span><i class="pi pi-user mr-2 text-[#e9c349]"></i>{{ t('tournament_view.pairs_count', { count: tournament.teamsCount || 0 }) }}</span>
+                <span><i class="pi pi-calendar mr-2 text-[#e9c349]"></i>{{ tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : '...' }} - {{ tournament.endDate ? new Date(tournament.endDate).toLocaleDateString() : '...' }}</span>
+                <span v-if="tournament.location"><i class="pi pi-map-marker mr-2 text-[#e9c349]"></i>{{ tournament.location }}</span>
               </p>
             </div>
 
             <div class="flex gap-4 align-items-center bg-white/5 p-3 rounded-2xl border border-white/5">
                 <div class="rule-icon-item" v-tooltip.top="t('tournament_form.labels.ruleKings') + ': ' + tournament.ruleKings">
-                  <i class="pi pi-crown text-xl text-[#0fb361]"></i>
+                  <i class="pi pi-crown text-xl text-[#e9c349]"></i>
                   <span class="text-xs font-black ml-2">{{ tournament.ruleKings }}</span>
                 </div>
                 <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.rulePoints') + ': ' + tournament.rulePoints">
-                  <i class="pi pi-hashtag text-xl text-[#0fb361]"></i>
+                  <i class="pi pi-hashtag text-xl text-[#e9c349]"></i>
                   <span class="text-xs font-black ml-2">{{ tournament.rulePoints }}</span>
                 </div>
                 <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.ruleGames') + ': ' + tournament.ruleGames">
-                  <i class="pi pi-bolt text-xl text-[#0fb361]"></i>
+                  <i class="pi pi-bolt text-xl text-[#e9c349]"></i>
                   <span class="text-xs font-black ml-2">{{ tournament.ruleGames }}</span>
                 </div>
                 <div v-if="tournament.tablesCount" class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.tablesCount') + ': ' + tournament.tablesCount">
@@ -349,7 +349,7 @@ const openPoster = () => {
 
                 <!-- Regular Stage Matches -->
                 <div v-for="([stage, stageMatches]) in groupedMatches" :key="stage" class="col-12 mb-8">
-                   <h4 class="text-[#0fb361] font-black italic uppercase tracking-[0.2em] mb-4 flex align-items-center gap-2 text-xs">
+                   <h4 class="text-[#e9c349] font-black italic uppercase tracking-[0.2em] mb-4 flex align-items-center gap-2 text-xs">
                       <i class="pi pi-calendar"></i> {{ stage }}
                    </h4>
                    <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5">
@@ -370,8 +370,8 @@ const openPoster = () => {
                                </td>
                                <td class="p-4 w-2/12 border-l border-white/5 align-middle">
                                   <div class="flex flex-column gap-3 text-center">
-                                     <span class="text-xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-[#0fb361]' : 'text-slate-600'">{{ match.scoreA }}</span>
-                                     <span class="text-xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-[#0fb361]' : 'text-slate-600'">{{ match.scoreB }}</span>
+                                     <span class="text-xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreA }}</span>
+                                     <span class="text-xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreB }}</span>
                                   </div>
                                </td>
                                <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
@@ -379,7 +379,7 @@ const openPoster = () => {
                                      <Tag :value="match.status" :severity="match.status === t('tournament_view.match_status.finished') ? 'success' : 'secondary'" class="text-[8px] whitespace-nowrap" />
                                      <button v-if="tournament.isManager" 
                                              @click="openEditModal(match)"
-                                             class="mt-2 text-[9px] font-black text-[#0fb361] uppercase border border-[#0fb361]/30 px-2 py-1 rounded bg-[#0fb361]/5 hover:bg-[#0fb361]/20 transition-all whitespace-nowrap">
+                                             class="mt-2 text-[9px] font-black text-[#e9c349] uppercase border border-[#e9c349]/30 px-2 py-1 rounded bg-[#e9c349]/5 hover:bg-[#e9c349]/20 transition-all whitespace-nowrap">
                                        {{ t('dashboard.manage') }}
                                      </button>
                                   </div>
@@ -396,7 +396,7 @@ const openPoster = () => {
 
            <div v-else-if="activeTab === 'standings'" class="classification-container">
              <div v-for="(teams, groupName) in classification" :key="groupName" class="mb-10">
-               <h4 class="text-[#0fb361] font-black italic uppercase tracking-widest mb-4 flex items-center gap-2">
+               <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest mb-4 flex items-center gap-2">
                  <i class="pi pi-table"></i> {{ groupName }}
                </h4>
                <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5">
@@ -416,7 +416,7 @@ const openPoster = () => {
                        <td class="p-4 text-center text-slate-400">{{ team.played }}</td>
                        <td class="p-4 text-center text-emerald-500">{{ team.won }}</td>
                        <td class="p-4 text-center text-rose-500">{{ team.lost }}</td>
-                       <td class="p-4 text-center font-black text-[#0fb361]">{{ team.points }}</td>
+                       <td class="p-4 text-center font-black text-[#e9c349]">{{ team.points }}</td>
                      </tr>
                    </tbody>
                  </table>
@@ -437,21 +437,21 @@ const openPoster = () => {
               <div v-else>
                 <div class="flex overflow-x-auto py-8 px-2 gap-4 md:gap-8 bracket-container">
                    <div v-for="col in bracketMatches" :key="col.stage" class="flex flex-column justify-content-around gap-6 min-w-[280px] w-[320px] relative">
-                     <h4 class="text-center font-black uppercase tracking-widest text-[#0fb361] text-xs mb-2 bg-[#0fb361]/10 py-2 rounded">{{ col.stage }}</h4>
+                     <h4 class="text-center font-black uppercase tracking-widest text-[#e9c349] text-xs mb-2 bg-[#e9c349]/10 py-2 rounded">{{ col.stage }}</h4>
                      <div class="flex-1 flex flex-column justify-content-around gap-6">
-                        <div v-for="(m, i) in col.matches" :key="i" class="card bg-[#0a0a0a] border border-white/10 p-4 rounded-xl relative hover:border-[#0fb361]/50 cursor-pointer transition-colors" @click="tournament.isManager ? openEditModal(m) : null">
+                        <div v-for="(m, i) in col.matches" :key="i" class="card bg-[#0a0a0a] border border-white/10 p-4 rounded-xl relative hover:border-[#e9c349]/50 cursor-pointer transition-colors" @click="tournament.isManager ? openEditModal(m) : null">
                           <div class="flex align-items-center justify-content-between mb-3">
                             <span class="text-white font-bold text-sm truncate pr-2 w-10/12" :title="m.teamA">{{ m.teamA || t('tournament_view.knockout.deciding') }}</span>
-                            <span class="font-black text-lg" :class="m.scoreA > m.scoreB ? 'text-[#0fb361]' : 'text-slate-500'">{{ m.scoreA }}</span>
+                            <span class="font-black text-lg" :class="m.scoreA > m.scoreB ? 'text-[#e9c349]' : 'text-slate-500'">{{ m.scoreA }}</span>
                           </div>
                           <div class="h-px bg-white/10 w-full my-3"></div>
                           <div class="flex align-items-center justify-content-between">
                             <span class="text-white font-bold text-sm truncate pr-2 w-10/12" :title="m.teamB">{{ m.teamB || t('tournament_view.knockout.deciding') }}</span>
-                            <span class="font-black text-lg" :class="m.scoreB > m.scoreA ? 'text-[#0fb361]' : 'text-slate-500'">{{ m.scoreB }}</span>
+                            <span class="font-black text-lg" :class="m.scoreB > m.scoreA ? 'text-[#e9c349]' : 'text-slate-500'">{{ m.scoreB }}</span>
                           </div>
                           
                           <!-- Connector lines -->
-                          <div v-if="col.stage !== 'Final'" class="absolute -right-4 top-1/2 w-4 h-px bg-[#0fb361]/30"></div>
+                          <div v-if="col.stage !== 'Final'" class="absolute -right-4 top-1/2 w-4 h-px bg-[#e9c349]/30"></div>
                         </div>
                      </div>
                   </div>
@@ -481,8 +481,8 @@ const openPoster = () => {
                     <tbody>
                        <tr v-for="tt in tournament.tournamentTeams" :key="tt.id" class="border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors group">
                           <td class="p-4 w-16 text-center border-r border-white/5">
-                             <div class="w-10 h-10 mx-auto rounded-full bg-[#0fb361]/10 border border-[#0fb361]/20 flex align-items-center justify-center">
-                                <i class="pi pi-users text-[#0fb361]"></i>
+                             <div class="w-10 h-10 mx-auto rounded-full bg-[#e9c349]/10 border border-[#e9c349]/20 flex align-items-center justify-center">
+                                <i class="pi pi-users text-[#e9c349]"></i>
                              </div>
                           </td>
                           <td class="p-4 font-bold text-white text-lg">
@@ -516,25 +516,25 @@ const openPoster = () => {
                    <p class="font-bold uppercase tracking-widest">{{ t('tournament_view.bracket.empty_desc') }}</p>
                 </div>
                 <div v-else v-for="match in matches" :key="match.id" class="col-12 md:col-6 lg:col-4 mb-4">
-                   <div class="mus-glass p-4 rounded-2xl border border-white/5 hover:border-[#0fb361]/30 transition-all cursor-pointer group" @click="openEditModal(match)">
+                   <div class="mus-glass p-4 rounded-2xl border border-white/5 hover:border-[#e9c349]/30 transition-all cursor-pointer group" @click="openEditModal(match)">
                       <div class="flex justify-between items-center mb-3">
                          <Tag :value="match.stage" severity="secondary" class="text-[8px] opacity-60" />
-                         <span class="text-[8px] font-black text-[#0fb361]" v-if="match.status === t('tournament_view.match_status.finished')">
+                         <span class="text-[8px] font-black text-[#e9c349]" v-if="match.status === t('tournament_view.match_status.finished')">
                             <i class="pi pi-check-circle mr-1"></i> {{ match.status }}
                          </span>
                       </div>
                       <div class="flex flex-column gap-2 mb-4">
                          <div class="flex justify-between items-center">
                             <span class="text-white font-bold text-sm truncate max-w-[150px]">{{ match.teamA }}</span>
-                            <span class="font-black text-lg" :class="match.scoreA > match.scoreB ? 'text-[#0fb361]' : 'text-slate-600'">{{ match.scoreA }}</span>
+                            <span class="font-black text-lg" :class="match.scoreA > match.scoreB ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreA }}</span>
                          </div>
                          <div class="flex justify-between items-center">
                             <span class="text-white font-bold text-sm truncate max-w-[150px]">{{ match.teamB }}</span>
-                            <span class="font-black text-lg" :class="match.scoreB > match.scoreA ? 'text-[#0fb361]' : 'text-slate-600'">{{ match.scoreB }}</span>
+                            <span class="font-black text-lg" :class="match.scoreB > match.scoreA ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreB }}</span>
                          </div>
                       </div>
                       <div class="pt-3 border-t border-white/5 text-center">
-                         <span class="text-[9px] font-black uppercase text-[#0fb361] group-hover:bg-[#0fb361]/10 px-3 py-1 rounded-full transition-all">
+                         <span class="text-[9px] font-black uppercase text-[#e9c349] group-hover:bg-[#e9c349]/10 px-3 py-1 rounded-full transition-all">
                             {{ t('tournament_view.match_edit.save') }}
                          </span>
                       </div>
@@ -550,7 +550,7 @@ const openPoster = () => {
         <div class="card p-6 mus-glass border-white/5 h-full">
            <h3 class="text-xl font-black text-white italic uppercase mb-6 leading-none">{{ t('tournament_view.activity.title') }}</h3>
            <Timeline :value="[
-             { icon: 'pi pi-check', color: '#0fb361', message: t('tournament_view.activity.match_closed', { table: 4, team: 'Alpha', score: '40-12' }), time: t('tournament_view.activity.time_5m') },
+             { icon: 'pi pi-check', color: '#e9c349', message: t('tournament_view.activity.match_closed', { table: 4, team: 'Alpha', score: '40-12' }), time: t('tournament_view.activity.time_5m') },
              { icon: 'pi pi-play', color: '#f4d125', message: t('tournament_view.activity.match_started', { table: 1, team1: 'Kings', team2: 'Jokers' }), time: t('tournament_view.activity.time_12m') },
              { icon: 'pi pi-user', color: '#3b82f6', message: t('tournament_view.activity.player_registered', { name: 'Blind Betty' }), time: t('tournament_view.activity.time_20m') }
            ]">
@@ -576,10 +576,10 @@ const openPoster = () => {
         <div class="flex flex-column gap-6">
           <!-- Team A scorecard -->
           <div class="p-6 bg-white/[0.02] rounded-3xl border border-white/5 flex flex-column align-items-center gap-5 relative overflow-hidden group">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-[#0fb361]/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+            <div class="absolute top-0 right-0 w-32 h-32 bg-[#e9c349]/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
             
             <div class="flex flex-column align-items-center relative z-10 text-center">
-              <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#0fb361] mb-2 opacity-60">{{ t('tournament_view.match_edit.local') }}</span>
+              <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#e9c349] mb-2 opacity-60">{{ t('tournament_view.match_edit.local') }}</span>
               <span class="font-black text-white italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamA }}</span>
             </div>
 
@@ -607,10 +607,10 @@ const openPoster = () => {
 
           <!-- Team B scorecard -->
           <div class="p-6 bg-white/[0.02] rounded-3xl border border-white/5 flex flex-column align-items-center gap-5 relative overflow-hidden group">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-[#0fb361]/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+            <div class="absolute top-0 right-0 w-32 h-32 bg-[#e9c349]/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
             
             <div class="flex flex-column align-items-center relative z-10 text-center">
-              <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#0fb361] mb-2 opacity-60">{{ t('tournament_view.match_edit.visitor') }}</span>
+              <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#e9c349] mb-2 opacity-60">{{ t('tournament_view.match_edit.visitor') }}</span>
               <span class="font-black text-white italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamB }}</span>
             </div>
 
@@ -629,8 +629,8 @@ const openPoster = () => {
         </div>
 
         <!-- Rule Summary Footer -->
-        <div class="mt-8 p-4 rounded-2xl bg-[#0fb361]/5 border border-[#0fb361]/10 flex align-items-center gap-3">
-            <i class="pi pi-info-circle text-[#0fb361]"></i>
+        <div class="mt-8 p-4 rounded-2xl bg-[#e9c349]/5 border border-[#e9c349]/10 flex align-items-center gap-3">
+            <i class="pi pi-info-circle text-[#e9c349]"></i>
             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                 {{ t('tournament_view.match_edit.rule_summary', { games: tournament.ruleGames || '...', points: tournament.rulePoints || '...' }) }}
             </span>
@@ -675,8 +675,8 @@ const openPoster = () => {
 .mus-tab-btn.active { color: white; }
 .mus-tab-btn.active::after {
   content: ''; position: absolute; bottom: -4px; left: 20px; right: 20px;
-  height: 2px; background: #0fb361; border-radius: 2px;
-  box-shadow: 0 0 10px #0fb361;
+  height: 2px; background: #e9c349; border-radius: 2px;
+  box-shadow: 0 0 10px #e9c349;
 }
 
 .mus-table-wrapper { 

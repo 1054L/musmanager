@@ -127,16 +127,16 @@ const handleSubmit = async () => {
           <div class="flex gap-4">
             <label class="flex-1 cursor-pointer">
               <input type="radio" v-model="role" value="user" class="hidden peer">
-              <div class="mus-glass p-3 rounded-xl border border-white/5 text-center transition-all peer-checked:border-[#0fb361] peer-checked:bg-[#0fb361]/10">
-                <i class="pi pi-user text-xs mb-1 block"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">{{ t('auth.roleUser') }}</span>
+              <div class="mus-glass p-3 rounded-lg border border-[var(--border)] text-center transition-all peer-checked:border-[var(--secondary)] peer-checked:bg-[var(--surface-hover)]">
+                <i class="pi pi-user text-xs mb-1 block text-[var(--secondary)]"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--text-main)]">{{ t('auth.roleUser') }}</span>
               </div>
             </label>
             <label class="flex-1 cursor-pointer">
               <input type="radio" v-model="role" value="admin" class="hidden peer">
-              <div class="mus-glass p-3 rounded-xl border border-white/5 text-center transition-all peer-checked:border-[#0fb361] peer-checked:bg-[#0fb361]/10">
-                <i class="pi pi-star text-xs mb-1 block"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider">{{ t('auth.roleAdmin') }}</span>
+              <div class="mus-glass p-3 rounded-lg border border-[var(--border)] text-center transition-all peer-checked:border-[var(--secondary)] peer-checked:bg-[var(--surface-hover)]">
+                <i class="pi pi-star text-xs mb-1 block text-[var(--secondary)]"></i>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--text-main)]">{{ t('auth.roleAdmin') }}</span>
               </div>
             </label>
           </div>
@@ -151,7 +151,7 @@ const handleSubmit = async () => {
       </button>
     </form>
 
-    <footer class="mt-8 text-center pt-8 border-t border-white/5">
+    <footer class="mt-8 text-center pt-8 border-t border-[var(--border)]">
       <p v-if="isLogin" class="footer-switch">
         {{ t('auth.noAccount') }} 
         <button @click="switchMode('register')" class="switch-btn">{{ t('auth.createAccount') }}</button>
@@ -172,8 +172,8 @@ const handleSubmit = async () => {
   margin: 0 auto 24px;
   filter: drop-shadow(0 10px 20px rgba(15, 179, 97, 0.2));
 }
-.auth-title { font-size: 32px; font-weight: 950; color: white; font-style: italic; text-transform: uppercase; letter-spacing: -0.025em; line-height: 1; }
-.auth-subtitle { color: #475569; margin-top: 12px; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+.auth-title { font-size: 32px; color: var(--secondary); }
+.auth-subtitle { font-family: var(--font-main); color: var(--text-main); margin-top: 12px; font-weight: 400; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; }
 
 .error-banner {
   background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2);
@@ -182,28 +182,28 @@ const handleSubmit = async () => {
 }
 
 .input-group { display: flex; flex-direction: column; gap: 10px; }
-.input-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.25em; color: #475569; margin-left: 8px; }
+.input-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.25em; color: var(--text-muted); margin-left: 8px; }
 
 .input-wrapper { position: relative; }
-.input-icon { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); color: #1e293b; font-size: 14px; transition: color 0.3s; }
-.mus-input-field:focus + .input-icon { color: #0fb361; }
+.input-icon { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; transition: color 0.3s; }
+.mus-input-field:focus + .input-icon { color: var(--primary); }
 
 .mus-input-field {
-  width: 100%; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 20px; padding: 18px 24px 18px 56px; color: white; font-size: 14px; font-weight: 600;
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 18px 24px 18px 56px; color: var(--text-main); font-size: 14px; font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.mus-input-field:focus { outline: none; border-color: #0fb361; background: rgba(15, 179, 97, 0.02); box-shadow: 0 0 0 4px rgba(15, 179, 97, 0.05); }
+.mus-input-field:focus { outline: none; border-color: var(--secondary); background: var(--surface-hover); box-shadow: 0 0 10px rgba(233, 195, 73, 0.2); }
 
 
 
-.footer-switch { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #475569; }
+.footer-switch { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
 .switch-btn {
-  background: none; border: none; color: #0fb361; font-weight: 950; text-transform: uppercase;
-  border-bottom: 2px solid rgba(15, 179, 97, 0.3); padding: 0 2px 2px; margin-left: 4px;
+  background: none; border: none; color: var(--primary); font-weight: 950; text-transform: uppercase;
+  border-bottom: 2px solid var(--primary-glow); padding: 0 2px 2px; margin-left: 4px;
   cursor: pointer; transition: all 0.3s;
 }
-.switch-btn:hover { color: white; border-color: white; }
+.switch-btn:hover { color: var(--text-main); border-color: var(--text-main); }
 
 /* Transitions */
 .slide-fade-enter-active, .slide-fade-leave-active { transition: all 0.3s ease-out; }

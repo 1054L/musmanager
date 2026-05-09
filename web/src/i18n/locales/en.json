@@ -16,6 +16,7 @@
     "dashboard": "Dashboard",
     "home": "Home",
     "logout": "Logout",
+    "organizer": "Organizer",
     "about": "About Us",
     "howItWorks": "How it Works"
   },
@@ -148,6 +149,14 @@
     "empty_cta": "Create your first tournament",
     "empty_subtitle": "Start your legacy as a Mus Manager organizer today.",
     "my_tournaments": "My Tournaments",
+    "my_tournaments_desc": "Manage your competitive events and registered pairs",
+    "recent_tournaments": "Recent Tournaments",
+    "stats": {
+      "total_tournaments": "Total Tournaments",
+      "active_tournaments": "Active Tournaments",
+      "total_teams": "Total Teams",
+      "total_matches": "Matches Played"
+    },
     "copy_link": "Copy Link",
     "copy_link_help": "Share this link with participants",
     "link_copied": "Link copied!",
@@ -160,7 +169,7 @@
     "quick_actions": {
       "new_tournament": "New Tournament",
       "new_tournament_desc": "Launch a new competitive event",
-      "new_team": "New Team",
+      "new_team": "New Pair",
       "new_team_desc": "Register a participating pair"
     },
     "delete_confirm_title": "Delete Tournament",
@@ -329,7 +338,8 @@
     }
   },
   "tournament_form": {
-    "create_title": "New Tournament",
+    "create_title": "Create Tournament",
+    "create_desc": "Configure the rules and details of your new competition",
     "edit_title": "Tournament",
     "back_dashboard": "Back to Dashboard",
     "labels": {
@@ -471,7 +481,7 @@
     }
   },
   "team_form": {
-    "title": "New Team",
+    "title": "New Pair",
     "name": "Pair Name",
     "name_placeholder": "E.g.: The Invincibles",
     "tournament": "Tournament",
