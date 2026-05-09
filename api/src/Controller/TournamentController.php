@@ -5,8 +5,12 @@ namespace App\Controller;
 use App\Entity\Tournament;
 use App\Entity\TournamentTeam;
 use App\Entity\MusMatch;
+use App\Entity\Province;
+use App\Entity\Town;
 use App\Repository\TournamentRepository;
 use App\Repository\TeamRepository;
+use App\Repository\ProvinceRepository;
+use App\Repository\TownRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +49,12 @@ class TournamentController extends AbstractController
                 'ruleGames' => $t->getRuleGames(),
                 'tablesCount' => $t->getTablesCount(),
                 'location' => $t->getLocation(),
+                'provinceId' => $t->getProvince() ? $t->getProvince()->getId() : null,
+                'provinceName' => $t->getProvince() ? $t->getProvince()->getName() : null,
+                'townId' => $t->getTown() ? $t->getTown()->getId() : null,
+                'townName' => $t->getTown() ? $t->getTown()->getName() : null,
                 'posterPath' => $t->getPosterPath(),
+                'rulesPath' => $t->getRulesPath(),
                 'teamsCount' => count($t->getTournamentTeams()),
                 'hasMatches' => count($t->getMatches()) > 0,
                 'private' => $t->isPrivate(),
@@ -55,7 +64,7 @@ class TournamentController extends AbstractController
 
     #[Route('/api/admin/tournament', name: 'app_tournament_create', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function create(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): JsonResponse
+    public function create(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, ProvinceRepository $provinceRepository, TownRepository $townRepository): JsonResponse
     {
         $name = $request->request->get('name');
         if (!$name) {
@@ -68,6 +77,13 @@ class TournamentController extends AbstractController
         $tournament->setStatus($request->request->get('status', 'draft'));
         $tournament->setStatusDescription($request->request->get('statusDescription'));
         $tournament->setLocation($request->request->get('location'));
+        
+        if ($provinceId = $request->request->get('provinceId')) {
+            $tournament->setProvince($provinceRepository->find($provinceId));
+        }
+        if ($townId = $request->request->get('townId')) {
+            $tournament->setTown($townRepository->find($townId));
+        }
         $tournament->setCreatedBy($this->getUser());
         
         if ($startDate = $request->request->get('startDate')) {
@@ -90,8 +106,14 @@ class TournamentController extends AbstractController
         
         $posterFile = $request->files->get('poster');
         if ($posterFile) {
-            $filename = $this->handleFileUpload($posterFile, $slugger);
+            $filename = $this->handleFileUpload($posterFile, $slugger, 'posters');
             $tournament->setPosterPath('/uploads/posters/' . $filename);
+        }
+
+        $rulesFile = $request->files->get('rulesFile');
+        if ($rulesFile) {
+            $filename = $this->handleFileUpload($rulesFile, $slugger, 'rules');
+            $tournament->setRulesPath('/uploads/rules/' . $filename);
         }
 
         $entityManager->persist($tournament);
@@ -112,13 +134,16 @@ class TournamentController extends AbstractController
             'ruleGames'  => $tournament->getRuleGames(),
             'tablesCount'=> $tournament->getTablesCount(),
             'location'   => $tournament->getLocation(),
+            'province'   => $tournament->getProvince(),
+            'town'       => $tournament->getTown(),
             'posterPath' => $tournament->getPosterPath(),
+            'rulesPath'  => $tournament->getRulesPath(),
         ]);
     }
 
     #[Route('/api/admin/tournament/{uuid}', name: 'app_tournament_update', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function update(string $uuid, Request $request, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager, SluggerInterface $slugger): JsonResponse
+    public function update(string $uuid, Request $request, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager, SluggerInterface $slugger, ProvinceRepository $provinceRepository, TownRepository $townRepository): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
 
@@ -144,6 +169,12 @@ class TournamentController extends AbstractController
         }
         if ($requestData->has('location')) {
             $tournament->setLocation($requestData->get('location'));
+        }
+        if ($requestData->has('provinceId')) {
+            $tournament->setProvince($requestData->get('provinceId') ? $provinceRepository->find($requestData->get('provinceId')) : null);
+        }
+        if ($requestData->has('townId')) {
+            $tournament->setTown($requestData->get('townId') ? $townRepository->find($requestData->get('townId')) : null);
         }
         if ($requestData->has('startDate')) {
             $val = $requestData->get('startDate');
@@ -172,8 +203,14 @@ class TournamentController extends AbstractController
 
         $posterFile = $request->files->get('poster');
         if ($posterFile) {
-            $filename = $this->handleFileUpload($posterFile, $slugger);
+            $filename = $this->handleFileUpload($posterFile, $slugger, 'posters');
             $tournament->setPosterPath('/uploads/posters/' . $filename);
+        }
+
+        $rulesFile = $request->files->get('rulesFile');
+        if ($rulesFile) {
+            $filename = $this->handleFileUpload($rulesFile, $slugger, 'rules');
+            $tournament->setRulesPath('/uploads/rules/' . $filename);
         }
 
         $entityManager->flush();
@@ -193,7 +230,10 @@ class TournamentController extends AbstractController
             'ruleGames'  => $tournament->getRuleGames(),
             'tablesCount'=> $tournament->getTablesCount(),
             'location'   => $tournament->getLocation(),
+            'province'   => $tournament->getProvince(),
+            'town'       => $tournament->getTown(),
             'posterPath' => $tournament->getPosterPath(),
+            'rulesPath'  => $tournament->getRulesPath(),
         ]);
     }
 
@@ -215,14 +255,14 @@ class TournamentController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    private function handleFileUpload($file, SluggerInterface $slugger): string
+    private function handleFileUpload($file, SluggerInterface $slugger, string $subdir): string
     {
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $slugger->slug($originalFilename);
         $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
         $file->move(
-            $this->getParameter('kernel.project_dir').'/public/uploads/posters',
+            $this->getParameter('kernel.project_dir').'/public/uploads/' . $subdir,
             $newFilename
         );
 
@@ -276,7 +316,10 @@ class TournamentController extends AbstractController
             'ruleGames' => $tournament->getRuleGames(),
             'tablesCount' => $tournament->getTablesCount(),
             'location' => $tournament->getLocation(),
+            'province' => $tournament->getProvince(),
+            'town' => $tournament->getTown(),
             'posterPath' => $tournament->getPosterPath(),
+            'rulesPath' => $tournament->getRulesPath(),
             'private' => $tournament->isPrivate(),
             'uuid' => $tournament->getUuidAccessToken(),
             'teamsCount' => count($tournament->getTournamentTeams()),
@@ -514,7 +557,12 @@ class TournamentController extends AbstractController
                 'rulePoints' => $t->getRulePoints(),
                 'ruleGames' => $t->getRuleGames(),
                 'posterPath' => $t->getPosterPath(),
+                'rulesPath' => $t->getRulesPath(),
                 'location' => $t->getLocation(),
+                'provinceId' => $t->getProvince() ? $t->getProvince()->getId() : null,
+                'provinceName' => $t->getProvince() ? $t->getProvince()->getName() : null,
+                'townId' => $t->getTown() ? $t->getTown()->getId() : null,
+                'townName' => $t->getTown() ? $t->getTown()->getName() : null,
                 'teamsCount' => count($t->getTournamentTeams()),
                 'playerCount' => 24,
                 'private' => $t->isPrivate(),

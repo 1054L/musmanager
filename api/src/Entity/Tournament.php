@@ -59,6 +59,17 @@ class Tournament
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $location = null;
 
+    #[ORM\ManyToOne(targetEntity: Province::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Province $province = null;
+
+    #[ORM\ManyToOne(targetEntity: Town::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Town $town = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $rulesPath = null;
+
     #[ORM\Column(options: ['default' => false])]
     private bool $private = false;
 
@@ -334,6 +345,39 @@ class Tournament
     public function setPrivate(bool $private): static
     {
         $this->private = $private;
+        return $this;
+    }
+
+    public function getProvince(): ?Province
+    {
+        return $this->province;
+    }
+
+    public function setProvince(?Province $province): static
+    {
+        $this->province = $province;
+        return $this;
+    }
+
+    public function getTown(): ?Town
+    {
+        return $this->town;
+    }
+
+    public function setTown(?Town $town): static
+    {
+        $this->town = $town;
+        return $this;
+    }
+
+    public function getRulesPath(): ?string
+    {
+        return $this->rulesPath;
+    }
+
+    public function setRulesPath(?string $rulesPath): static
+    {
+        $this->rulesPath = $rulesPath;
         return $this;
     }
 }

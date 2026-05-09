@@ -340,3 +340,13 @@ export const teamService = {
     return response.json();
   }
 };
+
+export const locationService = {
+  async getAll() {
+    const response = await fetch(`${API_URL}/location/all`, {
+      headers: authService.getAuthHeader()
+    });
+    if (!response.ok) throw new Error('Error al cargar localizaciones');
+    return response.json();
+  }
+};

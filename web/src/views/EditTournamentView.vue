@@ -1,10 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { tournamentService, teamService } from '../services/api'
 import { useI18n } from 'vue-i18n'
+import Dropdown from 'primevue/dropdown'
+import { useLocationStore } from '../stores/locationStore'
 import MusLoader from '../components/MusLoader.vue'
 
+const locationStore = useLocationStore()
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
@@ -22,10 +25,14 @@ const form = ref({
   ruleGames: 3,
   tablesCount: null,
   location: '',
+  provinceId: null,
+  townId: null,
   poster: null,
+  rulesFile: null,
   private: false
 })
 const existingPosterPath = ref(null)
+const existingRulesPath = ref(null)
 const posterPreview = ref(null)
 const loading = ref(true)
 const saving = ref(false)
@@ -58,18 +65,33 @@ const setGames = (val) => {
   }
 }
 
-const types = [
+const filteredTowns = ref([])
+
+const onProvinceChange = (isManual = true) => {
+  if (form.value.provinceId) {
+    filteredTowns.value = locationStore.getTownsByProvince(form.value.provinceId)
+  } else {
+    filteredTowns.value = []
+  }
+  if (isManual) {
+    form.value.townId = null
+  }
+}
+
+watch(() => form.value.provinceId, () => onProvinceChange(true))
+
+const types = computed(() => [
   { value: 'eliminatory', label: t('tournament_form.types.eliminatory') },
   { value: 'league', label: t('tournament_form.types.league') },
   { value: 'groups', label: t('tournament_form.types.groups') }
-]
+])
 
-const statuses = [
+const statuses = computed(() => [
   { value: 'draft', label: t('tournament_form.statuses.draft') },
   { value: 'pending', label: t('tournament_form.statuses.pending') },
   { value: 'active', label: t('tournament_form.statuses.active') },
   { value: 'finished', label: t('tournament_form.statuses.finished') }
-]
+])
 
 onMounted(async () => {
   try {
@@ -86,10 +108,17 @@ onMounted(async () => {
       ruleGames: data.ruleGames || 3,
       tablesCount: data.tablesCount,
       location: data.location || '',
+      provinceId: data.provinceId || null,
+      townId: data.townId || null,
       poster: null,
+      rulesFile: null,
       private: data.private || false
     }
     existingPosterPath.value = data.posterPath
+    existingRulesPath.value = data.rulesPath
+    
+    // Initialize towns list based on loaded province
+    onProvinceChange(false)
     
     if (![20, 30, 40].includes(form.value.rulePoints)) isOtherPoints.value = true
     if (![3, 4, 5].includes(form.value.ruleGames)) isOtherGames.value = true
@@ -155,6 +184,13 @@ const onFileChange = (e) => {
   }
 }
 
+const onRulesFileChange = (e) => {
+  const file = e.target.files[0]
+  if (file) {
+    form.value.rulesFile = file
+  }
+}
+
 const handleSave = async () => {
   saving.value = true
   error.value = null
@@ -171,8 +207,16 @@ const handleSave = async () => {
     formData.append('rulePoints', form.value.rulePoints)
     formData.append('ruleGames', form.value.ruleGames)
     if (form.value.tablesCount !== null) formData.append('tablesCount', form.value.tablesCount)
+    
+    // Geographic data
     if (form.value.location) formData.append('location', form.value.location)
+    if (form.value.provinceId) formData.append('provinceId', form.value.provinceId)
+    if (form.value.townId) formData.append('townId', form.value.townId)
+    
+    // Files
     if (form.value.poster) formData.append('poster', form.value.poster)
+    if (form.value.rulesFile) formData.append('rulesFile', form.value.rulesFile)
+    
     formData.append('private', form.value.private)
 
     await tournamentService.updateTournament(uuid, formData)
@@ -217,39 +261,88 @@ const handleSave = async () => {
           <!-- COLUMN 1: BASIS & LOGISTICS -->
           <div class="column">
             <section class="form-section">
-              <h3 class="section-title"><i class="pi pi-info-circle mr-2"></i> Identidad & Ubicación</h3>
-              <div class="form-group-wrapper">
-                <div class="form-group">
-                  <label class="mus-label">{{ $t('tournament_form.labels.name') }} *</label>
-                  <input v-model="form.name" type="text" required class="mus-input">
-                </div>
-                <div class="form-group">
-                  <label class="mus-label">{{ $t('tournament_form.labels.location') }}</label>
-                  <input v-model="form.location" type="text" class="mus-input">
-                </div>
+              <h3 class="section-title"><i class="pi pi-info-circle mr-2"></i> {{ t('tournament_form.sections.identity') }}</h3>
+              <div class="form-group">
+                <label class="mus-label">{{ $t('tournament_form.labels.name') }} *</label>
+                <input v-model="form.name" type="text" required class="mus-input">
               </div>
             </section>
 
             <section class="form-section">
-              <h3 class="section-title"><i class="pi pi-calendar mr-2"></i> Cronograma</h3>
+              <h3 class="section-title"><i class="pi pi-map-marker mr-2"></i> {{ t('tournament_form.sections.location') }}</h3>
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="form-group">
+                  <label class="mus-label">{{ t('tournament_form.labels.province') }}</label>
+                  <Dropdown 
+                    v-model="form.provinceId" 
+                    :options="locationStore.provinces" 
+                    optionLabel="name" 
+                    optionValue="id"
+                    filter 
+                    :placeholder="t('tournament_form.placeholders.province')"
+                    class="mus-dropdown"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="mus-label">{{ t('tournament_form.labels.town') }}</label>
+                  <Dropdown 
+                    v-model="form.townId" 
+                    :options="filteredTowns" 
+                    optionLabel="name" 
+                    optionValue="id"
+                    filter 
+                    :disabled="!form.provinceId"
+                    :placeholder="t('tournament_form.placeholders.town')"
+                    class="mus-dropdown"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="mus-label">{{ t('tournament_form.labels.location') }}</label>
+                <input v-model="form.location" type="text" :placeholder="t('tournament_form.placeholders.location')" class="mus-input">
+              </div>
+            </section>
+
+            <section class="form-section">
+              <h3 class="section-title"><i class="pi pi-calendar mr-2"></i> {{ t('tournament_form.sections.schedule') }}</h3>
               <div class="date-grid">
                 <div class="form-group">
+                  <label class="mus-label">{{ t('tournament_form.labels.startDate') }}</label>
                   <input v-model="form.startDate" type="datetime-local" class="mus-input date-input">
                 </div>
                 <div class="form-group">
+                  <label class="mus-label">{{ t('tournament_form.labels.endDate') }}</label>
                   <input v-model="form.endDate" type="datetime-local" class="mus-input date-input">
                 </div>
               </div>
             </section>
 
             <section class="form-section">
-              <h3 class="section-title"><i class="pi pi-image mr-2"></i> Cartel</h3>
-              <div class="file-upload-wrapper" :class="{ 'has-file': form.poster || existingPosterPath }">
-                <input type="file" @change="onFileChange" accept="image/*,application/pdf" id="poster-upload" class="hidden-input">
-                <label for="poster-upload" class="file-upload-label">
-                  <i class="pi" :class="form.poster ? 'pi-file-pdf' : 'pi-cloud-upload'"></i>
-                  <span>{{ form.poster ? form.poster.name : (existingPosterPath ? $t('tournament_form.labels.posterChange') : $t('tournament_form.labels.posterSelect')) }}</span>
-                </label>
+              <h3 class="section-title"><i class="pi pi-file-pdf mr-2"></i> {{ t('tournament_form.sections.docs') }}</h3>
+              <div class="grid grid-cols-1 gap-6">
+                <!-- Poster -->
+                <div class="file-box">
+                  <label class="mus-label">{{ t('tournament_form.labels.poster') }}</label>
+                  <div class="file-upload-wrapper-compact" :class="{ 'has-file': form.poster || existingPosterPath }">
+                    <input type="file" @change="onFileChange" accept="image/*" id="poster-upload" class="hidden-input">
+                    <label for="poster-upload" class="file-upload-label-compact">
+                      <i class="pi" :class="form.poster ? 'pi-check-circle' : 'pi-image'"></i>
+                      <span>{{ form.poster ? form.poster.name : (existingPosterPath ? $t('tournament_form.labels.posterChange') : $t('tournament_form.labels.posterSelect')) }}</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Rules PDF -->
+                <div class="file-box">
+                  <label class="mus-label">{{ t('tournament_form.labels.rulesFile') }}</label>
+                  <div class="file-upload-wrapper-compact rules-pdf" :class="{ 'has-file': form.rulesFile || existingRulesPath }">
+                    <input type="file" @change="onRulesFileChange" accept="application/pdf" id="rules-upload" class="hidden-input">
+                    <label for="rules-upload" class="file-upload-label-compact">
+                      <i class="pi" :class="form.rulesFile ? 'pi-file-pdf' : 'pi-file'"></i>
+                      <span>{{ form.rulesFile ? form.rulesFile.name : (existingRulesPath ? $t('tournament_form.labels.rulesFileChange') : $t('tournament_form.labels.rulesFileSelect')) }}</span>
+                    </label>
+                  </div>
+                </div>
               </div>
               <div v-if="posterPreview || existingPosterPath" class="poster-preview mt-4">
                 <img :src="posterPreview || existingPosterPath" alt="Cartel">
@@ -343,20 +436,24 @@ const handleSave = async () => {
 .dual-column-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
 .column { display: flex; flex-direction: column; gap: 48px; }
 .form-section { display: flex; flex-direction: column; gap: 20px; }
-.section-title { font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.3em; color: var(--secondary); opacity: 0.8; margin: 0; }
-.form-group-wrapper { display: flex; flex-direction: column; gap: 24px; }
+.section-title { font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.3em; color: var(--secondary); opacity: 0.8; margin: 0; display: flex; align-items: center; }
+.mus-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin-bottom: 8px; display: block; }
+.mus-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px 24px; color: white; font-size: 14px; width: 100%; box-sizing: border-box; outline: none; transition: 0.3s; }
+.mus-input:focus { border-color: var(--secondary); background: rgba(255, 255, 255, 0.05); }
 .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.mus-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin-bottom: 8px; }
-.mus-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px 24px; color: white; font-size: 14px; width: 100%; box-sizing: border-box; }
-.mus-input:focus { border-color: var(--secondary); }
-.file-upload-wrapper { border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 40px; text-align: center; cursor: pointer; }
-.file-upload-wrapper.has-file { border-style: solid; border-color: var(--secondary); background: rgba(233, 195, 73, 0.05); }
-.hidden-input { position: absolute; visibility: hidden; }
-.file-upload-label { display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer; }
-.file-upload-label i { font-size: 24px; color: #475569; }
-.file-upload-wrapper.has-file i { color: var(--secondary); }
-.file-upload-label span { font-size: 12px; font-weight: 700; color: #94a3b8; }
-.poster-preview img { width: 100%; height: 250px; object-fit: cover; border-radius: 20px; }
+
+.file-box { display: flex; flex-direction: column; }
+.file-upload-wrapper-compact { border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 14px 20px; transition: 0.3s; cursor: pointer; background: rgba(255,255,255,0.02); }
+.file-upload-wrapper-compact:hover { border-color: var(--secondary); background: rgba(255,255,255,0.04); }
+.file-upload-wrapper-compact.has-file { border-color: #10b981; background: rgba(16, 185, 129, 0.05); }
+.file-upload-wrapper-compact.rules-pdf.has-file { border-color: var(--secondary); background: rgba(233, 195, 73, 0.05); }
+.hidden-input { position: absolute; visibility: hidden; width: 0; height: 0; }
+.file-upload-label-compact { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.file-upload-label-compact i { font-size: 16px; color: #475569; }
+.has-file .file-upload-label-compact i { color: #10b981; }
+.rules-pdf.has-file .file-upload-label-compact i { color: var(--secondary); }
+.file-upload-label-compact span { font-size: 12px; font-weight: 600; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
 .option-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); padding: 16px; border-radius: 16px; text-align: center; cursor: pointer; }
 .option-card.active { border-color: var(--secondary); background: rgba(233, 195, 73, 0.1); }
 .option-label { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #94a3b8; }
@@ -371,5 +468,6 @@ const handleSave = async () => {
 .cancel-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #64748b; border-radius: 16px; padding: 18px 32px; font-size: 12px; font-weight: 900; cursor: pointer; }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-@media (max-width: 1024px) { .dual-column-grid { grid-template-columns: 1fr; gap: 40px; } .form-card { padding: 40px; } .form-page { padding: 0 20px 40px 20px; } }
+.poster-preview img { width: 100%; height: 250px; object-fit: cover; border-radius: 20px; }
+@media (max-width: 1024px) { .dual-column-grid { grid-template-columns: 1fr; gap: 40px; } .form-card { padding: 40px; } }
 </style>

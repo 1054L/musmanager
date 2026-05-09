@@ -1,8 +1,14 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppLayout from './layout/AppLayout.vue'
 import MusMasterLayout from './layout/MusMasterLayout.vue'
+import { useLocationStore } from './stores/locationStore'
+
+const locationStore = useLocationStore()
+onMounted(() => {
+  locationStore.fetchLocations()
+})
 
 const route = useRoute()
 
