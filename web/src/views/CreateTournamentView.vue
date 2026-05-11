@@ -361,7 +361,7 @@ const handleCreate = async () => {
 .form-section { display: flex; flex-direction: column; gap: 20px; }
 .section-title { font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.3em; color: var(--secondary); opacity: 0.8; margin: 0; display: flex; align-items: center; }
 .mus-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin-bottom: 8px; display: block; }
-.mus-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px 24px; color: white; font-size: 14px; outline: none; transition: all 0.3s; width: 100%; }
+.mus-input { background: var(--surface-hover); border: 1px solid var(--border); border-radius: 16px; padding: 18px 24px; color: var(--text-main); font-size: 14px; outline: none; transition: all 0.3s; width: 100%; }
 .mus-input:focus { border-color: var(--secondary); background: rgba(255, 255, 255, 0.05); }
 .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
@@ -381,7 +381,7 @@ const handleCreate = async () => {
 .option-card:hover { background: rgba(255, 255, 255, 0.05); }
 .option-card.active { border-color: var(--secondary); background: rgba(233, 195, 73, 0.1); }
 .option-label { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; }
-.option-card.active .option-label { color: white; }
+.option-card.active .option-label { color: var(--text-main); }
 
 .compact-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); color: #64748b; font-size: 10px; font-weight: 900; border-radius: 12px; padding: 12px; cursor: pointer; transition: 0.3s; }
 .compact-btn.active { background: var(--secondary); color: black; border-color: var(--secondary); }

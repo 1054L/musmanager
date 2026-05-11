@@ -3,6 +3,9 @@ import { authService } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ref, inject } from 'vue'
+import { useThemeStore } from '../stores/themeStore'
+
+const themeStore = useThemeStore()
 const { t, locale } = useI18n()
 const router = useRouter()
 const user = inject('user')
@@ -78,6 +81,11 @@ const closeMobileMenu = () => {
           </div>
         </div>
 
+        <!-- Theme Toggle (Desktop) -->
+        <button @click="themeStore.toggleTheme()" class="theme-toggle-btn desktop-only" v-tooltip.bottom="t('nav.theme')">
+          <i class="pi" :class="themeStore.isDark ? 'pi-sun' : 'pi-moon'"></i>
+        </button>
+
 
         <!-- Auth -->
         <div class="auth-actions">
@@ -129,6 +137,13 @@ const closeMobileMenu = () => {
               </button>
             </div>
 
+            <div class="mobile-divider"></div>
+            
+            <!-- Theme Toggle (Mobile) -->
+            <button @click="themeStore.toggleTheme()" class="mobile-nav-item">
+              <i class="pi" :class="themeStore.isDark ? 'pi-sun' : 'pi-moon'"></i>
+              {{ themeStore.isDark ? t('nav.lightMode') || 'Modo Claro' : t('nav.darkMode') || 'Modo Oscuro' }}
+            </button>
 
             <div class="mobile-divider"></div>
             

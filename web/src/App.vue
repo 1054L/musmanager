@@ -4,10 +4,14 @@ import { useRoute } from 'vue-router'
 import AppLayout from './layout/AppLayout.vue'
 import MusMasterLayout from './layout/MusMasterLayout.vue'
 import { useLocationStore } from './stores/locationStore'
+import { useThemeStore } from './stores/themeStore'
 
 const locationStore = useLocationStore()
+const themeStore = useThemeStore()
+
 onMounted(() => {
   locationStore.fetchLocations()
+  themeStore.initTheme()
 })
 
 const route = useRoute()

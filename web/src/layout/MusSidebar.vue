@@ -129,7 +129,7 @@ const user = inject('user')
 }
 
 .user-name {
-  color: white;
+  color: var(--text-main);
   font-weight: 800;
   font-size: 14px;
   white-space: nowrap;
@@ -180,8 +180,8 @@ const user = inject('user')
 }
 
 .sidebar-nav-item:hover {
-  background: rgba(255, 255, 255, 0.03);
-  color: white;
+  background: var(--surface-hover);
+  color: var(--primary);
 }
 
 .sidebar-nav-item.router-link-active {

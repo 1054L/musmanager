@@ -17,7 +17,10 @@
     "home": "Hasiera",
     "logout": "Irten",
     "about": "Guri Buruz",
-    "howItWorks": "Nola Funtzionatzen Du?"
+    "howItWorks": "Nola Funtzionatzen Du?",
+    "theme": "Aldatu Gaia",
+    "lightMode": "Modu Argia",
+    "darkMode": "Modu Iluna"
   },
   "hero": {
     "partner": "Mus Elkarte Ofiziala",

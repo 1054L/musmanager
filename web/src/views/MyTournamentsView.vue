@@ -192,14 +192,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="dashboard-container animate-in fade-in slide-in-from-bottom-4 duration-700">
+  <div class="view-container animate-in fade-in slide-in-from-bottom-4 duration-700">
     
     <!-- Section Title -->
-    <div class="mb-8">
-      <h1 class="mus-h1 italic text-2xl mb-1">
+    <header class="mus-page-header">
+      <h1 class="mus-title">
         MIS <span class="mus-gold-text">TORNEOS</span>
       </h1>
-      <p class="mus-p text-sm opacity-60">
+      <p class="mus-subtitle">
         {{ t('dashboard.my_tournaments_desc') || 'Gestiona tus eventos competitivos y parejas registradas' }}
       </p>
       
@@ -207,7 +207,7 @@ onMounted(() => {
       <div v-if="showDebug" class="debug-panel mt-4 p-4 mus-glass text-xs font-mono text-slate-400 overflow-auto max-h-[200px]">
         <pre>{{ JSON.stringify(debugInfo, null, 2) }}</pre>
       </div>
-    </div>
+    </header>
 
     <!-- Quick Actions Menu -->
     <section class="quick-actions">
@@ -253,7 +253,7 @@ onMounted(() => {
         <div class="empty-icon-wrapper mb-6">
           <i class="pi pi-trophy text-5xl opacity-10"></i>
         </div>
-        <h3 class="text-xl font-black text-white italic uppercase mb-2">{{ t('dashboard.empty_title') }}</h3>
+        <h3 class="text-xl font-black text-main italic uppercase mb-2">{{ t('dashboard.empty_title') }}</h3>
         <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-8 max-w-sm mx-auto opacity-60">{{ t('dashboard.empty_subtitle') }}</p>
         <Button :label="t('dashboard.empty_cta')" icon="pi pi-plus" class="mus-btn-primary scale-110" 
                 @click="router.push('/admin/tournament/create')" />
@@ -469,7 +469,7 @@ onMounted(() => {
 }
 
 .action-name {
-  color: white;
+  color: var(--text-main);
   font-weight: 900;
   text-transform: uppercase;
   font-style: italic;
@@ -501,8 +501,8 @@ onMounted(() => {
 }
 
 .custom-table :deep(.p-datatable-thead > tr > th) {
-  background: rgba(255, 255, 255, 0.01);
-  color: #475569;
+  background: var(--surface-hover);
+  color: var(--text-muted);
   font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
@@ -513,8 +513,8 @@ onMounted(() => {
 
 .custom-table :deep(.p-datatable-tbody > tr) {
   background: transparent;
-  color: #94a3b8;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -529,7 +529,7 @@ onMounted(() => {
 }
 
 .tournament-name {
-  color: white;
+  color: var(--text-main);
   font-weight: 800;
   font-size: 13px;
   font-style: italic;
@@ -587,12 +587,12 @@ onMounted(() => {
 }
 
 .row-action-btn {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  color: #64748b !important;
+  color: var(--text-muted) !important;
   cursor: pointer;
   transition: all 0.3s;
   display: inline-flex;

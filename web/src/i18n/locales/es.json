@@ -27,7 +27,10 @@
     "logout": "Salir",
     "organizer": "Organizador",
     "about": "Sobre Nosotros",
-    "howItWorks": "¿Cómo funciona?"
+    "howItWorks": "¿Cómo funciona?",
+    "theme": "Cambiar Tema",
+    "lightMode": "Modo Claro",
+    "darkMode": "Modo Oscuro"
   },
   "hero": {
     "partner": "Socio Oficial de Mus",

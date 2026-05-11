@@ -86,8 +86,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="profile-container animate-in fade-in duration-500">
-    <div class="profile-header text-center mb-12">
+  <div class="view-container animate-in fade-in duration-500">
+    <div class="mus-page-header">
       <h1 class="mus-title">{{ t('profile.title') || 'Mi Perfil' }}</h1>
       <p class="mus-subtitle">{{ t('profile.desc') || 'Gestiona tu información personal y credenciales' }}</p>
     </div>
@@ -170,27 +170,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.profile-container {
-  padding: 2rem 1rem;
-}
-
-.mus-title {
-  font-size: 3rem;
-  font-weight: 950;
-  text-transform: uppercase;
-  font-style: italic;
-  letter-spacing: -0.025em;
-  line-height: 1;
-  color: var(--secondary);
-}
-
-.mus-subtitle {
-  color: var(--text-muted);
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-top: 12px;
+.view-container {
+  /* Inherits from style.css */
 }
 
 .section-block {

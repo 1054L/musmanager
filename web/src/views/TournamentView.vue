@@ -168,7 +168,7 @@ const openPoster = () => {
     <div v-else-if="error" class="col-12 max-w-2xl mx-auto mt-8">
        <Card class="mus-glass border-rose-500/10 text-center p-8">
           <template #title>
-             <h2 class="text-3xl font-black text-white italic uppercase tracking-tight">{{ t('tournament_view.restricted_access') }}</h2>
+             <h2 class="text-3xl font-black text-main italic uppercase tracking-tight">{{ t('tournament_view.restricted_access') }}</h2>
           </template>
           <template #content>
              <p class="text-slate-500 font-medium mb-6">{{ error }}</p>
@@ -196,9 +196,9 @@ const openPoster = () => {
                 <Tag :value="t('tournament_form.statuses.' + tournament.status)" severity="success" class="italic font-black uppercase text-[8px] tracking-widest" />
                 <Tag v-if="tournament.private" :value="t('tournament_form.labels.private')" severity="danger" class="italic font-black uppercase text-[8px] tracking-widest" />
               </div>
-              <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight italic uppercase leading-tight m-0">{{ tournament.name }}</h1>
+              <h1 class="text-3xl md:text-4xl font-black text-main tracking-tight italic uppercase leading-tight m-0">{{ tournament.name }}</h1>
               <p class="text-slate-500 text-xs font-bold uppercase tracking-widest m-0 flex flex-wrap align-items-center gap-4">
-                <span @click="openPoster" class="cursor-pointer hover:text-white transition-colors flex align-items-center gap-2">
+                <span @click="openPoster" class="cursor-pointer hover:text-main transition-colors flex align-items-center gap-2">
                   <i class="pi pi-eye text-[#e9c349]"></i>
                   {{ t('dashboard.poster') }}
                 </span>
@@ -280,11 +280,11 @@ const openPoster = () => {
                                         <div class="flex flex-column gap-3">
                                            <div class="flex align-items-center gap-3">
                                               <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
-                                              <span class="text-white font-black italic text-lg truncate">{{ match.teamA }}</span>
+                                              <span class="text-main font-black italic text-lg truncate">{{ match.teamA }}</span>
                                            </div>
                                            <div class="flex align-items-center gap-3">
                                               <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
-                                              <span class="text-white font-black italic text-lg truncate">{{ match.teamB }}</span>
+                                              <span class="text-main font-black italic text-lg truncate">{{ match.teamB }}</span>
                                            </div>
                                         </div>
                                      </td>
@@ -317,18 +317,18 @@ const openPoster = () => {
                                         <div class="flex flex-column gap-3">
                                            <div class="flex align-items-center gap-3">
                                               <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
-                                              <span class="text-white font-black italic text-lg truncate">{{ match.teamA }}</span>
+                                              <span class="text-main font-black italic text-lg truncate">{{ match.teamA }}</span>
                                            </div>
                                            <div class="flex align-items-center gap-3">
                                               <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
-                                              <span class="text-white font-black italic text-lg truncate">{{ match.teamB }}</span>
+                                              <span class="text-main font-black italic text-lg truncate">{{ match.teamB }}</span>
                                            </div>
                                         </div>
                                      </td>
                                      <td class="p-4 w-2/12 border-l border-white/5 align-middle text-center">
                                         <div class="flex flex-column gap-3">
-                                           <span class="text-2xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-white' : 'text-slate-600'">{{ match.scoreA }}</span>
-                                           <span class="text-2xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-white' : 'text-slate-600'">{{ match.scoreB }}</span>
+                                           <span class="text-2xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-main' : 'text-slate-600'">{{ match.scoreA }}</span>
+                                           <span class="text-2xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-main' : 'text-slate-600'">{{ match.scoreB }}</span>
                                         </div>
                                      </td>
                                      <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
@@ -360,11 +360,11 @@ const openPoster = () => {
                                   <div class="flex flex-column gap-3">
                                      <div class="flex align-items-center gap-3">
                                         <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
-                                        <span class="text-white font-black italic text-base truncate" :title="match.teamA">{{ match.teamA }}</span>
+                                        <span class="text-main font-black italic text-base truncate" :title="match.teamA">{{ match.teamA }}</span>
                                      </div>
                                      <div class="flex align-items-center gap-3">
                                         <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
-                                        <span class="text-white font-black italic text-base truncate" :title="match.teamB">{{ match.teamB }}</span>
+                                        <span class="text-main font-black italic text-base truncate" :title="match.teamB">{{ match.teamB }}</span>
                                      </div>
                                   </div>
                                </td>
@@ -407,12 +407,12 @@ const openPoster = () => {
                        <th class="p-4 text-center">{{ t('tournament_view.classification.played') }}</th>
                        <th class="p-4 text-center">{{ t('tournament_view.classification.won') }}</th>
                        <th class="p-4 text-center">{{ t('tournament_view.classification.lost') }}</th>
-                       <th class="p-4 text-center text-white">{{ t('tournament_view.classification.points') }}</th>
+                       <th class="p-4 text-center text-main">{{ t('tournament_view.classification.points') }}</th>
                      </tr>
                    </thead>
                    <tbody>
                      <tr v-for="team in teams" :key="team.teamName" class="border-t border-white/5 hover:bg-white/5 transition-colors">
-                       <td class="p-4 font-bold text-white">{{ team.teamName }}</td>
+                       <td class="p-4 font-bold text-main">{{ team.teamName }}</td>
                        <td class="p-4 text-center text-slate-400">{{ team.played }}</td>
                        <td class="p-4 text-center text-emerald-500">{{ team.won }}</td>
                        <td class="p-4 text-center text-rose-500">{{ team.lost }}</td>
@@ -441,12 +441,12 @@ const openPoster = () => {
                      <div class="flex-1 flex flex-column justify-content-around gap-6">
                         <div v-for="(m, i) in col.matches" :key="i" class="card bg-[#0a0a0a] border border-white/10 p-4 rounded-xl relative hover:border-[#e9c349]/50 cursor-pointer transition-colors" @click="tournament.isManager ? openEditModal(m) : null">
                           <div class="flex align-items-center justify-content-between mb-3">
-                            <span class="text-white font-bold text-sm truncate pr-2 w-10/12" :title="m.teamA">{{ m.teamA || t('tournament_view.knockout.deciding') }}</span>
+                            <span class="text-main font-bold text-sm truncate pr-2 w-10/12" :title="m.teamA">{{ m.teamA || t('tournament_view.knockout.deciding') }}</span>
                             <span class="font-black text-lg" :class="m.scoreA > m.scoreB ? 'text-[#e9c349]' : 'text-slate-500'">{{ m.scoreA }}</span>
                           </div>
                           <div class="h-px bg-white/10 w-full my-3"></div>
                           <div class="flex align-items-center justify-content-between">
-                            <span class="text-white font-bold text-sm truncate pr-2 w-10/12" :title="m.teamB">{{ m.teamB || t('tournament_view.knockout.deciding') }}</span>
+                            <span class="text-main font-bold text-sm truncate pr-2 w-10/12" :title="m.teamB">{{ m.teamB || t('tournament_view.knockout.deciding') }}</span>
                             <span class="font-black text-lg" :class="m.scoreB > m.scoreA ? 'text-[#e9c349]' : 'text-slate-500'">{{ m.scoreB }}</span>
                           </div>
                           
@@ -462,12 +462,12 @@ const openPoster = () => {
                   <h4 class="text-center font-black uppercase tracking-widest text-slate-500 text-xs mb-4">{{ t('tournament_view.knockout.third_place') }}</h4>
                   <div class="card bg-[#0a0a0a] border border-[#f4d125]/30 p-4 rounded-xl cursor-pointer hover:border-[#f4d125]" @click="tournament.isManager ? openEditModal(thirdPlaceMatch) : null">
                      <div class="flex align-items-center justify-content-between mb-3">
-                       <span class="text-white font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamA">{{ thirdPlaceMatch.teamA || t('tournament_view.knockout.deciding') }}</span>
+                       <span class="text-main font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamA">{{ thirdPlaceMatch.teamA || t('tournament_view.knockout.deciding') }}</span>
                        <span class="font-black text-lg" :class="thirdPlaceMatch.scoreA > thirdPlaceMatch.scoreB ? 'text-[#f4d125]' : 'text-slate-500'">{{ thirdPlaceMatch.scoreA }}</span>
                      </div>
                      <div class="h-px bg-white/10 w-full my-3"></div>
                      <div class="flex align-items-center justify-content-between">
-                       <span class="text-white font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamB">{{ thirdPlaceMatch.teamB || t('tournament_view.knockout.deciding') }}</span>
+                       <span class="text-main font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamB">{{ thirdPlaceMatch.teamB || t('tournament_view.knockout.deciding') }}</span>
                        <span class="font-black text-lg" :class="thirdPlaceMatch.scoreB > thirdPlaceMatch.scoreA ? 'text-[#f4d125]' : 'text-slate-500'">{{ thirdPlaceMatch.scoreB }}</span>
                      </div>
                   </div>
@@ -485,7 +485,7 @@ const openPoster = () => {
                                 <i class="pi pi-users text-[#e9c349]"></i>
                              </div>
                           </td>
-                          <td class="p-4 font-bold text-white text-lg">
+                          <td class="p-4 font-bold text-main text-lg">
                              {{ tt.team?.name }}
                           </td>
                           <td class="p-4 text-right w-1/3 border-l border-white/5">
@@ -506,7 +506,7 @@ const openPoster = () => {
            <div v-else-if="activeTab === 'admin' && tournament.isManager" class="admin-section">
               <div class="mb-6 flex align-items-center justify-between">
                 <div>
-                   <h3 class="text-white font-black uppercase italic tracking-tight m-0">{{ t('tournament_view.match_edit.title') }}</h3>
+                   <h3 class="text-main font-black uppercase italic tracking-tight m-0">{{ t('tournament_view.match_edit.title') }}</h3>
                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">{{ t('tournament_view.active_matches_desc') }}</p>
                 </div>
               </div>
@@ -525,11 +525,11 @@ const openPoster = () => {
                       </div>
                       <div class="flex flex-column gap-2 mb-4">
                          <div class="flex justify-between items-center">
-                            <span class="text-white font-bold text-sm truncate max-w-[150px]">{{ match.teamA }}</span>
+                            <span class="text-main font-bold text-sm truncate max-w-[150px]">{{ match.teamA }}</span>
                             <span class="font-black text-lg" :class="match.scoreA > match.scoreB ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreA }}</span>
                          </div>
                          <div class="flex justify-between items-center">
-                            <span class="text-white font-bold text-sm truncate max-w-[150px]">{{ match.teamB }}</span>
+                            <span class="text-main font-bold text-sm truncate max-w-[150px]">{{ match.teamB }}</span>
                             <span class="font-black text-lg" :class="match.scoreB > match.scoreA ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreB }}</span>
                          </div>
                       </div>
@@ -548,7 +548,7 @@ const openPoster = () => {
       <!-- Sidebar -->
       <div v-if="showActivity" class="col-12 lg:col-4">
         <div class="card p-6 mus-glass border-white/5 h-full">
-           <h3 class="text-xl font-black text-white italic uppercase mb-6 leading-none">{{ t('tournament_view.activity.title') }}</h3>
+           <h3 class="text-xl font-black text-main italic uppercase mb-6 leading-none">{{ t('tournament_view.activity.title') }}</h3>
            <Timeline :value="[
              { icon: 'pi pi-check', color: '#e9c349', message: t('tournament_view.activity.match_closed', { table: 4, team: 'Alpha', score: '40-12' }), time: t('tournament_view.activity.time_5m') },
              { icon: 'pi pi-play', color: '#f4d125', message: t('tournament_view.activity.match_started', { table: 1, team1: 'Kings', team2: 'Jokers' }), time: t('tournament_view.activity.time_12m') },
@@ -561,7 +561,7 @@ const openPoster = () => {
               </template>
               <template #content="slotProps">
                  <div class="mb-6 ml-4">
-                    <p class="text-white text-xs font-black italic m-0 leading-tight">{{ slotProps.item.message }}</p>
+                    <p class="text-main text-xs font-black italic m-0 leading-tight">{{ slotProps.item.message }}</p>
                     <small class="text-slate-600 font-bold uppercase tracking-widest text-[8px]">{{ slotProps.item.time }}</small>
                  </div>
               </template>
@@ -580,7 +580,7 @@ const openPoster = () => {
             
             <div class="flex flex-column align-items-center relative z-10 text-center">
               <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#e9c349] mb-2 opacity-60">{{ t('tournament_view.match_edit.local') }}</span>
-              <span class="font-black text-white italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamA }}</span>
+              <span class="font-black text-main italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamA }}</span>
             </div>
 
             <div class="flex align-items-center justify-content-center gap-5 relative z-10">
@@ -611,7 +611,7 @@ const openPoster = () => {
             
             <div class="flex flex-column align-items-center relative z-10 text-center">
               <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#e9c349] mb-2 opacity-60">{{ t('tournament_view.match_edit.visitor') }}</span>
-              <span class="font-black text-white italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamB }}</span>
+              <span class="font-black text-main italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamB }}</span>
             </div>
 
             <div class="flex align-items-center justify-content-center gap-5 relative z-10">
@@ -672,7 +672,7 @@ const openPoster = () => {
   transition: all 0.3s; position: relative;
 }
 .mus-tab-btn:hover { color: #94a3b8; }
-.mus-tab-btn.active { color: white; }
+.mus-tab-btn.active { color: var(--text-main); }
 .mus-tab-btn.active::after {
   content: ''; position: absolute; bottom: -4px; left: 20px; right: 20px;
   height: 2px; background: #e9c349; border-radius: 2px;
@@ -684,7 +684,7 @@ const openPoster = () => {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-th { border-bottom: 1px solid rgba(255,255,255,0.05); }
+th { border-bottom: 1px solid var(--border); }
 
 .rule-icon-item {
   display: flex;
@@ -737,7 +737,7 @@ th { border-bottom: 1px solid rgba(255,255,255,0.05); }
 
 .score-display-v2 {
   background: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   border-radius: 20px;
   width: 110px;
   height: 85px;

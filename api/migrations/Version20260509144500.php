@@ -20,34 +20,48 @@ final class Version20260509144500 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // Province table
-        $this->addSql('CREATE TABLE province (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, code VARCHAR(10) NOT NULL)');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_PROVINCE_CODE ON province (code)');
+        $province = $schema->createTable('province');
+        $province->addColumn('id', 'integer', ['autoincrement' => true]);
+        $province->addColumn('name', 'string', ['length' => 255]);
+        $province->addColumn('code', 'string', ['length' => 10]);
+        $province->setPrimaryKey(['id']);
+        $province->addUniqueIndex(['code'], 'UNIQ_PROVINCE_CODE');
 
         // Town table
-        $this->addSql('CREATE TABLE town (id SERIAL PRIMARY KEY, province_id INT NOT NULL, name VARCHAR(255) NOT NULL, code VARCHAR(10) NOT NULL)');
-        $this->addSql('CREATE INDEX IDX_TOWN_PROVINCE ON town (province_id)');
-        $this->addSql('ALTER TABLE town ADD CONSTRAINT FK_TOWN_PROVINCE FOREIGN KEY (province_id) REFERENCES province (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $town = $schema->createTable('town');
+        $town->addColumn('id', 'integer', ['autoincrement' => true]);
+        $town->addColumn('province_id', 'integer');
+        $town->addColumn('name', 'string', ['length' => 255]);
+        $town->addColumn('code', 'string', ['length' => 10]);
+        $town->setPrimaryKey(['id']);
+        $town->addIndex(['province_id'], 'IDX_TOWN_PROVINCE');
+        $town->addForeignKeyConstraint('province', ['province_id'], ['id'], [], 'FK_TOWN_PROVINCE');
 
-        // Update Tournament table: remove old string columns and add relation columns
-        $this->addSql('ALTER TABLE tournament DROP province');
-        $this->addSql('ALTER TABLE tournament DROP town');
-        $this->addSql('ALTER TABLE tournament ADD province_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE tournament ADD town_id INT DEFAULT NULL');
-        $this->addSql('CREATE INDEX IDX_TOURNAMENT_PROVINCE ON tournament (province_id)');
-        $this->addSql('CREATE INDEX IDX_TOURNAMENT_TOWN ON tournament (town_id)');
-        $this->addSql('ALTER TABLE tournament ADD CONSTRAINT FK_TOURNAMENT_PROVINCE FOREIGN KEY (province_id) REFERENCES province (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE tournament ADD CONSTRAINT FK_TOURNAMENT_TOWN FOREIGN KEY (town_id) REFERENCES town (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        // Update Tournament table
+        $tournament = $schema->getTable('tournament');
+        $tournament->dropColumn('province');
+        $tournament->dropColumn('town');
+        $tournament->addColumn('province_id', 'integer', ['notnull' => false]);
+        $tournament->addColumn('town_id', 'integer', ['notnull' => false]);
+        $tournament->addIndex(['province_id'], 'IDX_TOURNAMENT_PROVINCE');
+        $tournament->addIndex(['town_id'], 'IDX_TOURNAMENT_TOWN');
+        $tournament->addForeignKeyConstraint('province', ['province_id'], ['id'], [], 'FK_TOURNAMENT_PROVINCE');
+        $tournament->addForeignKeyConstraint('town', ['town_id'], ['id'], [], 'FK_TOURNAMENT_TOWN');
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE tournament DROP CONSTRAINT FK_TOURNAMENT_PROVINCE');
-        $this->addSql('ALTER TABLE tournament DROP CONSTRAINT FK_TOURNAMENT_TOWN');
-        $this->addSql('DROP TABLE town');
-        $this->addSql('DROP TABLE province');
-        $this->addSql('ALTER TABLE tournament DROP province_id');
-        $this->addSql('ALTER TABLE tournament DROP town_id');
-        $this->addSql('ALTER TABLE tournament ADD province VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE tournament ADD town VARCHAR(255) DEFAULT NULL');
+        $tournament = $schema->getTable('tournament');
+        $tournament->removeForeignKey('FK_TOURNAMENT_PROVINCE');
+        $tournament->removeForeignKey('FK_TOURNAMENT_TOWN');
+        $tournament->dropIndex('IDX_TOURNAMENT_PROVINCE');
+        $tournament->dropIndex('IDX_TOURNAMENT_TOWN');
+        $tournament->dropColumn('province_id');
+        $tournament->dropColumn('town_id');
+        $tournament->addColumn('province', 'string', ['length' => 255, 'notnull' => false]);
+        $tournament->addColumn('town', 'string', ['length' => 255, 'notnull' => false]);
+
+        $schema->dropTable('town');
+        $schema->dropTable('province');
     }
 }

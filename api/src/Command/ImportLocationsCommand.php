@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(
     name: 'app:import-locations',
@@ -19,6 +20,7 @@ class ImportLocationsCommand extends Command
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        #[Autowire(param: 'kernel.project_dir')]
         private string $projectDir
     ) {
         parent::__construct();
@@ -36,8 +38,8 @@ class ImportLocationsCommand extends Command
             return Command::FAILURE;
         }
 
-        $provincias = json_decode(file_get_content($provinciasPath), true);
-        $poblaciones = json_decode(file_get_content($poblacionesPath), true);
+        $provincias = json_decode(file_get_contents($provinciasPath), true);
+        $poblaciones = json_decode(file_get_contents($poblacionesPath), true);
 
         $io->note('Importing provinces...');
         $provinceMap = [];

@@ -367,7 +367,7 @@ const handleSave = async () => {
 
                 <div v-if="enrolledTeams.length > 0" class="max-h-[180px] overflow-y-auto mb-6 pr-2 custom-scrollbar">
                    <div v-for="tt in enrolledTeams" :key="tt.id" class="flex justify-between items-center p-3 border-b border-white/5 last:border-0 text-xs">
-                      <span class="font-bold text-white">{{ tt.team.name }}</span>
+                      <span class="font-bold text-main">{{ tt.team.name }}</span>
                       <span class="opacity-40 uppercase font-black text-[9px]">{{ tt.groupName || t('tournament_mgmt.no_group') }}</span>
                    </div>
                 </div>
@@ -438,7 +438,7 @@ const handleSave = async () => {
 .form-section { display: flex; flex-direction: column; gap: 20px; }
 .section-title { font-size: 10px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.3em; color: var(--secondary); opacity: 0.8; margin: 0; display: flex; align-items: center; }
 .mus-label { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: #64748b; margin-bottom: 8px; display: block; }
-.mus-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px 24px; color: white; font-size: 14px; width: 100%; box-sizing: border-box; outline: none; transition: 0.3s; }
+.mus-input { background: var(--surface-hover); border: 1px solid var(--border); border-radius: 16px; padding: 18px 24px; color: var(--text-main); font-size: 14px; width: 100%; box-sizing: border-box; outline: none; transition: 0.3s; }
 .mus-input:focus { border-color: var(--secondary); background: rgba(255, 255, 255, 0.05); }
 .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
@@ -457,14 +457,14 @@ const handleSave = async () => {
 .option-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); padding: 16px; border-radius: 16px; text-align: center; cursor: pointer; }
 .option-card.active { border-color: var(--secondary); background: rgba(233, 195, 73, 0.1); }
 .option-label { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #94a3b8; }
-.option-card.active .option-label { color: white; }
+.option-card.active .option-label { color: var(--text-main); }
 .compact-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); color: #64748b; font-size: 10px; font-weight: 900; border-radius: 12px; padding: 12px; cursor: pointer; }
 .compact-btn.active { background: var(--secondary); color: black; border-color: var(--secondary); }
 .status-pill { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); padding: 10px 20px; border-radius: 99px; font-size: 10px; font-weight: 900; text-transform: uppercase; color: #64748b; cursor: pointer; }
 .status-pill.active { background: var(--secondary); color: black; }
 .mus-btn-gold-large { background: var(--secondary); border: none; border-radius: 24px; padding: 24px; color: black; font-size: 16px; font-weight: 950; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .mus-btn-gold-small { background: var(--secondary); border: none; border-radius: 12px; padding: 12px 20px; color: black; cursor: pointer; }
-.mus-btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px; color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+.mus-btn-secondary { background: var(--surface-hover); border: 1px solid var(--border); border-radius: 14px; padding: 14px; color: var(--text-main); font-size: 11px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 .cancel-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #64748b; border-radius: 16px; padding: 18px 32px; font-size: 12px; font-weight: 900; cursor: pointer; }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }

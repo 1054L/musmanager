@@ -173,11 +173,11 @@ onMounted(() => {
 
 .filter-bar {
   display: flex;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-hover);
   backdrop-filter: blur(20px);
   padding: 6px;
   border-radius: 99px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
   gap: 4px;
   max-width: 100%;
   overflow-x: auto;
@@ -216,8 +216,8 @@ onMounted(() => {
 }
 
 .filter-btn:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--secondary);
+  background: var(--surface-hover);
 }
 
 .filter-btn.active {
@@ -261,7 +261,7 @@ onMounted(() => {
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
 }
 
 .t-card:hover {
@@ -350,7 +350,7 @@ onMounted(() => {
   gap: 12px;
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -362,9 +362,9 @@ onMounted(() => {
 
 .details-btn {
   margin-top: auto;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: white;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  color: var(--text-main);
   padding: 18px;
   border-radius: 20px;
   font-size: 10px;

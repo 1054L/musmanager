@@ -1,6 +1,7 @@
 :root {
   /* Mus Masters (Gold Edition) - Based on "Grand Table Mus Tournament" */
   --bg-app: #021709; /* Championship Green (Foundation) */
+  --bg-gradient-end: #000000;
   --surface: #0d2415; /* Deep Baize (Containers) */
   --surface-hover: #182f1f;
   --text-main: #ceead1; /* Cream/Light Green (Prestigious Text) */
@@ -25,6 +26,60 @@
   --font-main: 'Inter', sans-serif;
   --font-display: 'Public Sans', 'Inter', sans-serif;
 }
+
+[data-theme="light"] {
+  --bg-app: #f4f9f5;
+  --bg-gradient-end: #dceae0;
+  --surface: #ffffff;
+  --surface-hover: #f0f7f2;
+  --text-main: #0d2415;
+  --text-muted: #4a5d4f;
+  
+  --primary: #2d6a4f;
+  --primary-hover: #40916c;
+  
+  --border: rgba(13, 36, 21, 0.1);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Theme-aware Utility Overrides */
+[data-theme="light"] .text-white,
+[data-theme="light"] .mus-text-white {
+  color: var(--text-main) !important;
+}
+
+[data-theme="light"] .text-slate-300,
+[data-theme="light"] .text-slate-400 {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="light"] .text-slate-500,
+[data-theme="light"] .text-slate-600,
+[data-theme="light"] .text-slate-700 {
+  color: var(--text-main) !important;
+  opacity: 0.8;
+}
+
+[data-theme="light"] .bg-white\/5,
+[data-theme="light"] .bg-white\/\[0\.02\] {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="light"] .border-white\/5,
+[data-theme="light"] .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Base Utility Classes */
+.text-main { color: var(--text-main); }
+.text-muted { color: var(--text-muted); }
+.text-secondary { color: var(--secondary); }
+.text-primary { color: var(--primary); }
+.text-surface { color: var(--surface); }
+.bg-surface { background-color: var(--surface); }
+.bg-surface-hover { background-color: var(--surface-hover); }
+.border-main { border-color: var(--border); }
 
 body {
   margin: 0;
@@ -138,10 +193,10 @@ body {
 
 /* Global PrimeVue Dropdown Overrides */
 .p-dropdown {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: var(--surface-hover) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 16px !important;
-  color: white !important;
+  color: var(--text-main) !important;
   transition: all 0.3s !important;
 }
 
@@ -152,11 +207,11 @@ body {
 
 .p-dropdown-label {
   padding: 18px 24px !important;
-  color: white !important;
+  color: var(--text-main) !important;
 }
 
 .p-dropdown-panel {
-  background: #0f172a !important;
+  background: var(--surface) !important;
   border: 1px solid var(--secondary) !important;
   border-radius: 12px !important;
   box-shadow: var(--shadow-md) !important;
@@ -167,7 +222,7 @@ body {
 }
 
 .p-dropdown-item {
-  color: #94a3b8 !important;
+  color: var(--text-muted) !important;
   border-radius: 8px !important;
   padding: 12px 16px !important;
   transition: 0.2s !important;
@@ -179,22 +234,77 @@ body {
 }
 
 .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: white !important;
+  background: var(--primary-glow) !important;
+  color: var(--primary) !important;
 }
 
 .p-dropdown-header {
-  background: rgba(255, 255, 255, 0.03) !important;
+  background: var(--surface-hover) !important;
   padding: 12px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-bottom: 1px solid var(--border) !important;
 }
 
 .p-dropdown-filter {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 8px !important;
-  color: white !important;
+  color: var(--text-main) !important;
   padding: 8px 12px !important;
+}
+
+/* Global PrimeVue Paginator Overrides */
+.p-paginator {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-top: none !important;
+  border-radius: 0 0 24px 24px !important;
+  padding: 1rem !important;
+  color: var(--text-muted) !important;
+}
+
+.p-paginator-page, 
+.p-paginator-next, 
+.p-paginator-last, 
+.p-paginator-first, 
+.p-paginator-prev {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--text-muted) !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  margin: 0 2px !important;
+  transition: all 0.2s !important;
+}
+
+.p-paginator-page.p-highlight {
+  background: var(--secondary) !important;
+  color: #000 !important;
+  font-weight: 900 !important;
+}
+
+.p-paginator-page:not(.p-highlight):hover,
+.p-paginator-next:hover, 
+.p-paginator-last:hover, 
+.p-paginator-first:hover, 
+.p-paginator-prev:hover {
+  background: var(--surface-hover) !important;
+  border-color: var(--secondary) !important;
+  color: var(--secondary) !important;
+}
+
+.p-datatable-footer {
+  background: var(--surface) !important;
+  border-top: 1px solid var(--border) !important;
+  color: var(--text-main) !important;
+  padding: 1rem 2rem !important;
+}
+
+/* Ensure no default PrimeVue styles leak white backgrounds */
+.p-paginator-bottom, .p-paginator-top {
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
 }
 
 /* Global Typography & Layout */
@@ -287,4 +397,36 @@ ul {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+/* Page Headers & Unified Layout */
+.view-container {
+  padding: 1.5rem 1rem 4rem 1rem;
+}
+
+.mus-page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  width: 100%;
+}
+
+.mus-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 950;
+  text-transform: uppercase;
+  font-style: italic;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: var(--secondary);
+  margin: 0;
+}
+
+.mus-subtitle {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-top: 12px;
+  opacity: 0.8;
 }

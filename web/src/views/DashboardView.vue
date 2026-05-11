@@ -37,19 +37,17 @@ onMounted(loadData)
 </script>
 
 <template>
-  <div class="dashboard-container animate-in fade-in slide-in-from-bottom-4 duration-700">
+  <div class="view-container animate-in fade-in slide-in-from-bottom-4 duration-700">
     <!-- Welcome Header -->
-    <header class="dashboard-header mb-12">
-      <div class="header-content">
-        <h1 class="mus-h1 italic text-3xl mb-2">
-          PANEL DE <span class="mus-gold-text">CONTROL</span>
-        </h1>
-        <p class="mus-p text-sm opacity-60">
-          Bienvenido de nuevo, 
-          <span class="mus-gold-text font-bold">{{ user?.firstName || user?.email?.split('@')[0] }} {{ user?.lastName || '' }}</span>. 
-          Tienes {{ tournaments.length }} eventos bajo tu gestión.
-        </p>
-      </div>
+    <header class="mus-page-header">
+      <h1 class="mus-title">
+        PANEL DE <span class="mus-gold-text">CONTROL</span>
+      </h1>
+      <p class="mus-subtitle">
+        {{ t('dashboard.welcome') || 'Bienvenido de nuevo' }}, 
+        <span class="text-secondary font-bold">{{ user?.firstName || user?.email?.split('@')[0] }} {{ user?.lastName || '' }}</span>. 
+        {{ t('dashboard.summary_count', { count: tournaments.length }) || `Tienes ${tournaments.length} eventos bajo tu gestión.` }}
+      </p>
     </header>
 
     <div v-if="loading" class="flex justify-center items-center py-20">
@@ -63,7 +61,7 @@ onMounted(loadData)
           <div class="flex justify-between items-start gap-4">
             <div class="flex-1 min-w-0">
               <p class="text-[10px] uppercase font-black tracking-widest text-slate-500 mb-2 truncate">{{ stat.label }}</p>
-              <h3 class="text-4xl font-black italic text-white leading-none">{{ stat.value }}</h3>
+              <h3 class="text-4xl font-black italic text-main leading-none">{{ stat.value }}</h3>
             </div>
             <div class="w-12 h-12 shrink-0 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
               <i :class="['pi', stat.icon, 'text-xl']" :style="{ color: stat.color }"></i>
@@ -94,7 +92,7 @@ onMounted(loadData)
                           <i v-else class="pi pi-trophy text-slate-600"></i>
                        </div>
                        <div class="min-w-0">
-                          <h4 class="text-white font-bold text-base m-0 truncate group-hover:text-secondary transition-colors">{{ t.name }}</h4>
+                          <h4 class="text-main font-bold text-base m-0 truncate group-hover:text-secondary transition-colors">{{ t.name }}</h4>
                           <span class="text-[10px] uppercase font-black tracking-widest text-slate-600 block mt-1">
                             {{ t('tournament_form.statuses.' + t.status) || t.status }} • {{ t.teamsCount || 0 }} equipos
                           </span>
@@ -117,7 +115,7 @@ onMounted(loadData)
                  <i class="pi pi-plus text-secondary"></i>
               </div>
               <div class="min-w-0">
-                 <h4 class="text-white font-black uppercase text-xs tracking-widest truncate">{{ t('dashboard.quick_actions.new_tournament') }}</h4>
+                 <h4 class="text-main font-black uppercase text-xs tracking-widest truncate">{{ t('dashboard.quick_actions.new_tournament') }}</h4>
                  <p class="text-[10px] text-slate-500 truncate">{{ t('dashboard.quick_actions.new_tournament_desc') }}</p>
               </div>
            </router-link>

@@ -18,7 +18,10 @@
     "logout": "Logout",
     "organizer": "Organizer",
     "about": "About Us",
-    "howItWorks": "How it Works"
+    "howItWorks": "How it Works",
+    "theme": "Toggle Theme",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode"
   },
   "hero": {
     "partner": "Official Mus Partner",

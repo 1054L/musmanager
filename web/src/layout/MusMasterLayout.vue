@@ -142,7 +142,7 @@ provide('logout', handleLogout)
 .bg-gradient {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, var(--bg-app) 0%, #000 100%);
+  background: radial-gradient(circle at 50% 50%, var(--bg-app) 0%, var(--bg-gradient-end) 100%);
 }
 
 .bg-noise {
