@@ -471,6 +471,7 @@
     "pairs_count": "{count} Parejas",
     "location": "Ubicación",
     "matches_in_progress": "Partidas en Curso",
+    "public_view": "Vista Pública",
     "view_full_bracket": "Ver Cuadro Completo",
     "match_status": {
       "finished": "Finalizado",
@@ -480,7 +481,7 @@
       "matches": "Partidas",
       "standings": "Clasificación",
       "bracket": "Cuadro",
-      "teams": "Equipos",
+      "teams": "Parejas",
       "admin": "Administración"
     },
     "rounds": {

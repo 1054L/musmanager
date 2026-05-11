@@ -67,6 +67,12 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/tournament/:uuid/manage',
+    name: 'TournamentManage',
+    component: () => import('../views/TournamentAdminView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/caracteristicas',
     name: 'Features',
     component: () => import('../views/FeaturesView.vue'),

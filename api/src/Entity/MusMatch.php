@@ -19,11 +19,11 @@ class MusMatch
     private ?Tournament $tournament = null;
 
     #[ORM\ManyToOne(inversedBy: 'matchesAsTeam1')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Team $team1 = null;
 
     #[ORM\ManyToOne(inversedBy: 'matchesAsTeam2')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Team $team2 = null;
 
     #[ORM\Column]
@@ -37,6 +37,12 @@ class MusMatch
 
     #[ORM\Column(length: 100)]
     private ?string $stage = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $bracketRound = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $bracketPosition = null;
 
     public function getId(): ?int
     {
@@ -117,6 +123,28 @@ class MusMatch
     public function setStage(string $stage): static
     {
         $this->stage = $stage;
+        return $this;
+    }
+
+    public function getBracketRound(): ?int
+    {
+        return $this->bracketRound;
+    }
+
+    public function setBracketRound(?int $bracketRound): static
+    {
+        $this->bracketRound = $bracketRound;
+        return $this;
+    }
+
+    public function getBracketPosition(): ?int
+    {
+        return $this->bracketPosition;
+    }
+
+    public function setBracketPosition(?int $bracketPosition): static
+    {
+        $this->bracketPosition = $bracketPosition;
         return $this;
     }
 }

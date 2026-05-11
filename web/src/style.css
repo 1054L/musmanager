@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   /* Mus Masters (Gold Edition) - Based on "Grand Table Mus Tournament" */
   --bg-app: #021709; /* Championship Green (Foundation) */

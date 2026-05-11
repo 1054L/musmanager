@@ -407,26 +407,89 @@ class TournamentController extends AbstractController
             return new JsonResponse(['error' => 'Ya existe un calendario generado para este torneo'], 400);
         }
 
-        $groups = [];
-        foreach ($tournament->getTournamentTeams() as $tt) {
-            $gn = $tt->getGroupName() ?: 'Sin Grupo';
-            $groups[$gn][] = $tt->getTeam();
+        $teams = $tournament->getTournamentTeams()->toArray();
+        if (count($teams) < 2) {
+            return new JsonResponse(['error' => 'Se necesitan al menos 2 parejas para generar partidas'], 400);
         }
 
-        foreach ($groups as $groupName => $teams) {
-            $count = count($teams);
-            for ($i = 0; $i < $count; $i++) {
-                for ($j = $i + 1; $j < $count; $j++) {
+        if ($tournament->getType() === 'eliminatory') {
+            // SHUFFLE TEAMS FOR INITIAL DRAW
+            shuffle($teams);
+            
+            $teamsCount = count($teams);
+            $roundsNeeded = (int)ceil(log($teamsCount, 2));
+            $initialPower = pow(2, $roundsNeeded);
+            
+            // Stage names mapping
+            $stageNames = [
+                1 => 'Final',
+                2 => 'Semifinales',
+                4 => 'Cuartos de Final',
+                8 => 'Octavos de Final',
+                16 => 'Dieciseisavos de Final',
+                32 => 'Treintaidosavos de Final'
+            ];
+
+            // Create ALL matches for the bracket structure
+            // Round 1 is $roundsNeeded, Round 2 is $roundsNeeded-1 ... Final is 1
+            for ($r = $roundsNeeded; $r >= 1; $r--) {
+                $matchesInRound = pow(2, $r - 1);
+                $stageLabel = $stageNames[$matchesInRound] ?? 'Ronda ' . ($roundsNeeded - $r + 1);
+                
+                for ($p = 0; $p < $matchesInRound; $p++) {
                     $match = new MusMatch();
                     $match->setTournament($tournament);
-                    $match->setTeam1($teams[$i]);
-                    $match->setTeam2($teams[$j]);
-                    $match->setStage($groupName);
+                    $match->setStage($stageLabel);
+                    $match->setBracketRound($r);
+                    $match->setBracketPosition($p);
+                    
+                    // Assign teams only for the first round ($r === $roundsNeeded)
+                    if ($r === $roundsNeeded) {
+                        $teamIndex1 = $p * 2;
+                        $teamIndex2 = $p * 2 + 1;
+                        
+                        if (isset($teams[$teamIndex1])) {
+                            $match->setTeam1($teams[$teamIndex1]->getTeam());
+                        }
+                        if (isset($teams[$teamIndex2])) {
+                            $match->setTeam2($teams[$teamIndex2]->getTeam());
+                        }
+
+                        // Handle Bye (if team2 is null, team1 wins immediately)
+                        if ($match->getTeam1() && !$match->getTeam2()) {
+                            $match->setWinner($match->getTeam1());
+                            $match->setScoreTeam1(1); // Minimal score to mark as played
+                            $match->setScoreTeam2(0);
+                        }
+                    }
+
                     $entityManager->persist($match);
+                }
+            }
+        } else {
+            // ROUND ROBIN / GROUPS LOGIC
+            $groups = [];
+            foreach ($teams as $tt) {
+                $gn = $tt->getGroupName() ?: 'Sin Grupo';
+                $groups[$gn][] = $tt->getTeam();
+            }
+
+            foreach ($groups as $groupName => $groupTeams) {
+                $count = count($groupTeams);
+                for ($i = 0; $i < $count; $i++) {
+                    for ($j = $i + 1; $j < $count; $j++) {
+                        $match = new MusMatch();
+                        $match->setTournament($tournament);
+                        $match->setTeam1($groupTeams[$i]);
+                        $match->setTeam2($groupTeams[$j]);
+                        $match->setStage($groupName);
+                        $entityManager->persist($match);
+                    }
                 }
             }
         }
 
+        $tournament->setStatus('active');
         $entityManager->flush();
 
         return new JsonResponse(['success' => true]);
@@ -456,6 +519,39 @@ class TournamentController extends AbstractController
 
         $this->recalculateTournamentStats($tournament, $entityManager);
         
+        // AUTOMATIC ADVANCEMENT FOR ELIMINATORY
+        if ($tournament->getType() === 'eliminatory' && $match->getWinner() && $match->getBracketRound() > 1) {
+            $nextRound = $match->getBracketRound() - 1;
+            $nextPos = (int)floor($match->getBracketPosition() / 2);
+            $isTeam2 = $match->getBracketPosition() % 2 === 1;
+
+            $nextMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
+                'tournament' => $tournament,
+                'bracketRound' => $nextRound,
+                'bracketPosition' => $nextPos
+            ]);
+
+            if ($nextMatch) {
+                if ($isTeam2) {
+                    $nextMatch->setTeam2($match->getWinner());
+                } else {
+                    $nextMatch->setTeam1($match->getWinner());
+                }
+            }
+        }
+
+        // CHECK IF ALL MATCHES ARE FINISHED -> AUTO-FINISH TOURNAMENT
+        $allFinished = true;
+        foreach ($tournament->getMatches() as $m) {
+            if (!$m->getWinner()) {
+                $allFinished = false;
+                break;
+            }
+        }
+        if ($allFinished && count($tournament->getMatches()) > 0 && $tournament->getStatus() === 'active') {
+            $tournament->setStatus('finished');
+        }
+
         $entityManager->flush();
 
         return new JsonResponse(['success' => true]);

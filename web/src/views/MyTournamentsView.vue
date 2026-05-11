@@ -312,33 +312,19 @@ onMounted(() => {
                  <i :class="copiedUuid === slotProps.data.uuid ? 'pi pi-check text-[#0fb361]' : 'pi pi-copy'"></i>
                </button>
 
-               <!-- Quick Actions: Enroll, Sorteo & Calendario -->
-               <button class="row-action-btn"
-                       @click="openEnroll($event, slotProps.data)"
-                       v-tooltip.top="t('tournament_mgmt.enroll')">
-                   <i class="pi pi-user-plus"></i>
-               </button>
+                <!-- Manage Dashboard (Private) -->
+                <router-link :to="`/tournament/${slotProps.data.uuid}/manage`"
+                        class="row-action-btn border-[#e9c349]/30 text-[#e9c349] bg-[#e9c349]/5"
+                        v-tooltip.top="t('dashboard.manage')">
+                  <i class="pi pi-cog"></i>
+                </router-link>
 
-               <button class="row-action-btn"
-                       @click="handleGenerateGroups(slotProps.data)"
-                       :disabled="processingUuid === slotProps.data.uuid"
-                       v-tooltip.top="t('tournament_mgmt.draw_groups')">
-                   <i class="pi" :class="processingUuid === slotProps.data.uuid ? 'pi-spin pi-spinner' : 'pi-sitemap'"></i>
-               </button>
-
-               <button class="row-action-btn"
-                       @click="handleGenerateMatches(slotProps.data)"
-                       :disabled="processingUuid === slotProps.data.uuid"
-                       v-tooltip.top="t('tournament_mgmt.generate_matches')">
-                   <i class="pi" :class="processingUuid === slotProps.data.uuid ? 'pi-spin pi-spinner' : 'pi-calendar'"></i>
-               </button>
-
-               <!-- Edit -->
-               <router-link :to="`/admin/tournament/${slotProps.data.uuid}/edit`"
-                       class="row-action-btn"
-                       v-tooltip.top="t('dashboard.manage')">
-                 <i class="pi pi-pencil"></i>
-               </router-link>
+                <!-- Edit Info (Basic Settings) -->
+                <router-link :to="`/admin/tournament/${slotProps.data.uuid}/edit`"
+                        class="row-action-btn"
+                        v-tooltip.top="t('common.edit')">
+                  <i class="pi pi-pencil"></i>
+                </router-link>
 
                <!-- Delete -->
                <button class="row-action-btn hover:!bg-rose-500/10 hover:!text-rose-500 hover:!border-rose-500/20"

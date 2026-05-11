@@ -22,11 +22,10 @@ const loading = ref(true)
 const error = ref(null)
 const matches = ref([])
 const showActivity = ref(false)
-const editingMatch = ref(null)
-const editScore1 = ref(0)
-const editScore2 = ref(0)
 const isSavingResult = ref(false)
 const showPosterDialog = ref(false)
+const canManage = computed(() => tournament.value?.isManager)
+const uuid = route.params.uuid
 
 
 const activeStageTab = ref(null);
@@ -117,35 +116,7 @@ const fetchTournament = async () => {
 
 onMounted(fetchTournament)
 
-const openEditModal = (match) => {
-  editingMatch.value = match
-  editScore1.value = match.scoreA
-  editScore2.value = match.scoreB
-}
-
-const adjustScore = (team, amount) => {
-  const max = tournament.value?.ruleGames || 40 // Default to 40 if not set, though usually it's 2, 3 or 4
-  if (team === 1) {
-    const newVal = editScore1.value + amount
-    if (newVal >= 0 && newVal <= max) editScore1.value = newVal
-  } else {
-    const newVal = editScore2.value + amount
-    if (newVal >= 0 && newVal <= max) editScore2.value = newVal
-  }
-}
-
-const saveMatchResult = async () => {
-  isSavingResult.value = true
-  try {
-    await tournamentService.updateMatchScore(editingMatch.value.id, editScore1.value, editScore2.value)
-    editingMatch.value = null
-    await fetchTournament()
-  } catch (e) {
-    alert(e.message)
-  } finally {
-    isSavingResult.value = false
-  }
-}
+// Administrative functions removed - moved to TournamentAdminView.vue
 
 const openPoster = () => {
   const path = tournament.value?.posterPath || '/vertical.png';
@@ -208,23 +179,27 @@ const openPoster = () => {
               </p>
             </div>
 
-            <div class="flex gap-4 align-items-center bg-white/5 p-3 rounded-2xl border border-white/5">
-                <div class="rule-icon-item" v-tooltip.top="t('tournament_form.labels.ruleKings') + ': ' + tournament.ruleKings">
-                  <i class="pi pi-crown text-xl text-[#e9c349]"></i>
-                  <span class="text-xs font-black ml-2">{{ tournament.ruleKings }}</span>
-                </div>
-                <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.rulePoints') + ': ' + tournament.rulePoints">
-                  <i class="pi pi-hashtag text-xl text-[#e9c349]"></i>
-                  <span class="text-xs font-black ml-2">{{ tournament.rulePoints }}</span>
-                </div>
-                <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.ruleGames') + ': ' + tournament.ruleGames">
-                  <i class="pi pi-bolt text-xl text-[#e9c349]"></i>
-                  <span class="text-xs font-black ml-2">{{ tournament.ruleGames }}</span>
-                </div>
-                <div v-if="tournament.tablesCount" class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.tablesCount') + ': ' + tournament.tablesCount">
-                  <i class="pi pi-table text-xl text-[#f4d125]"></i>
-                  <span class="text-xs font-black ml-2 text-[#f4d125]">{{ tournament.tablesCount }}</span>
-                </div>
+            <div class="flex flex-column md:flex-row align-items-center gap-4">
+              <div class="flex gap-4 align-items-center bg-white/5 p-3 rounded-2xl border border-white/5">
+                  <div class="rule-icon-item" v-tooltip.top="t('tournament_form.labels.ruleKings') + ': ' + tournament.ruleKings">
+                    <i class="pi pi-crown text-xl text-[#e9c349]"></i>
+                    <span class="text-xs font-black ml-2">{{ tournament.ruleKings }}</span>
+                  </div>
+                  <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.rulePoints') + ': ' + tournament.rulePoints">
+                    <i class="pi pi-hashtag text-xl text-[#e9c349]"></i>
+                    <span class="text-xs font-black ml-2">{{ tournament.rulePoints }}</span>
+                  </div>
+                  <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.ruleGames') + ': ' + tournament.ruleGames">
+                    <i class="pi pi-bolt text-xl text-[#e9c349]"></i>
+                    <span class="text-xs font-black ml-2">{{ tournament.ruleGames }}</span>
+                  </div>
+              </div>
+              
+              <button v-if="canManage" @click="router.push(`/tournament/${uuid}/manage`)" 
+                      class="mus-btn-gold px-6 py-3 flex align-items-center gap-2">
+                <i class="pi pi-cog"></i>
+                <span>GESTIONAR</span>
+              </button>
             </div>
           </div>
         </div>
@@ -254,10 +229,6 @@ const openPoster = () => {
               <button @click="activeTab = 'teams'" 
                       class="mus-tab-btn" :class="{ active: activeTab === 'teams' }">
                 {{ t('tournament_view.tabs.teams') }}
-              </button>
-              <button v-if="tournament.isManager" @click="activeTab = 'admin'" 
-                      class="mus-tab-btn border-l border-white/5 pl-4 ml-auto" :class="{ active: activeTab === 'admin' }">
-                <i class="pi pi-cog mr-2"></i> {{ t('tournament_view.tabs.admin') }}
               </button>
            </div>
 
@@ -502,46 +473,6 @@ const openPoster = () => {
               </div>
            </div>
 
-           <!-- Admin / Result Entry Section -->
-           <div v-else-if="activeTab === 'admin' && tournament.isManager" class="admin-section">
-              <div class="mb-6 flex align-items-center justify-between">
-                <div>
-                   <h3 class="text-main font-black uppercase italic tracking-tight m-0">{{ t('tournament_view.match_edit.title') }}</h3>
-                   <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">{{ t('tournament_view.active_matches_desc') }}</p>
-                </div>
-              </div>
-
-              <div class="grid">
-                <div v-if="matches.length === 0" class="col-12 text-center py-10 opacity-30 border-2 border-dashed border-white/10 rounded-2xl">
-                   <p class="font-bold uppercase tracking-widest">{{ t('tournament_view.bracket.empty_desc') }}</p>
-                </div>
-                <div v-else v-for="match in matches" :key="match.id" class="col-12 md:col-6 lg:col-4 mb-4">
-                   <div class="mus-glass p-4 rounded-2xl border border-white/5 hover:border-[#e9c349]/30 transition-all cursor-pointer group" @click="openEditModal(match)">
-                      <div class="flex justify-between items-center mb-3">
-                         <Tag :value="match.stage" severity="secondary" class="text-[8px] opacity-60" />
-                         <span class="text-[8px] font-black text-[#e9c349]" v-if="match.status === t('tournament_view.match_status.finished')">
-                            <i class="pi pi-check-circle mr-1"></i> {{ match.status }}
-                         </span>
-                      </div>
-                      <div class="flex flex-column gap-2 mb-4">
-                         <div class="flex justify-between items-center">
-                            <span class="text-main font-bold text-sm truncate max-w-[150px]">{{ match.teamA }}</span>
-                            <span class="font-black text-lg" :class="match.scoreA > match.scoreB ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreA }}</span>
-                         </div>
-                         <div class="flex justify-between items-center">
-                            <span class="text-main font-bold text-sm truncate max-w-[150px]">{{ match.teamB }}</span>
-                            <span class="font-black text-lg" :class="match.scoreB > match.scoreA ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreB }}</span>
-                         </div>
-                      </div>
-                      <div class="pt-3 border-t border-white/5 text-center">
-                         <span class="text-[9px] font-black uppercase text-[#e9c349] group-hover:bg-[#e9c349]/10 px-3 py-1 rounded-full transition-all">
-                            {{ t('tournament_view.match_edit.save') }}
-                         </span>
-                      </div>
-                   </div>
-                </div>
-              </div>
-           </div>
         </div>
       </div>
 
