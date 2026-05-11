@@ -56,7 +56,7 @@
       "points": [
         "Eliminatorias directas con reenganche",
         "Ligas de todos contra todos por puntos",
-        "Sistemas de fase de grupos + eliminatorias",
+        "Liguilla + eliminatorias",
         "Gestión avanzada de 'ceros' y vidas"
       ]
     },
@@ -140,6 +140,10 @@
     "firstNamePlaceholder": "Tu nombre",
     "lastName": "Apellidos",
     "lastNamePlaceholder": "Tus apellidos",
+    "nickname": "Mote / Nombre Corto",
+    "nicknamePlaceholder": "Cómo te llaman",
+    "phone": "Teléfono",
+    "phonePlaceholder": "Tu número de contacto",
     "emailHelp": "El correo electrónico se usa para iniciar sesión y no se puede modificar.",
     "security": "Seguridad",
     "passwordHelp": "Deja los campos en blanco si no deseas cambiar la contraseña.",
@@ -147,8 +151,10 @@
     "updated": "Perfil actualizado correctamente"
   },
   "dashboard": {
-    "title": "Tus",
-    "subtitle": "Torneos",
+    "title": "Panel de",
+    "title_gold": "Control",
+    "my_tournaments_title": "Mis",
+    "my_tournaments_gold": "Torneos",
     "welcome": "Bienvenido de nuevo, {name}. Tienes {count} eventos bajo tu gestión.",
     "create": "Crear Nuevo Torneo",
     "loading": "Cargando Datos...",
@@ -170,7 +176,7 @@
       "total_matches": "Partidas Jugadas"
     },
     "copy_link": "Copiar Enlace",
-    "copy_link_help": "Comparte este link entre los participantes",
+    "copy_link_help": "Comparte este link entre los muslaris",
     "link_copied": "¡Enlace copiado!",
     "view_poster": "Ver cartel",
     "poster": "Cartel",
@@ -426,7 +432,7 @@
     "types": {
       "eliminatory": "Eliminación Directa",
       "league": "Liga (Todos contra todos)",
-      "groups": "Fase de Grupos + Eliminatorias",
+      "groups": "Liguilla + Eliminatorias",
       "ceros": "Ceros"
     },
     "statuses": {
@@ -492,7 +498,7 @@
     },
     "bracket": {
       "title": "Cuadro de Eliminatorias",
-      "empty_desc": "El cuadro se generará automáticamente tras la fase de grupos"
+      "empty_desc": "El cuadro se generará automáticamente tras la liguilla"
     },
     "teams": {
       "empty": "No hay equipos inscritos todavía",

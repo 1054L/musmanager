@@ -135,7 +135,7 @@ const handleCreate = async () => {
     formData.append('private', form.value.private)
 
     await tournamentService.createTournament(formData)
-    router.push('/dashboard')
+    router.push('/my-tournaments')
   } catch (e) {
     error.value = e.message
   } finally {
@@ -342,8 +342,9 @@ const handleCreate = async () => {
           </div>
         </div>
 
-        <div class="mt-12 pt-10 border-t border-white/5">
-           <button type="submit" :disabled="loading" class="mus-btn-gold-large w-full">
+        <div class="mt-12 pt-10 border-t border-white/5 flex gap-4">
+           <button type="button" @click="router.push('/my-tournaments')" class="cancel-btn">Cancelar</button>
+           <button type="submit" :disabled="loading" class="mus-btn-gold-large flex-1">
             <i v-if="!loading" class="pi pi-trophy mr-3"></i>
             {{ loading ? t('tournament_form.actions.saving') : t('tournament_form.actions.create') }}
           </button>
@@ -391,6 +392,8 @@ const handleCreate = async () => {
 
 .mus-btn-gold-large { background: var(--secondary); border: none; border-radius: 24px; padding: 24px; color: black; font-size: 16px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
 .mus-btn-gold-large:hover { transform: translateY(-3px); box-shadow: 0 15px 40px -10px rgba(233, 195, 73, 0.5); }
+.cancel-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #64748b; border-radius: 16px; padding: 18px 32px; font-size: 12px; font-weight: 900; cursor: pointer; }
+.cancel-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: rgba(255,255,255,0.2); }
 
 .poster-preview img { width: 100%; height: 250px; object-fit: cover; border-radius: 20px; }
 

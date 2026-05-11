@@ -24,6 +24,8 @@ class UserController extends AbstractController
             'email' => $user->getEmail(),
             'firstName' => $user->getFirstName(),
             'lastName' => $user->getLastName(),
+            'nickname' => $user->getNickname(),
+            'phone' => $user->getPhone(),
             'roles' => $user->getRoles(),
             'player' => $player ? [
                 'id' => $player->getId(),
@@ -49,6 +51,12 @@ class UserController extends AbstractController
         }
         if (isset($data['lastName'])) {
             $user->setLastName($data['lastName']);
+        }
+        if (isset($data['nickname'])) {
+            $user->setNickname($data['nickname']);
+        }
+        if (isset($data['phone'])) {
+            $user->setPhone($data['phone']);
         }
         if (!empty($data['password'])) {
             $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);

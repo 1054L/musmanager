@@ -121,15 +121,15 @@ const fetchTournaments = async () => {
   try {
     // Artificial delay to ensure MusLoader is visible and premium feel is maintained
     await new Promise(resolve => setTimeout(resolve, 500))
-    tournaments.value = await tournamentService.getManagedTournaments()
+    const data = await tournamentService.getManagedTournaments()
+    tournaments.value = Array.isArray(data) ? data : []
     
     // Debug info for dev console
     console.log('User ID from Auth:', user?.id)
     console.log('Tournaments loaded:', tournaments.value.length)
   } catch (e) {
     console.error('Error loading tournaments:', e)
-    // Show detailed error if possible
-    error.value = `${t('dashboard.error')}: ${e.message}`
+    error.value = e.message || t('dashboard.error')
   } finally {
     loading.value = false
   }
@@ -197,7 +197,7 @@ onMounted(() => {
     <!-- Section Title -->
     <header class="mus-page-header">
       <h1 class="mus-title">
-        MIS <span class="mus-gold-text">TORNEOS</span>
+        {{ t('dashboard.my_tournaments_title') }} <span class="mus-gold-text">{{ t('dashboard.my_tournaments_gold') }}</span>
       </h1>
       <p class="mus-subtitle">
         {{ t('dashboard.my_tournaments_desc') || 'Gestiona tus eventos competitivos y parejas registradas' }}
@@ -229,8 +229,8 @@ onMounted(() => {
     </section>
 
     <!-- Main Table Section -->
-    <section class="tournaments-section mus-glass p-0 overflow-hidden">
-      <div class="section-header p-8 border-b border-white/5 flex items-center justify-between">
+    <section class="tournaments-section mus-glass p-0 overflow-hidden mt-6">
+      <div class="section-header p-8 flex items-center justify-between">
         <h2 class="section-title m-0">{{ t('dashboard.my_tournaments') }}</h2>
         <div class="flex items-center gap-4">
            <button @click="fetchTournaments" class="refresh-btn" v-tooltip.top="t('dashboard.retry')">
@@ -243,10 +243,16 @@ onMounted(() => {
         <MusLoader />
       </div>
 
-      <div v-else-if="error" class="p-8 text-center">
-        <i class="pi pi-exclamation-triangle text-rose-500 text-3xl mb-4"></i>
-        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs mb-6">{{ error }}</p>
-        <button @click="fetchTournaments" class="mus-button-primary scale-90">{{ t('dashboard.retry') }}</button>
+      <div v-else-if="error" class="p-16 text-center animate-in fade-in zoom-in duration-500">
+        <div class="w-20 h-20 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-6">
+          <i class="pi pi-exclamation-triangle text-rose-500 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2">{{ t('dashboard.error') || 'Error de Conexión' }}</h3>
+        <p class="text-slate-400 mb-8 max-w-md mx-auto">{{ error }}</p>
+        <button @click="fetchTournaments" class="mus-btn-secondary px-8 py-3">
+          <i class="pi pi-refresh mr-2"></i>
+          {{ t('dashboard.retry') || 'Reintentar' }}
+        </button>
       </div>
 
       <div v-else-if="tournaments.length === 0" class="empty-state-container p-12 text-center">
@@ -429,6 +435,10 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
+}
+
+.tournaments-section {
+   border-radius: 24px;
 }
 
 .action-card {

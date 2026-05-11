@@ -131,6 +131,10 @@
     "firstNamePlaceholder": "Your first name",
     "lastName": "Last Name",
     "lastNamePlaceholder": "Your last name",
+    "nickname": "Nickname / Short Name",
+    "nicknamePlaceholder": "How they call you",
+    "phone": "Phone",
+    "phonePlaceholder": "Your contact number",
     "emailHelp": "The email address is used to log in and cannot be changed.",
     "security": "Security",
     "passwordHelp": "Leave fields blank if you do not want to change the password.",
@@ -138,8 +142,10 @@
     "updated": "Profile updated successfully"
   },
   "dashboard": {
-    "title": "Your",
-    "subtitle": "Tournaments",
+    "title": "Control",
+    "title_gold": "Panel",
+    "my_tournaments_title": "My",
+    "my_tournaments_gold": "Tournaments",
     "welcome": "Welcome back, {name}. You have {count} events under your management.",
     "create": "Create New Tournament",
     "loading": "Loading Data...",

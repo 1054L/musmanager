@@ -221,7 +221,7 @@ const handleSave = async () => {
 
     await tournamentService.updateTournament(uuid, formData)
     success.value = true
-    setTimeout(() => router.push('/dashboard'), 1200)
+    setTimeout(() => router.push('/my-tournaments'), 1200)
   } catch (e) {
     error.value = e.message
   } finally {
@@ -419,7 +419,7 @@ const handleSave = async () => {
         </div>
 
         <div class="form-actions mt-12 pt-10 border-t border-white/5 flex gap-4">
-          <button type="button" @click="router.push('/dashboard')" class="cancel-btn">Cancelar</button>
+          <button type="button" @click="router.push('/my-tournaments')" class="cancel-btn">Cancelar</button>
           <button type="submit" :disabled="saving || success" class="mus-btn-gold-large flex-1">
             <i class="pi" :class="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
             <span>{{ saving ? t('tournament_form.actions.saving') : t('tournament_form.actions.save') }}</span>

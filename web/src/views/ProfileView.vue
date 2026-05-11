@@ -13,6 +13,8 @@ const saving = ref(false)
 const userProfile = ref({
   firstName: '',
   lastName: '',
+  nickname: '',
+  phone: '',
   email: ''
 })
 
@@ -34,6 +36,8 @@ const loadProfile = async () => {
       userProfile.value = {
         firstName: data.firstName || '',
         lastName: data.lastName || '',
+        nickname: data.nickname || '',
+        phone: data.phone || '',
         email: data.email || ''
       }
     }
@@ -54,7 +58,9 @@ const updateProfile = async () => {
   try {
     const data = {
       firstName: userProfile.value.firstName,
-      lastName: userProfile.value.lastName
+      lastName: userProfile.value.lastName,
+      nickname: userProfile.value.nickname,
+      phone: userProfile.value.phone
     }
     
     if (passwords.value.newPassword) {
@@ -94,7 +100,7 @@ onMounted(() => {
 
     <MusLoader v-if="loading" />
 
-    <div v-else class="max-w-2xl mx-auto mus-glass rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden border border-[var(--border)]">
+    <div v-else class="max-w-5xl mx-auto mus-glass rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden border border-[var(--border)]">
       <!-- Background Glow Effects -->
       <div class="absolute -top-24 -right-24 w-64 h-64 bg-[var(--primary)] opacity-10 blur-[80px] rounded-full pointer-events-none"></div>
       
@@ -103,12 +109,12 @@ onMounted(() => {
         <div class="section-block">
           <h2 class="section-title"><i class="pi pi-user mr-2"></i>{{ t('profile.personalInfo') || 'Información Personal' }}</h2>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <div class="input-group">
               <label class="input-label">{{ t('profile.firstName') || 'Nombre' }}</label>
               <div class="input-wrapper">
                 <i class="pi pi-id-card input-icon"></i>
-                <input v-model="userProfile.firstName" type="text" class="mus-input-field" :placeholder="t('profile.firstNamePlaceholder') || 'Tu nombre'">
+                <input v-model="userProfile.firstName" type="text" class="mus-input-field" :placeholder="t('profile.firstNamePlaceholder') || 'Nombre'">
               </div>
             </div>
             
@@ -116,18 +122,41 @@ onMounted(() => {
               <label class="input-label">{{ t('profile.lastName') || 'Apellidos' }}</label>
               <div class="input-wrapper">
                 <i class="pi pi-id-card input-icon"></i>
-                <input v-model="userProfile.lastName" type="text" class="mus-input-field" :placeholder="t('profile.lastNamePlaceholder') || 'Tus apellidos'">
+                <input v-model="userProfile.lastName" type="text" class="mus-input-field" :placeholder="t('profile.lastNamePlaceholder') || 'Apellidos'">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">{{ t('profile.nickname') || 'Mote' }}</label>
+              <div class="input-wrapper">
+                <i class="pi pi-user-edit input-icon"></i>
+                <input v-model="userProfile.nickname" type="text" class="mus-input-field" :placeholder="t('profile.nicknamePlaceholder') || 'Mote'">
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">{{ t('profile.phone') || 'Teléfono' }}</label>
+              <div class="input-wrapper">
+                <i class="pi pi-phone input-icon"></i>
+                <input v-model="userProfile.phone" type="tel" class="mus-input-field" :placeholder="t('profile.phonePlaceholder') || 'Móvil'">
               </div>
             </div>
           </div>
           
-          <div class="input-group mt-6">
-            <label class="input-label">{{ t('auth.email') }}</label>
-            <div class="input-wrapper opacity-50 cursor-not-allowed">
-              <i class="pi pi-envelope input-icon"></i>
-              <input v-model="userProfile.email" type="email" disabled class="mus-input-field" title="El correo electrónico no se puede cambiar">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6 items-center">
+            <div class="input-group md:col-span-2">
+              <label class="input-label">{{ t('auth.email') }}</label>
+              <div class="input-wrapper opacity-50 cursor-not-allowed">
+                <i class="pi pi-envelope input-icon"></i>
+                <input v-model="userProfile.email" type="email" disabled class="mus-input-field" title="El correo electrónico no se puede cambiar">
+              </div>
             </div>
-            <span class="text-[10px] text-[var(--text-muted)] mt-1 ml-2">{{ t('profile.emailHelp') || 'El correo electrónico se usa para iniciar sesión y no se puede modificar.' }}</span>
+            <div class="md:col-span-2 pt-6">
+              <div class="bg-[var(--bg-app)]/50 p-4 rounded-2xl border border-[var(--border)] flex items-center gap-4">
+                <i class="pi pi-info-circle text-[var(--secondary)] text-lg"></i>
+                <span class="text-[11px] text-[var(--text-muted)] font-medium leading-relaxed uppercase tracking-wider">{{ t('profile.emailHelp') || 'El correo electrónico se usa para iniciar sesión y no se puede modificar.' }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -217,7 +246,7 @@ onMounted(() => {
 
 .input-icon {
   position: absolute;
-  left: 24px;
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
@@ -234,9 +263,9 @@ onMounted(() => {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 18px 24px 18px 56px;
+  padding: 14px 16px 14px 48px;
   color: var(--text-main);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

@@ -46,7 +46,7 @@
       "points": [
         "Kanporaketa zuzenak reengantxearekin",
         "Guztiak guztien aurkako ligak puntuka",
-        "Taldeen fasea + kanporaketa sistemak",
+        "Ligaxka + kanporaketa sistemak",
         "Zeroen eta bizitzen kudeaketa aurreratua"
       ]
     },
@@ -130,6 +130,10 @@
     "firstNamePlaceholder": "Zure izena",
     "lastName": "Abizenak",
     "lastNamePlaceholder": "Zure abizenak",
+    "nickname": "Motea / Izen Laburra",
+    "nicknamePlaceholder": "Nola deitzen dizuten",
+    "phone": "Telefonoa",
+    "phonePlaceholder": "Zure harremanetarako zenbakia",
     "emailHelp": "Helbide elektronikoa saioa hasteko erabiltzen da eta ezin da aldatu.",
     "security": "Segurtasuna",
     "passwordHelp": "Utzi eremuak hutsik pasahitza aldatu nahi ez baduzu.",
@@ -137,8 +141,10 @@
     "updated": "Profila ongi eguneratu da"
   },
   "dashboard": {
-    "title": "Zure",
-    "subtitle": "Txapelketak",
+    "title": "Kontrol",
+    "title_gold": "Panela",
+    "my_tournaments_title": "Nire",
+    "my_tournaments_gold": "Txapelketak",
     "welcome": "Ongi etorri berriro, {name}. {count} ekitaldi dituzu zure kudeaketapean.",
     "create": "Sortu Txapelketa Berria",
     "loading": "Datuak Kargatzen...",
@@ -152,7 +158,7 @@
     "empty_subtitle": "Hasi zure ondarea Mus Manager antolatzaile gisa gaur bertan.",
     "my_tournaments": "Nire Txapelketak",
     "copy_link": "Kopiatu Esteka",
-    "copy_link_help": "Partekatu esteka hau parte-hartzaileen artean",
+    "copy_link_help": "Partekatu esteka hau muslarien artean",
     "link_copied": "Esteka kopiatua!",
     "view_poster": "Ikusi kartela",
     "poster": "Kartela",
@@ -388,7 +394,7 @@
     "types": {
       "eliminatory": "Kanporaketa Zuzena",
       "league": "Liga (Guztiak guztien aurka)",
-      "groups": "Taldeen Fasea + Kanporaketak",
+      "groups": "Ligaxka + Kanporaketak",
       "ceros": "Ceros"
     },
     "statuses": {
@@ -454,7 +460,7 @@
     },
     "bracket": {
       "title": "Kanporaketa Koadroa",
-      "empty_desc": "Koadroa automatikoki sortuko da taldeen fasearen ondoren"
+      "empty_desc": "Koadroa automatikoki sortuko da ligaxkaren ondoren"
     },
     "teams": {
       "empty": "Ez dago talderik izena emanda oraindik",

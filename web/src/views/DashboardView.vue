@@ -7,10 +7,11 @@ import MusLoader from '../components/MusLoader.vue'
 const { t } = useI18n()
 const user = inject('user')
 const loading = ref(true)
+const error = ref(null)
 const tournaments = ref([])
 
 const stats = computed(() => {
-  const active = tournaments.value.filter(t => t.status === 'active' || t.status === 'pendiente').length
+  const active = tournaments.value.filter(t => t.status === 'active' || t.status === 'pending').length
   const totalTeams = tournaments.value.reduce((acc, curr) => acc + (curr.teamsCount || 0), 0)
   const totalMatches = tournaments.value.reduce((acc, curr) => acc + (curr.matchesCount || 0), 0)
   
@@ -23,11 +24,15 @@ const stats = computed(() => {
 })
 
 const loadData = async () => {
+  loading.value = true
+  error.value = null
   try {
     const data = await tournamentService.getManagedTournaments()
-    tournaments.value = data
-  } catch (error) {
-    console.error('Error loading stats:', error)
+    // Sort by ID descending to show newest first
+    tournaments.value = Array.isArray(data) ? [...data].sort((a, b) => b.id - a.id) : []
+  } catch (err) {
+    console.error('Error loading dashboard data:', err)
+    error.value = err.message || t('dashboard.error')
   } finally {
     loading.value = false
   }
@@ -41,17 +46,30 @@ onMounted(loadData)
     <!-- Welcome Header -->
     <header class="mus-page-header">
       <h1 class="mus-title">
-        PANEL DE <span class="mus-gold-text">CONTROL</span>
+        {{ t('dashboard.title') }} <span class="mus-gold-text">{{ t('dashboard.title_gold') }}</span>
       </h1>
       <p class="mus-subtitle">
-        {{ t('dashboard.welcome') || 'Bienvenido de nuevo' }}, 
-        <span class="text-secondary font-bold">{{ user?.firstName || user?.email?.split('@')[0] }} {{ user?.lastName || '' }}</span>. 
-        {{ t('dashboard.summary_count', { count: tournaments.length }) || `Tienes ${tournaments.length} eventos bajo tu gestión.` }}
+        {{ t('dashboard.welcome', { 
+          name: user?.firstName || user?.email?.split('@')[0] || 'Jugador', 
+          count: tournaments.length 
+        }) }}
       </p>
     </header>
 
     <div v-if="loading" class="flex justify-center items-center py-20">
       <MusLoader />
+    </div>
+
+    <div v-else-if="error" class="mus-card p-12 border-red-500/20 bg-red-500/5 text-center my-10 max-w-2xl mx-auto animate-in fade-in zoom-in duration-500">
+       <div class="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-6">
+          <i class="pi pi-exclamation-triangle text-red-500 text-3xl"></i>
+       </div>
+       <h3 class="text-xl font-bold text-white mb-2">{{ t('dashboard.error') || 'Error de Conexión' }}</h3>
+       <p class="text-slate-400 mb-8">{{ error }}</p>
+       <button @click="loadData" class="mus-btn-secondary px-8 py-3">
+          <i class="pi pi-refresh mr-2"></i>
+          {{ t('dashboard.retry') || 'Reintentar' }}
+       </button>
     </div>
 
     <template v-else>
@@ -88,7 +106,7 @@ onMounted(loadData)
                  <div v-for="t in tournaments.slice(0, 6)" :key="t.id" class="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors group">
                     <div class="flex items-center gap-4 min-w-0">
                        <div class="w-14 h-14 shrink-0 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-secondary/30 transition-colors overflow-hidden">
-                          <img v-if="t.posterUrl" :src="t.posterUrl" class="w-full h-full object-cover" />
+                          <img v-if="t.posterPath" :src="t.posterPath" class="w-full h-full object-cover" />
                           <i v-else class="pi pi-trophy text-slate-600"></i>
                        </div>
                        <div class="min-w-0">
