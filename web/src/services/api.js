@@ -205,13 +205,14 @@ export const tournamentService = {
     return response.json();
   },
 
-  async enrollTeam(uuid, teamId) {
-    const formData = new FormData();
-    formData.append('teamId', teamId);
+  async enrollTeam(uuid, data) {
     const response = await fetch(`${API_URL}/admin/tournament/${uuid}/enroll-team`, {
       method: 'POST',
-      headers: authService.getAuthHeader(),
-      body: formData
+      headers: {
+        ...authService.getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
     });
     if (!response.ok) {
       let errorMessage = 'Error al inscribir equipo';
@@ -224,6 +225,28 @@ export const tournamentService = {
         else errorMessage = `Error del servidor (${response.status})`;
       }
       throw new Error(errorMessage);
+    }
+    return response.json();
+  },
+
+  async toggleConfirmTeam(registrationId) {
+    const response = await fetch(`${API_URL}/admin/tournament/team/${registrationId}/toggle-confirm`, {
+      method: 'POST',
+      headers: authService.getAuthHeader()
+    });
+    if (!response.ok) {
+      throw new Error('Error al cambiar estado de confirmación');
+    }
+    return response.json();
+  },
+
+  async unenrollTeam(registrationId) {
+    const response = await fetch(`${API_URL}/admin/tournament/team/${registrationId}`, {
+      method: 'DELETE',
+      headers: authService.getAuthHeader()
+    });
+    if (!response.ok) {
+      throw new Error('Error al desapuntar la pareja');
     }
     return response.json();
   },

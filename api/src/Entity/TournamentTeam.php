@@ -37,9 +37,23 @@ class TournamentTeam
     #[ORM\Column(options: ['default' => 0])]
     private int $matchesPlayed = 0;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isConfirmed = false;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->isConfirmed;
+    }
+
+    public function setIsConfirmed(bool $isConfirmed): static
+    {
+        $this->isConfirmed = $isConfirmed;
+        return $this;
     }
 
     public function getTournament(): ?Tournament

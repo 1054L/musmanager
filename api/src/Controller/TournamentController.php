@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Tournament;
 use App\Entity\TournamentTeam;
+use App\Entity\Team;
 use App\Entity\MusMatch;
 use App\Entity\Province;
 use App\Entity\Town;
@@ -327,6 +328,7 @@ class TournamentController extends AbstractController
                 return [
                     'id' => $tt->getId(),
                     'groupName' => $tt->getGroupName(),
+                    'isConfirmed' => $tt->isConfirmed(),
                     'team' => [
                         'id' => $tt->getTeam()->getId(),
                         'name' => $tt->getTeam()->getName(),
@@ -353,24 +355,73 @@ class TournamentController extends AbstractController
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
         if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
 
-        $teamId = $request->request->get('teamId');
-        $team = $teamRepository->find($teamId);
-        if (!$team) return new JsonResponse(['error' => 'Equipo no encontrado'], 404);
+        $data = json_decode($request->getContent(), true) ?: $request->request->all();
+        $teamName = $data['name'] ?? null;
+        $isConfirmed = (bool) ($data['isConfirmed'] ?? false);
 
-        // Check if already enrolled
-        foreach ($tournament->getTournamentTeams() as $tt) {
-            if ($tt->getTeam()->getId() === $team->getId()) {
-                return new JsonResponse(['error' => 'El equipo ya está inscrito'], 400);
-            }
+        if (!$teamName) {
+            return new JsonResponse(['error' => 'El nombre de la pareja es obligatorio'], 400);
         }
+
+        // Create new Team
+        $team = new Team();
+        $team->setName(substr($teamName, 0, 255));
+        $entityManager->persist($team);
 
         $tournamentTeam = new TournamentTeam();
         $tournamentTeam->setTournament($tournament);
         $tournamentTeam->setTeam($team);
+        $tournamentTeam->setIsConfirmed($isConfirmed);
 
         $entityManager->persist($tournamentTeam);
         $entityManager->flush();
 
+        return new JsonResponse([
+            'success' => true,
+            'team' => [
+                'id' => $tournamentTeam->getId(),
+                'groupName' => $tournamentTeam->getGroupName(),
+                'isConfirmed' => $tournamentTeam->isConfirmed(),
+                'team' => [
+                    'id' => $team->getId(),
+                    'name' => $team->getName(),
+                ]
+            ]
+        ]);
+    }
+
+    #[Route('/api/admin/tournament/team/{id}/toggle-confirm', name: 'app_tournament_team_toggle_confirm', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function toggleConfirmTeam(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $tt = $entityManager->getRepository(TournamentTeam::class)->find($id);
+        if (!$tt) return new JsonResponse(['error' => 'Registro no encontrado'], 404);
+        
+        $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tt->getTournament());
+        
+        $tt->setIsConfirmed(!$tt->isConfirmed());
+        $entityManager->flush();
+        
+        return new JsonResponse(['success' => true, 'isConfirmed' => $tt->isConfirmed()]);
+    }
+
+    #[Route('/api/admin/tournament/team/{id}', name: 'app_tournament_unenroll_team', methods: ['DELETE'])]
+    #[IsGranted('ROLE_USER')]
+    public function unenrollTeam(int $id, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $tt = $entityManager->getRepository(TournamentTeam::class)->find($id);
+        if (!$tt) return new JsonResponse(['error' => 'Registro no encontrado'], 404);
+        
+        $tournament = $tt->getTournament();
+        $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tournament);
+        
+        if ($tournament->getStatus() !== 'draft' && $tournament->getStatus() !== 'pending') {
+            return new JsonResponse(['error' => 'No se puede desapuntar una pareja si el torneo no está en borrador o pendiente'], 400);
+        }
+
+        $entityManager->remove($tt);
+        $entityManager->flush();
+        
         return new JsonResponse(['success' => true]);
     }
 

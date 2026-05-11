@@ -441,6 +441,7 @@
     "players_count": "{count} Players",
     "pairs_count": "{count} Pairs",
     "location": "Location",
+    "public_view": "Public View",
     "matches_in_progress": "Matches in Progress",
     "view_full_bracket": "View Full Bracket",
     "match_status": {

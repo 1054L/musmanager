@@ -432,6 +432,7 @@
     "players_count": "{count} Jokalari",
     "pairs_count": "{count} Bikote",
     "location": "Lekua",
+    "public_view": "Ikuspegi Publikoa",
     "matches_in_progress": "Partidak Abian",
     "view_full_bracket": "Ikusi Koadro Osoa",
     "match_status": {

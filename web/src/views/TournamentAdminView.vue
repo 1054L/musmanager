@@ -7,13 +7,17 @@ import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
+import Checkbox from 'primevue/checkbox'
 import MusLoader from '../components/MusLoader.vue'
+import TournamentEnrollmentForm from '../components/TournamentEnrollmentForm.vue'
 import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+const confirm = useConfirm()
 const uuid = route.params.uuid
 
 const tournament = ref(null)
@@ -25,6 +29,7 @@ const availableTeams = ref([])
 const enrollmentTeamId = ref(null)
 const groupsCount = ref(2)
 const processing = ref(false)
+const showEnrollmentDialog = ref(false)
 
 // Match editing state
 const editingMatch = ref(null)
@@ -32,8 +37,8 @@ const editScore1 = ref(0)
 const editScore2 = ref(0)
 const isSavingResult = ref(false)
 
-const fetchTournamentData = async () => {
-  loading.value = true
+const fetchTournamentData = async (silent = false) => {
+  if (!silent) loading.value = true
   error.value = null
   try {
     const data = await tournamentService.getTournament(uuid)
@@ -78,23 +83,53 @@ const handleStatusChange = async (newStatus) => {
   }
 }
 
-const handleEnrollTeam = async () => {
-  if (!enrollmentTeamId.value) return
-  processing.value = true
+const onEnrollmentSuccess = (newTeam) => {
+  showEnrollmentDialog.value = false
+  if (newTeam) {
+    enrolledTeams.value.push(newTeam)
+    if (tournament.value) tournament.value.teamsCount++
+  }
+  toast.add({ severity: 'success', summary: t('common.success'), detail: 'Pareja inscrita correctamente', life: 3000 })
+}
+
+const handleToggleConfirm = async (registrationId) => {
   try {
-    await tournamentService.enrollTeam(uuid, enrollmentTeamId.value)
-    toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_mgmt.enroll_success'), life: 3000 })
-    await fetchTournamentData()
-    enrollmentTeamId.value = null
+    const response = await tournamentService.toggleConfirmTeam(registrationId)
+    const team = enrolledTeams.value.find(tt => tt.id === registrationId)
+    if (team) {
+      team.isConfirmed = response.isConfirmed
+    }
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
-  } finally {
-    processing.value = false
   }
 }
 
-const handleRemoveTeam = async (teamUuid) => {
-  toast.add({ severity: 'info', summary: 'Info', detail: 'Funcionalidad de desapuntar en desarrollo', life: 3000 })
+const handleRemoveTeam = async (event, registrationId) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: '¿Estás seguro de que quieres desapuntar a esta pareja? Esta acción no se puede deshacer.',
+    header: 'Confirmar Eliminación',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+        label: 'Cancelar',
+        severity: 'secondary',
+        outlined: true
+    },
+    acceptProps: {
+        label: 'Eliminar',
+        severity: 'danger'
+    },
+    accept: async () => {
+      try {
+        await tournamentService.unenrollTeam(registrationId)
+        enrolledTeams.value = enrolledTeams.value.filter(tt => tt.id !== registrationId)
+        if (tournament.value) tournament.value.teamsCount--
+        toast.add({ severity: 'success', summary: t('common.success'), detail: 'Pareja eliminada correctamente', life: 3000 })
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+      }
+    }
+  })
 }
 
 const handleGenerateGroups = async () => {
@@ -102,7 +137,7 @@ const handleGenerateGroups = async () => {
   try {
     await tournamentService.generateGroups(uuid, groupsCount.value)
     toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_mgmt.groups_success'), life: 3000 })
-    await fetchTournamentData()
+    await fetchTournamentData(true)
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
   } finally {
@@ -118,7 +153,7 @@ const handleGenerateMatches = async () => {
     await tournamentService.updateTournament(uuid, { status: 'active' })
     const msg = tournament.value.type === 'eliminatory' ? 'Sorteo realizado con éxito. ¡Torneo en marcha!' : t('dashboard.matches_success')
     toast.add({ severity: 'success', summary: t('common.success'), detail: msg, life: 3000 })
-    await fetchTournamentData()
+    await fetchTournamentData(true)
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
   } finally {
@@ -147,9 +182,23 @@ const saveMatchResult = async () => {
   isSavingResult.value = true
   try {
     await tournamentService.updateMatchScore(editingMatch.value.id, editScore1.value, editScore2.value)
+    
+    // Update local match state reactively
+    const match = matches.value.find(m => m.id === editingMatch.value.id)
+    if (match) {
+      match.scoreA = editScore1.value
+      match.scoreB = editScore2.value
+      match.status = (editScore1.value > 0 || editScore2.value > 0) ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending')
+    }
+
     editingMatch.value = null
     toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_view.match_edit.save_success'), life: 3000 })
-    await fetchTournamentData()
+    
+    // Silent check for tournament finish
+    const allFinished = matches.value.every(m => m.status === t('tournament_view.match_status.finished'))
+    if (allFinished && tournament.value.status === 'active') {
+       tournament.value.status = 'finished'
+    }
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
   } finally {
@@ -159,10 +208,12 @@ const saveMatchResult = async () => {
 
 const stats = computed(() => {
   if (!tournament.value) return []
+  const confirmedCount = enrolledTeams.value.filter(tt => tt.isConfirmed).length
   return [
     { label: t('tournament_view.tabs.teams'), value: tournament.value.teamsCount || 0, icon: 'pi-users', color: '#e9c349' },
+    { label: 'Confirmadas', value: confirmedCount, icon: 'pi-verified', color: '#10b981' },
     { label: t('tournament_view.tabs.matches'), value: matches.value.length, icon: 'pi-calendar', color: '#f4d125' },
-    { label: 'Finalizados', value: matches.value.filter(m => m.status === t('tournament_view.match_status.finished')).length, icon: 'pi-check-circle', color: '#10b981' }
+    { label: 'Finalizados', value: matches.value.filter(m => m.status === t('tournament_view.match_status.finished')).length, icon: 'pi-check-circle', color: '#3b82f6' }
   ]
 })
 
@@ -245,7 +296,7 @@ const statusOptions = [
 
       <!-- Stats Ribbon -->
       <div class="grid mt-4">
-        <div v-for="stat in stats" :key="stat.label" class="col-12 md:col-4">
+        <div v-for="stat in stats" :key="stat.label" class="col-12 md:col-3">
           <div class="stat-card-premium">
             <div class="stat-icon" :style="{ background: stat.color + '10', color: stat.color, borderColor: stat.color + '20' }">
               <i :class="['pi', stat.icon]"></i>
@@ -266,20 +317,10 @@ const statusOptions = [
           <section v-if="['draft', 'pending'].includes(tournament.status)" class="side-panel-premium">
             <h3 class="panel-title"><i class="pi pi-user-plus"></i> Inscripción de Parejas</h3>
             <div class="p-6">
-              <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-4">Selecciona una pareja registrada</p>
-              <div class="flex flex-column gap-3">
-                <div class="custom-select-wrapper">
-                  <select v-model="enrollmentTeamId" class="mus-select">
-                    <option :value="null" disabled>{{ t('tournament_mgmt.select_team') }}</option>
-                    <option v-for="team in availableTeams" :key="team.id" :value="team.id">{{ team.name }}</option>
-                  </select>
-                  <i class="pi pi-chevron-down select-arrow"></i>
-                </div>
-                <button @click="handleEnrollTeam" :disabled="!enrollmentTeamId || processing" class="mus-btn-primary-large w-full">
-                  <i class="pi" :class="processing ? 'pi-spin pi-spinner' : 'pi-plus'"></i>
-                  <span>INSCRIBIR PAREJA</span>
-                </button>
-              </div>
+              <button @click="showEnrollmentDialog = true" class="mus-btn-primary-large w-full">
+                <i class="pi pi-plus"></i>
+                <span>INSCRIBIR NUEVA PAREJA</span>
+              </button>
             </div>
           </section>
 
@@ -295,12 +336,15 @@ const statusOptions = [
                 <p class="text-[9px] font-black uppercase tracking-widest">No hay parejas todavía</p>
               </div>
               <div v-else class="teams-list-scroll custom-scrollbar">
-                <div v-for="tt in enrolledTeams" :key="tt.id" class="team-list-item">
-                  <div class="team-info">
-                    <span class="name">{{ tt.team?.name }}</span>
-                    <span class="group-tag" v-if="tt.groupName">{{ tt.groupName }}</span>
+                <div v-for="tt in enrolledTeams" :key="tt.id" class="team-list-item flex align-items-center justify-content-between">
+                  <div class="flex align-items-center gap-3">
+                    <Checkbox :modelValue="tt.isConfirmed" :binary="true" @change="handleToggleConfirm(tt.id)" v-tooltip.top="'Confirmado / Pagado'" />
+                    <div class="team-info">
+                      <span class="name" :class="{ 'opacity-50': !tt.isConfirmed }">{{ tt.team?.name }}</span>
+                      <span class="group-tag" v-if="tt.groupName">{{ tt.groupName }}</span>
+                    </div>
                   </div>
-                  <button v-if="['draft', 'pending'].includes(tournament.status)" @click="handleRemoveTeam(tt.uuid)" class="remove-btn" v-tooltip.left="'Eliminar'">
+                  <button v-if="['draft', 'pending'].includes(tournament.status)" @click="handleRemoveTeam($event, tt.id)" class="remove-btn" v-tooltip.left="'Eliminar'">
                     <i class="pi pi-times"></i>
                   </button>
                 </div>
@@ -506,6 +550,13 @@ const statusOptions = [
             {{ isSavingResult ? 'GUARDANDO...' : 'GUARDAR RESULTADO' }}
           </button>
         </div>
+      </div>
+    </Dialog>
+
+    <!-- Enrollment Dialog -->
+    <Dialog v-model:visible="showEnrollmentDialog" modal :header="'Inscribir Pareja'" :style="{ width: '450px' }" class="mus-dialog-premium">
+      <div class="p-4">
+        <TournamentEnrollmentForm :tournamentUuid="uuid" @success="onEnrollmentSuccess" @cancel="showEnrollmentDialog = false" />
       </div>
     </Dialog>
   </div>
