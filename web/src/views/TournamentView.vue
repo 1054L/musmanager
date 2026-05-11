@@ -27,6 +27,20 @@ const showPosterDialog = ref(false)
 const canManage = computed(() => tournament.value?.isManager)
 const uuid = route.params.uuid
 
+const bracketContainer = ref(null);
+const isFullscreen = ref(false);
+
+const toggleFullscreen = () => {
+  if (!bracketContainer.value) return;
+  if (!document.fullscreenElement) {
+    bracketContainer.value.requestFullscreen().catch(err => {
+      console.error(err);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+};
+
 
 const activeStageTab = ref(null);
 
@@ -60,21 +74,21 @@ watch(groupedMatches, (newGroups) => {
 }, { immediate: true });
 
 const bracketMatches = computed(() => {
-  const cols = [];
-  const orderedTreeStages = [
-    t('tournament_view.knockout.t32'),
-    t('tournament_view.knockout.t16'),
-    t('tournament_view.knockout.t8'),
-    t('tournament_view.knockout.t4'), 
-    t('tournament_view.knockout.final')
-  ];
-  
-  orderedTreeStages.forEach(col => {
-    const m = matches.value.filter(x => x.stage === col);
-    if (m.length) cols.push({ stage: col, matches: m });
+  const acc = {};
+  matches.value.forEach(m => {
+    if (m.bracketRound && m.bracketRound >= 1) {
+      if (!acc[m.bracketRound]) acc[m.bracketRound] = { 
+        round: m.bracketRound, 
+        stageName: m.stage, 
+        matches: [] 
+      };
+      acc[m.bracketRound].matches.push(m);
+    }
   });
-  return cols;
-})
+
+  // Sort by bracketRound descending (e.g. 4, 3, 2, 1)
+  return Object.values(acc).sort((a, b) => b.round - a.round);
+});
 
 const thirdPlaceMatch = computed(() => matches.value.find(x => x.stage === t('tournament_view.knockout.third_place')))
 
@@ -93,7 +107,9 @@ const fetchTournament = async () => {
         scoreA: m.score1,
         teamB: m.team2,
         scoreB: m.score2,
-        stage: m.stage
+        stage: m.stage,
+        bracketRound: m.bracketRound,
+        bracketPosition: m.bracketPosition
       }))
     }
     
@@ -114,7 +130,12 @@ const fetchTournament = async () => {
   }
 }
 
-onMounted(fetchTournament)
+onMounted(() => {
+  fetchTournament();
+  document.addEventListener('fullscreenchange', () => {
+    isFullscreen.value = !!document.fullscreenElement;
+  });
+});
 
 // Administrative functions removed - moved to TournamentAdminView.vue
 
@@ -213,22 +234,32 @@ const openPoster = () => {
       <!-- Main Content Container -->
       <div :class="showActivity ? 'col-12 lg:col-8' : 'col-12'">
         <div class="card p-3 md:p-6 mus-glass border-white/5">
-           <div class="flex gap-4 mb-2 border-b border-white/5 pb-4">
-              <button v-if="tournament.type !== 'eliminatory'" @click="activeTab = 'matches'" 
-                      class="mus-tab-btn" :class="{ active: activeTab === 'matches' }">
-                {{ t('tournament_view.tabs.matches') }}
-              </button>
-              <button v-if="tournament.type === 'groups' || tournament.type === 'league'" @click="activeTab = 'standings'" 
-                      class="mus-tab-btn" :class="{ active: activeTab === 'standings' }">
-                {{ t('tournament_view.tabs.standings') }}
-              </button>
-              <button v-if="tournament.type !== 'league'" @click="activeTab = 'bracket'" 
-                      class="mus-tab-btn" :class="{ active: activeTab === 'bracket' }">
-                {{ t('tournament_view.tabs.bracket') }}
-              </button>
-              <button @click="activeTab = 'teams'" 
-                      class="mus-tab-btn" :class="{ active: activeTab === 'teams' }">
-                {{ t('tournament_view.tabs.teams') }}
+           <div class="flex justify-content-between align-items-center mb-2 border-b border-white/5 pb-4">
+              <div class="flex gap-4">
+                <button v-if="tournament.type !== 'eliminatory'" @click="activeTab = 'matches'" 
+                        class="mus-tab-btn" :class="{ active: activeTab === 'matches' }">
+                  {{ t('tournament_view.tabs.matches') }}
+                </button>
+                <button v-if="tournament.type === 'groups' || tournament.type === 'league'" @click="activeTab = 'standings'" 
+                        class="mus-tab-btn" :class="{ active: activeTab === 'standings' }">
+                  {{ t('tournament_view.tabs.standings') }}
+                </button>
+                <button v-if="tournament.type !== 'league'" @click="activeTab = 'bracket'" 
+                        class="mus-tab-btn" :class="{ active: activeTab === 'bracket' }">
+                  {{ t('tournament_view.tabs.bracket') }}
+                </button>
+                <button @click="activeTab = 'teams'" 
+                        class="mus-tab-btn" :class="{ active: activeTab === 'teams' }">
+                  {{ t('tournament_view.tabs.teams') }}
+                </button>
+              </div>
+
+              <!-- Fullscreen Button at tab level -->
+              <button v-if="activeTab === 'bracket' && bracketMatches.length > 0" 
+                      @click="toggleFullscreen" 
+                      class="mus-btn-gold px-3 py-1.5 flex align-items-center gap-2">
+                <i class="pi" :class="isFullscreen ? 'pi-window-minimize' : 'pi-external-link'"></i>
+                <span class="text-[9px] font-black uppercase">{{ isFullscreen ? 'SALIR' : 'TV MODE' }}</span>
               </button>
            </div>
 
@@ -399,52 +430,107 @@ const openPoster = () => {
              </div>
            </div>
 
-           <div v-else-if="activeTab === 'bracket'" class="py-6">
-              <div v-if="bracketMatches.length === 0" class="text-center py-20 opacity-30">
-                <i class="pi pi-sitemap text-6xl mb-4"></i>
-                <h3 class="font-black italic uppercase">{{ t('tournament_view.bracket.title') }}</h3>
-                <p>{{ t('tournament_view.bracket.empty_desc') }}</p>
-              </div>
-              <div v-else>
-                <div class="flex overflow-x-auto py-8 px-2 gap-4 md:gap-8 bracket-container">
-                   <div v-for="col in bracketMatches" :key="col.stage" class="flex flex-column justify-content-around gap-6 min-w-[280px] w-[320px] relative">
-                     <h4 class="text-center font-black uppercase tracking-widest text-[#e9c349] text-xs mb-2 bg-[#e9c349]/10 py-2 rounded">{{ col.stage }}</h4>
-                     <div class="flex-1 flex flex-column justify-content-around gap-6">
-                        <div v-for="(m, i) in col.matches" :key="i" class="card bg-[#0a0a0a] border border-white/10 p-4 rounded-xl relative hover:border-[#e9c349]/50 cursor-pointer transition-colors" @click="tournament.isManager ? openEditModal(m) : null">
-                          <div class="flex align-items-center justify-content-between mb-3">
-                            <span class="text-main font-bold text-sm truncate pr-2 w-10/12" :title="m.teamA">{{ m.teamA || t('tournament_view.knockout.deciding') }}</span>
-                            <span class="font-black text-lg" :class="m.scoreA > m.scoreB ? 'text-[#e9c349]' : 'text-slate-500'">{{ m.scoreA }}</span>
-                          </div>
-                          <div class="h-px bg-white/10 w-full my-3"></div>
-                          <div class="flex align-items-center justify-content-between">
-                            <span class="text-main font-bold text-sm truncate pr-2 w-10/12" :title="m.teamB">{{ m.teamB || t('tournament_view.knockout.deciding') }}</span>
-                            <span class="font-black text-lg" :class="m.scoreB > m.scoreA ? 'text-[#e9c349]' : 'text-slate-500'">{{ m.scoreB }}</span>
-                          </div>
-                          
-                          <!-- Connector lines -->
-                          <div v-if="col.stage !== 'Final'" class="absolute -right-4 top-1/2 w-4 h-px bg-[#e9c349]/30"></div>
-                        </div>
-                     </div>
-                  </div>
-                </div>
+            <div v-else-if="activeTab === 'bracket'" class="py-8">
+               <div v-if="bracketMatches.length === 0" class="text-center py-20 opacity-30">
+                 <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
+                   <i class="pi pi-sitemap text-5xl"></i>
+                 </div>
+                 <h3 class="text-2xl font-black italic uppercase tracking-tighter">{{ t('tournament_view.bracket.title') }}</h3>
+                 <p class="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em]">{{ t('tournament_view.bracket.empty_desc') }}</p>
+               </div>
+               
+               <div v-else class="bracket-viewport" ref="bracketContainer" :class="{ 'is-fullscreen': isFullscreen }">
+                 <!-- Fullscreen Header (Only visible in FS) -->
+                 <div v-if="isFullscreen" class="flex justify-content-between align-items-center mb-10 px-4 fs-controls">
+                    <div class="flex align-items-center gap-5">
+                       <img src="/logo.png" class="h-14" alt="Logo" />
+                       <div>
+                          <h2 class="text-4xl font-black text-main italic uppercase tracking-tighter m-0">{{ tournament.name }}</h2>
+                          <div class="text-[12px] font-bold text-secondary uppercase tracking-[0.4em] mt-1">CUADRO DE ELIMINATORIAS - RESULTADOS EN VIVO</div>
+                       </div>
+                    </div>
+                    <div class="text-right">
+                       <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Cerrar con ESC</div>
+                       <button @click="toggleFullscreen" class="mus-btn-secondary px-4 py-2 text-[10px] font-black uppercase">SALIR</button>
+                    </div>
+                 </div>
 
-                <!-- 3er y 4o Puesto -->
-                <div v-if="thirdPlaceMatch" class="mt-8 border-t border-white/10 pt-8 max-w-md mx-auto">
-                  <h4 class="text-center font-black uppercase tracking-widest text-slate-500 text-xs mb-4">{{ t('tournament_view.knockout.third_place') }}</h4>
-                  <div class="card bg-[#0a0a0a] border border-[#f4d125]/30 p-4 rounded-xl cursor-pointer hover:border-[#f4d125]" @click="tournament.isManager ? openEditModal(thirdPlaceMatch) : null">
-                     <div class="flex align-items-center justify-content-between mb-3">
-                       <span class="text-main font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamA">{{ thirdPlaceMatch.teamA || t('tournament_view.knockout.deciding') }}</span>
-                       <span class="font-black text-lg" :class="thirdPlaceMatch.scoreA > thirdPlaceMatch.scoreB ? 'text-[#f4d125]' : 'text-slate-500'">{{ thirdPlaceMatch.scoreA }}</span>
-                     </div>
-                     <div class="h-px bg-white/10 w-full my-3"></div>
-                     <div class="flex align-items-center justify-content-between">
-                       <span class="text-main font-bold text-sm truncate pr-2" :title="thirdPlaceMatch.teamB">{{ thirdPlaceMatch.teamB || t('tournament_view.knockout.deciding') }}</span>
-                       <span class="font-black text-lg" :class="thirdPlaceMatch.scoreB > thirdPlaceMatch.scoreA ? 'text-[#f4d125]' : 'text-slate-500'">{{ thirdPlaceMatch.scoreB }}</span>
-                     </div>
-                  </div>
-                </div>
-              </div>
-           </div>
+                 <div class="bracket-wrapper flex px-4 gap-0 overflow-x-auto custom-scrollbar pb-10">
+                    <div v-for="(col, colIdx) in bracketMatches" :key="col.round" 
+                         class="bracket-round flex flex-column min-w-[280px] w-[300px]">
+                      
+                      <!-- Round Header -->
+                      <div class="round-title mb-8 px-4">
+                        <div class="flex align-items-center gap-3">
+                          <div class="h-4 w-1 bg-secondary rounded-full"></div>
+                          <h4 class="m-0 font-black uppercase italic tracking-widest text-[11px] text-secondary">{{ col.stageName }}</h4>
+                        </div>
+                        <div class="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-1">{{ col.matches.length }} Enfrentamientos</div>
+                      </div>
+
+                      <!-- Matches Column -->
+                      <div class="flex-1 flex flex-column justify-content-around gap-8 relative pb-4">
+                         <div v-for="(m, i) in col.matches" :key="m.id" 
+                              class="bracket-match-container relative"
+                              :class="{ 'has-connectors': colIdx < bracketMatches.length - 1 }">
+                           
+                           <div class="bracket-match-card mus-glass border-white/5 overflow-hidden transition-all hover:border-secondary/30"
+                                @click="canManage ? openEditModal(m) : null">
+                             <!-- Team A -->
+                             <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5"
+                                  :class="{ 'bg-secondary/5': m.scoreA > m.scoreB && (m.scoreA > 0 || m.scoreB > 0) }">
+                                <div class="flex align-items-center gap-3 min-w-0">
+                                   <div class="w-1.5 h-1.5 rounded-full" :class="m.scoreA > m.scoreB ? 'bg-secondary' : 'bg-white/10'"></div>
+                                   <span class="text-xs font-bold truncate text-main uppercase italic tracking-tighter" :class="{ 'opacity-40': m.scoreB > m.scoreA }">
+                                     {{ m.teamA || 'POR DECIDIR' }}
+                                   </span>
+                                </div>
+                                <span class="font-black italic text-lg ml-4" :class="m.scoreA > m.scoreB ? 'text-secondary' : 'text-slate-600'">
+                                  {{ m.scoreA }}
+                                </span>
+                             </div>
+                             
+                             <!-- Team B -->
+                             <div class="team-row-bracket flex justify-content-between align-items-center p-3"
+                                  :class="{ 'bg-secondary/5': m.scoreB > m.scoreA && (m.scoreA > 0 || m.scoreB > 0) }">
+                                <div class="flex align-items-center gap-3 min-w-0">
+                                   <div class="w-1.5 h-1.5 rounded-full" :class="m.scoreB > m.scoreA ? 'bg-secondary' : 'bg-white/10'"></div>
+                                   <span class="text-xs font-bold truncate text-main uppercase italic tracking-tighter" :class="{ 'opacity-40': m.scoreA > m.scoreB }">
+                                     {{ m.teamB || 'POR DECIDIR' }}
+                                   </span>
+                                </div>
+                                <span class="font-black italic text-lg ml-4" :class="m.scoreB > m.scoreA ? 'text-secondary' : 'text-slate-600'">
+                                  {{ m.scoreB }}
+                                </span>
+                             </div>
+                           </div>
+
+                           <!-- Visual connectors (CSS based) -->
+                           <div v-if="colIdx < bracketMatches.length - 1" class="bracket-connector"></div>
+                         </div>
+                      </div>
+                   </div>
+                 </div>
+
+                 <!-- 3rd Place Match (Special Footer) -->
+                 <div v-if="thirdPlaceMatch" class="mt-12 pt-8 border-t border-white/5 flex flex-column align-items-center">
+                    <div class="text-center mb-6">
+                      <Tag :value="t('tournament_view.knockout.third_place')" severity="secondary" class="font-black italic uppercase tracking-[0.2em] text-[10px]" />
+                    </div>
+                    <div class="bracket-match-card mus-glass border-white/10 w-[300px] overflow-hidden hover:border-[#f4d125]/30 transition-all cursor-pointer"
+                         @click="canManage ? openEditModal(thirdPlaceMatch) : null">
+                       <div class="flex justify-content-between align-items-center p-3 border-b border-white/5" :class="{ 'bg-amber-500/5': thirdPlaceMatch.scoreA > thirdPlaceMatch.scoreB }">
+                          <span class="text-xs font-black text-main italic uppercase tracking-tighter">{{ thirdPlaceMatch.teamA || 'TBD' }}</span>
+                          <span class="font-black italic text-lg" :class="thirdPlaceMatch.scoreA > thirdPlaceMatch.scoreB ? 'text-amber-500' : 'text-slate-600'">{{ thirdPlaceMatch.scoreA }}</span>
+                       </div>
+                       <div class="flex justify-content-between align-items-center p-3" :class="{ 'bg-amber-500/5': thirdPlaceMatch.scoreB > thirdPlaceMatch.scoreA }">
+                          <span class="text-xs font-black text-main italic uppercase tracking-tighter">{{ thirdPlaceMatch.teamB || 'TBD' }}</span>
+                          <span class="font-black italic text-lg" :class="thirdPlaceMatch.scoreB > thirdPlaceMatch.scoreA ? 'text-amber-500' : 'text-slate-600'">{{ thirdPlaceMatch.scoreB }}</span>
+                       </div>
+                    </div>
+                 </div>
+               </div>
+            </div>
 
            <div v-else-if="activeTab === 'teams'">
               <div v-if="tournament.tournamentTeams?.length" class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5">
@@ -715,5 +801,143 @@ input[type=number] { -moz-appearance: textfield; }
 .mus-btn-gold:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(191, 149, 63, 0.4);
+}
+
+/* Bracket Specific Styles */
+.bracket-viewport {
+  width: 100%;
+  position: relative;
+}
+
+.bracket-wrapper {
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+.bracket-match-card {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.bracket-connector {
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  width: 30px;
+  height: 2px;
+  background: rgba(233, 195, 73, 0.15);
+  z-index: 1;
+}
+
+/* Vertical lines for meetups */
+.bracket-match-container.has-connectors::after {
+  content: '';
+  position: absolute;
+  right: -30px;
+  width: 2px;
+  background: rgba(233, 195, 73, 0.15);
+  z-index: 1;
+}
+
+/* Alternating connector heights based on bracket logic */
+/* Note: This is a simplified version of bracket connectors */
+.bracket-round:not(:last-child) .bracket-match-container:nth-child(odd)::after {
+  height: 100%;
+  top: 50%;
+}
+.bracket-round:not(:last-child) .bracket-match-container:nth-child(even)::after {
+  height: 100%;
+  bottom: 50%;
+}
+
+.round-title {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(5, 5, 5, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 15px 15px 15px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  height: 80px; /* Fixed height for alignment */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.bracket-viewport.is-fullscreen .round-title {
+  height: 100px;
+  background: #050505;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(233, 195, 73, 0.2);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(233, 195, 73, 0.4);
+}
+
+/* TV / Fullscreen Mode Styles */
+.bracket-viewport.is-fullscreen {
+  background: #050505;
+  padding: 40px;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.bracket-viewport.is-fullscreen .bracket-wrapper {
+  flex: 1;
+  align-items: stretch; /* Stretches columns to full height */
+  mask-image: none;
+  -webkit-mask-image: none;
+  padding-top: 0; /* Remove top padding to keep titles at the very top */
+}
+
+.bracket-viewport.is-fullscreen .bracket-round {
+  min-width: 350px;
+  width: 380px;
+}
+
+.bracket-viewport.is-fullscreen .bracket-match-card {
+  min-height: 120px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bracket-viewport.is-fullscreen .team-row-bracket {
+  padding: 1.2rem;
+}
+
+.bracket-viewport.is-fullscreen .team-row-bracket span.text-xs {
+  font-size: 1.1rem !important;
+}
+
+.bracket-viewport.is-fullscreen .team-row-bracket span.text-lg {
+  font-size: 2rem !important;
+}
+
+.bracket-viewport.is-fullscreen .round-title h4 {
+  font-size: 1.2rem;
+}
+
+.fs-controls {
+  z-index: 100;
 }
 </style>

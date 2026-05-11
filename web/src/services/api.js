@@ -294,14 +294,14 @@ export const tournamentService = {
     return response.json();
   },
 
-  async updateMatchScore(matchId, score1, score2) {
-    const formData = new FormData();
-    formData.append('score1', score1);
-    formData.append('score2', score2);
+  async updateMatchScore(matchId, data) {
     const response = await fetch(`${API_URL}/admin/match/${matchId}`, {
       method: 'POST',
-      headers: authService.getAuthHeader(),
-      body: formData
+      headers: {
+        ...authService.getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

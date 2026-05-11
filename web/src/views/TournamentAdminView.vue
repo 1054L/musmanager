@@ -161,10 +161,50 @@ const handleGenerateMatches = async () => {
   }
 }
 
+const editGames = ref([])
+
+const calculatedScore1 = computed(() => {
+  return editGames.value.filter(g => g.points1 >= (tournament.value?.rulePoints || 40)).length
+})
+
+const calculatedScore2 = computed(() => {
+  return editGames.value.filter(g => g.points2 >= (tournament.value?.rulePoints || 40)).length
+})
+
 const openEditModal = (match) => {
   editingMatch.value = match
-  editScore1.value = match.scoreA
-  editScore2.value = match.scoreB
+  
+  const toWin = tournament.value.ruleGames || 3
+  const maxPossibleGames = (toWin * 2) - 1
+  const currentGames = match.games || []
+  
+  editGames.value = []
+  for (let i = 0; i < maxPossibleGames; i++) {
+    editGames.value.push({
+      points1: currentGames[i]?.points1 || 0,
+      points2: currentGames[i]?.points2 || 0
+    })
+  }
+}
+
+const setWinnerPoints = (game, team) => {
+  const max = tournament.value?.rulePoints || 40
+  if (team === 1) {
+    game.points1 = max
+    // If the other team has points, we might want to keep them or clear them. 
+    // Usually in Mus, the loser keeps their points.
+  } else {
+    game.points2 = max
+  }
+}
+
+const enforceMaxPoints = (game, team) => {
+  const max = tournament.value?.rulePoints || 40
+  if (team === 1) {
+    if (game.points1 > max) game.points1 = max
+  } else {
+    if (game.points2 > max) game.points2 = max
+  }
 }
 
 const adjustScore = (team, amount) => {
@@ -181,14 +221,17 @@ const adjustScore = (team, amount) => {
 const saveMatchResult = async () => {
   isSavingResult.value = true
   try {
-    await tournamentService.updateMatchScore(editingMatch.value.id, editScore1.value, editScore2.value)
+    await tournamentService.updateMatchScore(editingMatch.value.id, {
+      games: editGames.value
+    })
     
     // Update local match state reactively
     const match = matches.value.find(m => m.id === editingMatch.value.id)
     if (match) {
-      match.scoreA = editScore1.value
-      match.scoreB = editScore2.value
-      match.status = (editScore1.value > 0 || editScore2.value > 0) ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending')
+      match.scoreA = calculatedScore1.value
+      match.scoreB = calculatedScore2.value
+      match.status = (calculatedScore1.value > 0 || calculatedScore2.value > 0) ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending')
+      match.games = [...editGames.value]
     }
 
     editingMatch.value = null
@@ -463,9 +506,12 @@ const statusOptions = [
                       <div class="match-card-bg"></div>
                       <div class="relative z-10">
                         <div class="flex justify-content-between align-items-center mb-4">
-                          <span class="match-status-tag" :class="{ 'is-finished': match.status === t('tournament_view.match_status.finished') }">
-                            {{ match.status }}
-                          </span>
+                          <div class="flex flex-column gap-1">
+                            <span class="text-[8px] font-black text-secondary uppercase tracking-[0.2em]">{{ match.stage }}</span>
+                            <span class="match-status-tag" :class="{ 'is-finished': match.status === t('tournament_view.match_status.finished') }">
+                              {{ match.status }}
+                            </span>
+                          </div>
                           <div class="match-edit-icon"><i class="pi pi-pencil"></i></div>
                         </div>
                         <div class="team-row">
@@ -489,66 +535,122 @@ const statusOptions = [
     </div>
     </template>
 
-    <!-- Score Edit Dialog (Redesigned) -->
-    <Dialog v-model:visible="editingMatch" modal :header="'Introducir Resultado'" :style="{ width: '500px' }" class="mus-dialog-premium">
-      <div v-if="editingMatch" class="p-6">
-        <div class="flex flex-column gap-8">
-          <!-- Team A Scorecard -->
-          <div class="scorecard-premium">
-            <div class="scorecard-header">
-              <span class="role-label">LOCAL</span>
-              <h3 class="team-title">{{ editingMatch.teamA }}</h3>
-            </div>
-            <div class="score-controls">
-              <button @click="adjustScore(1, -1)" class="score-step-btn" :disabled="editScore1 <= 0">
-                <i class="pi pi-minus"></i>
-              </button>
-              <div class="score-input-container">
-                <input v-model.number="editScore1" type="number" readonly class="score-input-field">
+    <!-- Score Edit Dialog (Redesigned for Games - Side by Side - Ultra Wide - Fixed) -->
+    <Dialog v-model:visible="editingMatch" modal :header="'Gestión de Resultado'" :style="{ width: '1000px' }" :dismissableMask="true" class="mus-dialog-premium no-scroll">
+      <div v-if="editingMatch" class="p-0 overflow-hidden">
+        <div class="grid grid-nogutter">
+          <!-- LEFT COLUMN: INFO & SUMMARY (Horizontal alignment - Optimized) -->
+          <div class="col-12 md:col-6 p-5 bg-white/2 border-right border-white/5">
+            <div class="flex flex-column h-full">
+              <div class="flex align-items-center gap-3 mb-6">
+                <div class="h-1 w-6 bg-secondary rounded-full"></div>
+                <span class="text-[9px] font-black text-secondary uppercase tracking-[0.4em]">Panel de Control</span>
               </div>
-              <button @click="adjustScore(1, 1)" class="score-step-btn" :disabled="editScore1 >= (tournament.ruleGames || 40)">
-                <i class="pi pi-plus"></i>
-              </button>
-            </div>
-          </div>
 
-          <div class="vs-divider">
-            <div class="line"></div>
-            <div class="vs-badge">VS</div>
-            <div class="line"></div>
-          </div>
+              <!-- Teams Scoreboard Style -->
+              <div class="scoreboard-premium">
+                 <div class="flex justify-content-between align-items-center gap-4 mb-6">
+                    <div class="flex-1 min-w-0">
+                      <span class="text-[9px] font-black text-secondary/60 uppercase tracking-[0.3em] block mb-1">LOCAL</span>
+                      <div class="text-xl font-black text-white italic truncate" v-tooltip.bottom="editingMatch.teamA">{{ editingMatch.teamA }}</div>
+                    </div>
+                    <div class="flex-shrink-0 px-2">
+                      <span class="text-xl font-black italic text-white/10">VS</span>
+                    </div>
+                    <div class="flex-1 min-w-0 text-right">
+                      <span class="text-[9px] font-black text-secondary/60 uppercase tracking-[0.3em] block mb-1">VISITANTE</span>
+                      <div class="text-xl font-black text-white italic truncate" v-tooltip.bottom="editingMatch.teamB">{{ editingMatch.teamB }}</div>
+                    </div>
+                 </div>
 
-          <!-- Team B Scorecard -->
-          <div class="scorecard-premium">
-            <div class="scorecard-header">
-              <span class="role-label">VISITANTE</span>
-              <h3 class="team-title">{{ editingMatch.teamB }}</h3>
-            </div>
-            <div class="score-controls">
-              <button @click="adjustScore(2, -1)" class="score-step-btn" :disabled="editScore2 <= 0">
-                <i class="pi pi-minus"></i>
-              </button>
-              <div class="score-input-container">
-                <input v-model.number="editScore2" type="number" readonly class="score-input-field">
+                 <div class="match-summary-panel p-6 bg-secondary/10 border border-secondary/20 rounded-[32px] text-center shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-20"></div>
+                    <span class="text-[9px] font-black text-secondary uppercase tracking-[0.5em] block mb-4">PUNTUACIÓN CHICOS</span>
+                    <div class="flex align-items-center justify-content-center gap-10">
+                      <div class="flex flex-column align-items-center">
+                        <span class="text-7xl font-black italic text-white leading-none tracking-tighter">{{ calculatedScore1 }}</span>
+                      </div>
+                      <div class="h-16 w-px bg-white/10 mx-4"></div>
+                      <div class="flex flex-column align-items-center">
+                        <span class="text-7xl font-black italic text-white leading-none tracking-tighter">{{ calculatedScore2 }}</span>
+                      </div>
+                    </div>
+                 </div>
               </div>
-              <button @click="adjustScore(2, 1)" class="score-step-btn" :disabled="editScore2 >= (tournament.ruleGames || 40)">
-                <i class="pi pi-plus"></i>
-              </button>
+
+              <div class="rules-hint mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex align-items-center gap-4">
+                <i class="pi pi-info-circle text-emerald-500 text-lg"></i>
+                <div class="flex flex-column">
+                  <span class="text-[9px] font-black text-white uppercase tracking-widest">REGLAMENTO</span>
+                  <span class="text-[9px] font-bold text-emerald-500/80 uppercase tracking-widest">
+                    Al mejor de {{ (tournament.ruleGames * 2) - 1 }} (ganar {{ tournament.ruleGames }}) a {{ tournament.rulePoints }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- MOVED ACTIONS: NOW ON THE LEFT -->
+              <div class="dialog-actions mt-8 grid grid-cols-2 gap-4">
+                <button @click="editingMatch = null" class="mus-btn-secondary px-4 py-3 text-[10px]">CANCELAR</button>
+                <button @click="saveMatchResult" :disabled="isSavingResult" class="mus-btn-primary px-4 py-3 text-[10px]">
+                  <i v-if="isSavingResult" class="pi pi-spin pi-spinner mr-2"></i>
+                  {{ isSavingResult ? 'GUARDANDO...' : 'GUARDAR' }}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="rules-hint mt-8">
-          <i class="pi pi-info-circle"></i>
-          <span>REGLAMENTO: {{ tournament.ruleGames }} juegos a {{ tournament.rulePoints }} tantos</span>
-        </div>
+          <!-- RIGHT COLUMN: GAMES EDITOR -->
+          <div class="col-12 md:col-6 p-5">
+            <div class="flex align-items-center justify-content-between mb-6">
+               <h4 class="m-0 text-white font-black italic uppercase tracking-widest">Desglose de Juegos</h4>
+               <span class="text-[10px] font-bold text-slate-500">{{ tournament.rulePoints }} tantos/juego</span>
+            </div>
 
-        <div class="dialog-actions mt-10 grid grid-cols-2 gap-4">
-          <button @click="editingMatch = null" class="mus-btn-secondary px-6 py-4">CANCELAR</button>
-          <button @click="saveMatchResult" :disabled="isSavingResult" class="mus-btn-primary px-6 py-4">
-            <i v-if="isSavingResult" class="pi pi-spin pi-spinner mr-2"></i>
-            {{ isSavingResult ? 'GUARDANDO...' : 'GUARDAR RESULTADO' }}
-          </button>
+            <div class="games-editor-container">
+               <div class="grid mb-4 px-4 opacity-40">
+                 <div class="col-2 text-[9px] font-black uppercase tracking-[0.2em]">Juego</div>
+                 <div class="col-5 text-[9px] font-black uppercase tracking-[0.2em] text-center">Local</div>
+                 <div class="col-5 text-[9px] font-black uppercase tracking-[0.2em] text-center">Visitante</div>
+               </div>
+
+               <div class="games-list custom-scrollbar max-h-[500px] overflow-y-auto pr-2">
+                 <div v-for="(game, index) in editGames" :key="index" 
+                      class="game-row flex align-items-center mb-2 p-2 bg-white/5 rounded-2xl border border-white/5 hover:border-secondary/20 transition-all">
+                    <div class="col-2 flex align-items-center justify-content-center">
+                      <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">{{ index + 1 }}º</span>
+                    </div>
+                    <div class="col-5 px-4">
+                      <div class="score-input-wrapper relative">
+                        <input type="number" 
+                               v-model.number="game.points1" 
+                               :min="0" 
+                               :max="tournament.rulePoints"
+                               @input="enforceMaxPoints(game, 1)"
+                               class="game-score-field text-sm"
+                               :class="{ 'is-winner': game.points1 >= tournament.rulePoints }">
+                        <button @click="setWinnerPoints(game, 1)" class="quick-win-btn" v-tooltip.top="'Ganar'">
+                          <i class="pi pi-check"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="col-5 px-4">
+                      <div class="score-input-wrapper relative">
+                        <input type="number" 
+                               v-model.number="game.points2" 
+                               :min="0" 
+                               :max="tournament.rulePoints"
+                               @input="enforceMaxPoints(game, 2)"
+                               class="game-score-field text-sm"
+                               :class="{ 'is-winner': game.points2 >= tournament.rulePoints }">
+                        <button @click="setWinnerPoints(game, 2)" class="quick-win-btn" v-tooltip.top="'Ganar'">
+                          <i class="pi pi-check"></i>
+                        </button>
+                      </div>
+                    </div>
+                 </div>
+               </div>
+            </div>
+          </div>
         </div>
       </div>
     </Dialog>
@@ -673,6 +775,29 @@ const statusOptions = [
 .match-edit-icon { color: var(--secondary); font-size: 12px; opacity: 0.3; transition: 0.3s; }
 .match-card-premium:hover .match-edit-icon { opacity: 1; transform: scale(1.2); }
 
+/* Rules Hint & Dialog Actions */
+.rules-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+  color: #10b981;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.dialog-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
 .team-row { display: flex; justify-content: space-between; align-items: center; }
 .team-name { color: #94a3b8; font-weight: 700; font-size: 14px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .team-name.is-winner { color: white; font-weight: 950; font-style: italic; }
@@ -705,15 +830,69 @@ const statusOptions = [
 .remove-btn { background: transparent; border: none; color: #334155; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
 .remove-btn:hover { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
 
-/* Scorecards */
-.scorecard-premium { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 28px; padding: 32px; text-align: center; }
-.role-label { font-size: 9px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.3em; color: var(--secondary); opacity: 0.5; margin-bottom: 12px; display: block; }
-.team-title { font-size: 24px; font-weight: 950; font-style: italic; color: white; margin: 0 0 28px 0; letter-spacing: -0.5px; }
-.score-controls { display: flex; align-items: center; justify-content: center; gap: 24px; }
-.score-step-btn { width: 56px; height: 56px; border-radius: 18px; background: rgba(233, 195, 73, 0.1); border: 1px solid rgba(233, 195, 73, 0.2); color: var(--secondary); cursor: pointer; transition: 0.3s; }
-.score-step-btn:hover:not(:disabled) { background: var(--secondary); color: black; transform: translateY(-2px); }
-.score-input-container { background: black; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; width: 100px; height: 80px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 10px 30px rgba(0,0,0,0.8); }
-.score-input-field { background: transparent; border: none; color: white; font-size: 42px; font-weight: 950; font-style: italic; text-align: center; width: 100%; outline: none; }
+/* Games Editor */
+.game-score-field {
+  width: 100%;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 14px;
+  color: white;
+  font-size: 18px;
+  font-weight: 950;
+  text-align: center;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-style: italic;
+}
+.game-score-field:focus {
+  border-color: var(--secondary);
+  background: rgba(233, 195, 73, 0.05);
+  box-shadow: 0 0 20px rgba(233, 195, 73, 0.1);
+  transform: scale(1.02);
+}
+
+/* Hide number arrows */
+.game-score-field::-webkit-outer-spin-button,
+.game-score-field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.game-score-field[type=number] {
+  -moz-appearance: textfield;
+}
+.game-score-field.is-winner {
+  border-color: #10b981;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.quick-win-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 10;
+  font-size: 10px;
+}
+.quick-win-btn:hover {
+  background: #10b981;
+  color: black;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
 
 .vs-divider { display: flex; align-items: center; gap: 15px; }
 .vs-divider .line { flex: 1; height: 1px; background: rgba(255,255,255,0.05); }

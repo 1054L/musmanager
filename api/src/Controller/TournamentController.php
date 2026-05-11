@@ -6,6 +6,7 @@ use App\Entity\Tournament;
 use App\Entity\TournamentTeam;
 use App\Entity\Team;
 use App\Entity\MusMatch;
+use App\Entity\MusMatchGame;
 use App\Entity\Province;
 use App\Entity\Town;
 use App\Repository\TournamentRepository;
@@ -343,6 +344,14 @@ class TournamentController extends AbstractController
                     'team2' => $match->getTeam2() ? $match->getTeam2()->getName() : 'TBD',
                     'score1' => $match->getScoreTeam1(),
                     'score2' => $match->getScoreTeam2(),
+                    'bracketRound' => $match->getBracketRound(),
+                    'bracketPosition' => $match->getBracketPosition(),
+                    'games' => array_map(function($game) {
+                        return [
+                            'points1' => $game->getPointsTeam1(),
+                            'points2' => $game->getPointsTeam2(),
+                        ];
+                    }, $match->getGames()->toArray())
                 ];
             }, $tournament->getMatches()->toArray())
         ]);
@@ -482,8 +491,8 @@ class TournamentController extends AbstractController
             ];
 
             // Create ALL matches for the bracket structure
-            // Round 1 is $roundsNeeded, Round 2 is $roundsNeeded-1 ... Final is 1
-            for ($r = $roundsNeeded; $r >= 1; $r--) {
+            // We create them from Final (1) to Initial ($roundsNeeded) so Byes can advance
+            for ($r = 1; $r <= $roundsNeeded; $r++) {
                 $matchesInRound = pow(2, $r - 1);
                 $stageLabel = $stageNames[$matchesInRound] ?? 'Ronda ' . ($roundsNeeded - $r + 1);
                 
@@ -509,8 +518,13 @@ class TournamentController extends AbstractController
                         // Handle Bye (if team2 is null, team1 wins immediately)
                         if ($match->getTeam1() && !$match->getTeam2()) {
                             $match->setWinner($match->getTeam1());
-                            $match->setScoreTeam1(1); // Minimal score to mark as played
+                            $match->setScoreTeam1(1); 
                             $match->setScoreTeam2(0);
+                            
+                            // Advance Bye winner if round > 1
+                            if ($r > 1) {
+                                $this->advanceWinnerInBracket($match, $entityManager);
+                            }
                         }
                     }
 
@@ -556,40 +570,53 @@ class TournamentController extends AbstractController
         $tournament = $match->getTournament();
         $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tournament);
 
-        $score1 = (int) $request->request->get('score1');
-        $score2 = (int) $request->request->get('score2');
+        $data = json_decode($request->getContent(), true) ?: $request->request->all();
+        $gamesData = $data['games'] ?? [];
 
-        $match->setScoreTeam1($score1);
-        $match->setScoreTeam2($score2);
+        // Clear existing games
+        foreach ($match->getGames() as $game) {
+            $entityManager->remove($game);
+        }
+        $match->getGames()->clear();
 
-        // Update winner if score reaches limit
+        $gamesWon1 = 0;
+        $gamesWon2 = 0;
         $limit = $tournament->getRulePoints();
-        if ($score1 >= $limit) $match->setWinner($match->getTeam1());
-        elseif ($score2 >= $limit) $match->setWinner($match->getTeam2());
+
+        foreach ($gamesData as $index => $g) {
+            $points1 = (int) ($g['points1'] ?? 0);
+            $points2 = (int) ($g['points2'] ?? 0);
+            
+            if ($points1 === 0 && $points2 === 0) continue;
+
+            $game = new MusMatchGame();
+            $game->setMusMatch($match);
+            $game->setGameNumber($index + 1);
+            $game->setPointsTeam1($points1);
+            $game->setPointsTeam2($points2);
+            
+            if ($points1 >= $limit) $gamesWon1++;
+            elseif ($points2 >= $limit) $gamesWon2++;
+            
+            $entityManager->persist($game);
+            $match->addGame($game);
+        }
+
+        $match->setScoreTeam1($gamesWon1);
+        $match->setScoreTeam2($gamesWon2);
+
+        // Winner logic: First to reach ruleGames (e.g. 3) wins the match
+        $toWin = $tournament->getRuleGames();
+        if ($gamesWon1 >= $toWin) $match->setWinner($match->getTeam1());
+        elseif ($gamesWon2 >= $toWin) $match->setWinner($match->getTeam2());
         else $match->setWinner(null);
 
         $this->recalculateTournamentStats($tournament, $entityManager);
         
         // AUTOMATIC ADVANCEMENT FOR ELIMINATORY
-        if ($tournament->getType() === 'eliminatory' && $match->getWinner() && $match->getBracketRound() > 1) {
-            $nextRound = $match->getBracketRound() - 1;
-            $nextPos = (int)floor($match->getBracketPosition() / 2);
-            $isTeam2 = $match->getBracketPosition() % 2 === 1;
+        $this->advanceWinnerInBracket($match, $entityManager);
 
-            $nextMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
-                'tournament' => $tournament,
-                'bracketRound' => $nextRound,
-                'bracketPosition' => $nextPos
-            ]);
-
-            if ($nextMatch) {
-                if ($isTeam2) {
-                    $nextMatch->setTeam2($match->getWinner());
-                } else {
-                    $nextMatch->setTeam1($match->getWinner());
-                }
-            }
-        }
+        $entityManager->flush();
 
         // CHECK IF ALL MATCHES ARE FINISHED -> AUTO-FINISH TOURNAMENT
         $allFinished = true;
@@ -725,5 +752,39 @@ class TournamentController extends AbstractController
 
             return $data;
         }, $tournaments));
+    }
+
+    private function advanceWinnerInBracket(MusMatch $match, EntityManagerInterface $entityManager): void
+    {
+        $tournament = $match->getTournament();
+        if ($tournament->getType() !== 'eliminatory' || !$match->getWinner() || $match->getBracketRound() <= 1) {
+            return;
+        }
+
+        $nextRound = $match->getBracketRound() - 1;
+        $nextPos = (int)floor($match->getBracketPosition() / 2);
+        $isTeam2 = $match->getBracketPosition() % 2 === 1;
+
+        $nextMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
+            'tournament' => $tournament,
+            'bracketRound' => $nextRound,
+            'bracketPosition' => $nextPos
+        ]);
+
+        if ($nextMatch) {
+            if ($isTeam2) {
+                $nextMatch->setTeam2($match->getWinner());
+            } else {
+                $nextMatch->setTeam1($match->getWinner());
+            }
+            
+            // If the next match also becomes a Bye (cascading BYE)
+            if ($nextMatch->getTeam1() && !$nextMatch->getTeam2()) {
+                $nextMatch->setWinner($nextMatch->getTeam1());
+                $nextMatch->setScoreTeam1(1);
+                $nextMatch->setScoreTeam2(0);
+                $this->advanceWinnerInBracket($nextMatch, $entityManager);
+            }
+        }
     }
 }
