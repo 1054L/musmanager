@@ -28,23 +28,11 @@ class Team
     #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'teams')]
     private Collection $players;
 
-    /**
-     * @var Collection<int, MusMatch>
-     */
-    #[ORM\OneToMany(targetEntity: MusMatch::class, mappedBy: 'team1')]
-    private Collection $matchesAsTeam1;
 
-    /**
-     * @var Collection<int, MusMatch>
-     */
-    #[ORM\OneToMany(targetEntity: MusMatch::class, mappedBy: 'team2')]
-    private Collection $matchesAsTeam2;
 
     public function __construct()
     {
         $this->players = new ArrayCollection();
-        $this->matchesAsTeam1 = new ArrayCollection();
-        $this->matchesAsTeam2 = new ArrayCollection();
     }
 
     public function getId(): ?int

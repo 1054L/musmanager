@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TournamentTeamRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TournamentTeamRepository::class)]
@@ -39,6 +41,24 @@ class TournamentTeam
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $isConfirmed = false;
+
+    /**
+     * @var Collection<int, MusMatch>
+     */
+    #[ORM\OneToMany(targetEntity: MusMatch::class, mappedBy: 'team1')]
+    private Collection $matchesAsTeam1;
+
+    /**
+     * @var Collection<int, MusMatch>
+     */
+    #[ORM\OneToMany(targetEntity: MusMatch::class, mappedBy: 'team2')]
+    private Collection $matchesAsTeam2;
+
+    public function __construct()
+    {
+        $this->matchesAsTeam1 = new ArrayCollection();
+        $this->matchesAsTeam2 = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -98,6 +118,22 @@ class TournamentTeam
     {
         $this->points = $points;
         return $this;
+    }
+
+    /**
+     * @return Collection<int, MusMatch>
+     */
+    public function getMatchesAsTeam1(): Collection
+    {
+        return $this->matchesAsTeam1;
+    }
+
+    /**
+     * @return Collection<int, MusMatch>
+     */
+    public function getMatchesAsTeam2(): Collection
+    {
+        return $this->matchesAsTeam2;
     }
 
     public function getGamesWon(): int
