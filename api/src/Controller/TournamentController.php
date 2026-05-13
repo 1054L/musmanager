@@ -61,6 +61,7 @@ class TournamentController extends AbstractController
                 'teamsCount' => count($t->getTournamentTeams()),
                 'hasMatches' => count($t->getMatches()) > 0,
                 'private' => $t->isPrivate(),
+                'hasThirdPlace' => $t->isHasThirdPlace(),
             ];
 
             if ($isSuperAdmin) {
@@ -117,7 +118,8 @@ class TournamentController extends AbstractController
             $tournament->setTablesCount($request->request->get('tablesCount') !== null ? (int) $request->request->get('tablesCount') : null);
         }
 
-        $tournament->setPrivate($request->request->get('private') === 'true' || $request->request->get('private') === '1');
+        $tournament->setPrivate(filter_var($request->request->get('private'), FILTER_VALIDATE_BOOLEAN));
+        $tournament->setHasThirdPlace(filter_var($request->request->get('hasThirdPlace'), FILTER_VALIDATE_BOOLEAN));
         
         $posterFile = $request->files->get('poster');
         if ($posterFile) {
@@ -142,6 +144,7 @@ class TournamentController extends AbstractController
             'statusDescription' => $tournament->getStatusDescription(),
             'type'       => $tournament->getType(),
             'private'    => $tournament->isPrivate(),
+            'hasThirdPlace' => $tournament->isHasThirdPlace(),
             'startDate'  => $tournament->getStartDate() ? $tournament->getStartDate()->format(\DateTimeInterface::ATOM) : null,
             'endDate'    => $tournament->getEndDate() ? $tournament->getEndDate()->format(\DateTimeInterface::ATOM) : null,
             'ruleKings'  => $tournament->getRuleKings(),
@@ -215,7 +218,10 @@ class TournamentController extends AbstractController
             $tournament->setTablesCount($requestData->get('tablesCount') !== "" ? (int) $requestData->get('tablesCount') : null);
         }
         if ($requestData->has('private')) {
-            $tournament->setPrivate($requestData->get('private') === 'true' || $requestData->get('private') === '1');
+            $tournament->setPrivate(filter_var($requestData->get('private'), FILTER_VALIDATE_BOOLEAN));
+        }
+        if ($requestData->has('hasThirdPlace')) {
+            $tournament->setHasThirdPlace(filter_var($requestData->get('hasThirdPlace'), FILTER_VALIDATE_BOOLEAN));
         }
 
         $posterFile = $request->files->get('poster');
@@ -240,6 +246,7 @@ class TournamentController extends AbstractController
             'statusDescription' => $tournament->getStatusDescription(),
             'type'       => $tournament->getType(),
             'private'    => $tournament->isPrivate(),
+            'hasThirdPlace' => $tournament->isHasThirdPlace(),
             'startDate'  => $tournament->getStartDate() ? $tournament->getStartDate()->format(\DateTimeInterface::ATOM) : null,
             'endDate'    => $tournament->getEndDate() ? $tournament->getEndDate()->format(\DateTimeInterface::ATOM) : null,
             'ruleKings'  => $tournament->getRuleKings(),
@@ -342,6 +349,7 @@ class TournamentController extends AbstractController
             'posterPath' => $tournament->getPosterPath(),
             'rulesPath' => $tournament->getRulesPath(),
             'private' => $tournament->isPrivate(),
+            'hasThirdPlace' => $tournament->isHasThirdPlace(),
             'uuid' => $tournament->getUuidAccessToken(),
             'teamsCount' => count($tournament->getTournamentTeams()),
             'tournamentTeams' => array_map(function($tt) {
@@ -549,6 +557,17 @@ class TournamentController extends AbstractController
 
                     $entityManager->persist($match);
                 }
+            }
+
+            // Generate 3rd place match if enabled and there are enough rounds (at least semifinals)
+            if ($roundsNeeded >= 2 && $tournament->isHasThirdPlace()) {
+                $thirdPlaceMatch = new MusMatch();
+                $thirdPlaceMatch->setTournament($tournament);
+                $thirdPlaceMatch->setStage('3º y 4º puesto');
+                // We place it in Round 1 (same as Final) but position 1 (Final is 0)
+                $thirdPlaceMatch->setBracketRound(1);
+                $thirdPlaceMatch->setBracketPosition(1);
+                $entityManager->persist($thirdPlaceMatch);
             }
         } else {
             // ROUND ROBIN / GROUPS LOGIC
@@ -766,6 +785,7 @@ class TournamentController extends AbstractController
                 'teamsCount' => count($t->getTournamentTeams()),
                 'playerCount' => 24,
                 'private' => $t->isPrivate(),
+                'hasThirdPlace' => $t->isHasThirdPlace(),
             ];
 
             if ($isSuperAdmin) {
@@ -802,6 +822,26 @@ class TournamentController extends AbstractController
                 $nextMatch->setTeam2($match->getWinner());
             } else {
                 $nextMatch->setTeam1($match->getWinner());
+            }
+        }
+
+        // Logic for 3rd and 4th place (losers of semifinals)
+        if ($match->getBracketRound() === 2 && $tournament->isHasThirdPlace()) {
+            $thirdPlaceMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
+                'tournament' => $tournament,
+                'bracketRound' => 1,
+                'bracketPosition' => 1
+            ]);
+
+            if ($thirdPlaceMatch) {
+                $loser = ($match->getWinner() === $match->getTeam1()) ? $match->getTeam2() : $match->getTeam1();
+                if ($loser) {
+                    if ($match->getBracketPosition() === 0) {
+                        $thirdPlaceMatch->setTeam1($loser);
+                    } else {
+                        $thirdPlaceMatch->setTeam2($loser);
+                    }
+                }
             }
         }
     }

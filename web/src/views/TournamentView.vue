@@ -51,7 +51,8 @@ const knockoutStages = [
   t('tournament_view.knockout.t8'),
   t('tournament_view.knockout.t4'), 
   t('tournament_view.knockout.final'), 
-  t('tournament_view.knockout.third_place')
+  t('tournament_view.knockout.third_place'),
+  '3º y 4º puesto'
 ];
 const groupedMatches = computed(() => {
   if (!matches.value.length) return []
@@ -97,8 +98,15 @@ const splitBracketMatches = computed(() => {
   const final = [];
 
   bracketMatches.value.forEach(roundData => {
-    if (roundData.matches.length === 1) {
-      final.push(roundData.matches[0]);
+    // Round 1 is the final round.
+    if (roundData.round === 1) {
+      // Find the final match (position 0)
+      const fm = roundData.matches.find(m => m.bracketPosition === 0);
+      if (fm) final.push(fm);
+      
+      // Also find 3rd place match (position 1) if it exists in this round data
+      const tpm = roundData.matches.find(m => m.bracketPosition === 1);
+      if (tpm) final.push(tpm);
     } else {
       const half = Math.ceil(roundData.matches.length / 2);
       left[roundData.round] = { ...roundData, matches: roundData.matches.slice(0, half) };
@@ -106,17 +114,23 @@ const splitBracketMatches = computed(() => {
     }
   });
 
+  // Make sure 3rd place match is included even if not in Round 1 data structure (fallback)
+  const thirdMatch = matches.value.find(x => x.stage === '3º y 4º puesto' || x.stage === t('tournament_view.knockout.third_place'));
+  if (thirdMatch && !final.find(m => m.id === thirdMatch.id)) {
+    final.push(thirdMatch);
+  }
+
   return {
     left: Object.values(left).sort((a, b) => b.matches.length - a.matches.length),
     right: Object.values(right).sort((a, b) => a.matches.length - b.matches.length),
-    final
+    final: final.sort((a, b) => (a.bracketPosition || 0) - (b.bracketPosition || 0))
   };
 });
 
 const publicUrl = computed(() => window.location.origin + route.path);
 const qrCodeUrl = computed(() => `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(publicUrl.value)}&color=e9c349&bgcolor=111111`);
 
-const thirdPlaceMatch = computed(() => matches.value.find(x => x.stage === t('tournament_view.knockout.third_place')))
+const thirdPlaceMatch = computed(() => matches.value.find(x => x.stage === t('tournament_view.knockout.third_place') || x.stage === '3º y 4º puesto'))
 
 
 const fetchTournament = async () => {
@@ -135,7 +149,8 @@ const fetchTournament = async () => {
         scoreB: m.score2,
         stage: m.stage,
         bracketRound: m.bracketRound,
-        bracketPosition: m.bracketPosition
+        bracketPosition: m.bracketPosition,
+        games: m.games || []
       }))
     }
     
@@ -211,6 +226,7 @@ const saveMatchResult = async () => {
     }
     
     editingMatch.value = null;
+    await fetchTournament();
   } catch (e) {
     console.error('Error saving result:', e);
   } finally {
@@ -264,6 +280,10 @@ const saveMatchResult = async () => {
                   <i class="pi pi-eye text-[#e9c349]"></i>
                   {{ t('dashboard.poster') }}
                 </span>
+                <router-link v-if="canManage" :to="`/admin/tournament/${uuid}/edit`" class="cursor-pointer hover:text-main transition-colors flex align-items-center gap-2 no-underline text-slate-500">
+                  <i class="pi pi-pencil text-[#e9c349]"></i>
+                  {{ t('common.edit') }}
+                </router-link>
                 <span><i class="pi pi-user mr-2 text-[#e9c349]"></i>{{ t('tournament_view.pairs_count', { count: tournament.teamsCount || 0 }) }}</span>
                 <span><i class="pi pi-calendar mr-2 text-[#e9c349]"></i>{{ tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : '...' }} - {{ tournament.endDate ? new Date(tournament.endDate).toLocaleDateString() : '...' }}</span>
                 <span v-if="tournament.location"><i class="pi pi-map-marker mr-2 text-[#e9c349]"></i>{{ tournament.location }}</span>
@@ -341,90 +361,89 @@ const saveMatchResult = async () => {
               </div>
            </div>
 
-           <!-- Content according to active tab -->
-           <div v-if="activeTab === 'matches'">
+           <div v-if="activeTab === 'matches'" class="matches-container">
               <div class="grid">
-                <!-- Highlighted Matches (Final & 3rd Place) -->
-                <div v-if="matches.find(m => m.stage === t('tournament_view.knockout.final')) || matches.find(m => m.stage === t('tournament_view.knockout.third_place'))" class="col-12 mb-8">
-                   <h4 class="text-[#f4d125] font-black italic uppercase tracking-[0.2em] mb-4 flex align-items-center gap-2 text-xs">
-                      <i class="pi pi-trophy"></i> {{ t('tournament_view.tabs.bracket') }}
-                   </h4>
+                <!-- Highlighted Final Section (Horizontal) -->
+                <div v-if="tournament.type === 'eliminatory' && (splitBracketMatches.final.length > 0 || thirdPlaceMatch)" class="col-12 mb-10">
                    <div class="grid">
-                      <!-- Final -->
-                      <div v-for="match in matches.filter(m => m.stage === t('tournament_view.knockout.final'))" :key="'final-'+match.id" class="col-12 mb-4">
-                         <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-[#f4d125]/30 bg-[#f4d125]/5 p-1">
-                            <table class="w-full text-left border-collapse bg-slate-900/50 rounded-xl">
-                               <tbody>
-                                  <tr class="group">
-                                     <td class="p-4 w-7/12">
-                                        <div class="flex flex-column gap-3">
-                                           <div class="flex align-items-center gap-3">
-                                              <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
-                                              <span class="text-main font-black italic text-lg truncate">{{ match.teamA }}</span>
-                                           </div>
-                                           <div class="flex align-items-center gap-3">
-                                              <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
-                                              <span class="text-main font-black italic text-lg truncate">{{ match.teamB }}</span>
-                                           </div>
-                                        </div>
-                                     </td>
-                                     <td class="p-4 w-2/12 border-l border-white/5 align-middle text-center">
-                                        <div class="flex flex-column gap-3">
-                                           <span class="text-2xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-[#f4d125]' : 'text-slate-600'">{{ match.scoreA }}</span>
-                                           <span class="text-2xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-[#f4d125]' : 'text-slate-600'">{{ match.scoreB }}</span>
-                                        </div>
-                                     </td>
-                                     <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
-                                        <div class="flex flex-column align-items-center justify-center gap-3">
-                                           <Tag :value="t('tournament_view.knockout.final')" severity="warning" class="text-[9px] font-black uppercase" />
-                                           <button v-if="tournament.isManager" @click="openEditModal(match)" class="text-[9px] font-black text-[#f4d125] uppercase border border-[#f4d125]/30 px-3 py-1 rounded bg-[#f4d125]/5 hover:bg-[#f4d125]/20 transition-all">
-                                              {{ t('dashboard.manage') }}
-                                           </button>
-                                        </div>
-                                     </td>
-                                  </tr>
-                               </tbody>
-                            </table>
-                         </div>
-                      </div>
-                      <!-- 3rd Place -->
-                      <div v-for="match in matches.filter(m => m.stage === t('tournament_view.knockout.third_place'))" :key="'third-'+match.id" class="col-12 mb-4">
-                         <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/10 bg-white/5 p-1">
-                            <table class="w-full text-left border-collapse bg-slate-900/50 rounded-xl">
-                               <tbody>
-                                  <tr class="group">
-                                     <td class="p-4 w-7/12">
-                                        <div class="flex flex-column gap-3">
-                                           <div class="flex align-items-center gap-3">
-                                              <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
-                                              <span class="text-main font-black italic text-lg truncate">{{ match.teamA }}</span>
-                                           </div>
-                                           <div class="flex align-items-center gap-3">
-                                              <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
-                                              <span class="text-main font-black italic text-lg truncate">{{ match.teamB }}</span>
-                                           </div>
-                                        </div>
-                                     </td>
-                                     <td class="p-4 w-2/12 border-l border-white/5 align-middle text-center">
-                                        <div class="flex flex-column gap-3">
-                                           <span class="text-2xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-main' : 'text-slate-600'">{{ match.scoreA }}</span>
-                                           <span class="text-2xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-main' : 'text-slate-600'">{{ match.scoreB }}</span>
-                                        </div>
-                                     </td>
-                                     <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
-                                        <div class="flex flex-column align-items-center justify-center gap-3">
-                                           <Tag :value="t('tournament_view.knockout.third_place')" severity="secondary" class="text-[9px] font-black uppercase" />
-                                           <button v-if="tournament.isManager" @click="openEditModal(match)" class="text-[9px] font-black text-slate-400 uppercase border border-white/10 px-3 py-1 rounded bg-white/5 hover:bg-white/10 transition-all">
-                                              {{ t('dashboard.manage') }}
-                                           </button>
-                                        </div>
-                                     </td>
-                                  </tr>
-                               </tbody>
-                            </table>
-                         </div>
-                      </div>
-                   </div>
+                       <!-- Final Match -->
+                       <div v-for="match in splitBracketMatches.final.filter(m => m.bracketPosition === 0)" :key="'final-'+match.id" 
+                            :class="tournament.hasThirdPlace ? 'col-12 md:col-6 mb-4' : 'col-12 mb-4'">
+                          <div class="mus-table-wrapper h-full rounded-2xl overflow-hidden border border-[#e9c349]/30 bg-[#e9c349]/5 p-1 shadow-[0_0_30px_rgba(233,195,73,0.1)]">
+                             <table class="w-full h-full text-left border-collapse bg-slate-900/80 rounded-xl">
+                                <tbody>
+                                   <tr class="group">
+                                      <td class="p-4 w-7/12">
+                                         <div class="flex flex-column gap-3">
+                                            <div class="flex align-items-center gap-3">
+                                               <div class="w-7 h-7 flex-shrink-0 rounded-full bg-secondary border border-white/20 flex align-items-center justify-center text-[10px] font-black text-black">1</div>
+                                               <span class="text-main font-black italic text-xl truncate tracking-tight uppercase">{{ match.teamA }}</span>
+                                            </div>
+                                            <div class="flex align-items-center gap-3">
+                                               <div class="w-7 h-7 flex-shrink-0 rounded-full bg-secondary border border-white/20 flex align-items-center justify-center text-[10px] font-black text-black">2</div>
+                                               <span class="text-main font-black italic text-xl truncate tracking-tight uppercase">{{ match.teamB }}</span>
+                                            </div>
+                                         </div>
+                                      </td>
+                                      <td class="p-4 w-2/12 border-l border-white/5 align-middle text-center">
+                                         <div class="flex flex-column gap-3">
+                                            <span class="text-3xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-secondary' : 'text-slate-600'">{{ match.scoreA }}</span>
+                                            <span class="text-3xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-secondary' : 'text-slate-600'">{{ match.scoreB }}</span>
+                                         </div>
+                                      </td>
+                                      <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
+                                         <div class="flex flex-column align-items-center justify-center gap-4">
+                                            <Tag value="GRAND FINAL" severity="warning" class="text-[10px] font-black italic uppercase tracking-widest px-4 py-2" />
+                                            <button v-if="tournament.isManager" @click="openEditModal(match)" class="text-[9px] font-black text-secondary uppercase border border-secondary/30 px-3 py-1.5 rounded bg-secondary/5 hover:bg-secondary/20 transition-all">
+                                               {{ t('dashboard.manage') }}
+                                            </button>
+                                         </div>
+                                      </td>
+                                   </tr>
+                                </tbody>
+                             </table>
+                          </div>
+                       </div>
+
+                       <!-- 3rd Place -->
+                       <div v-for="match in matches.filter(m => m.stage === t('tournament_view.knockout.third_place') || m.stage === '3º y 4º puesto')" :key="'third-'+match.id" 
+                            :class="tournament.hasThirdPlace ? 'col-12 md:col-6 mb-4' : 'col-12 mb-4'">
+                          <div class="mus-table-wrapper h-full rounded-2xl overflow-hidden border border-white/10 bg-white/5 p-1">
+                             <table class="w-full h-full text-left border-collapse bg-slate-900/50 rounded-xl">
+                                <tbody>
+                                   <tr class="group">
+                                      <td class="p-4 w-7/12">
+                                         <div class="flex flex-column gap-3">
+                                            <div class="flex align-items-center gap-3">
+                                               <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
+                                               <span class="text-main font-black italic text-lg truncate uppercase">{{ match.teamA }}</span>
+                                            </div>
+                                            <div class="flex align-items-center gap-3">
+                                               <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
+                                               <span class="text-main font-black italic text-lg truncate uppercase">{{ match.teamB }}</span>
+                                            </div>
+                                         </div>
+                                      </td>
+                                      <td class="p-4 w-2/12 border-l border-white/5 align-middle text-center">
+                                         <div class="flex flex-column gap-3">
+                                            <span class="text-2xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-main' : 'text-slate-600'">{{ match.scoreA }}</span>
+                                            <span class="text-2xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-main' : 'text-slate-600'">{{ match.scoreB }}</span>
+                                         </div>
+                                      </td>
+                                      <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
+                                         <div class="flex flex-column align-items-center justify-center gap-3">
+                                            <Tag :value="t('tournament_view.knockout.third_place')" severity="secondary" class="text-[9px] font-black uppercase" />
+                                            <button v-if="tournament.isManager" @click="openEditModal(match)" class="text-[9px] font-black text-slate-400 uppercase border border-white/10 px-3 py-1 rounded bg-white/5 hover:bg-white/10 transition-all">
+                                               {{ t('dashboard.manage') }}
+                                            </button>
+                                         </div>
+                                      </td>
+                                   </tr>
+                                </tbody>
+                             </table>
+                          </div>
+                       </div>
+                    </div>
                 </div>
 
                 <!-- Regular Stage Matches -->
@@ -440,11 +459,11 @@ const saveMatchResult = async () => {
                                   <div class="flex flex-column gap-3">
                                      <div class="flex align-items-center gap-3">
                                         <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
-                                        <span class="text-main font-black italic text-base truncate" :title="match.teamA">{{ match.teamA }}</span>
+                                        <span class="text-main font-black italic text-base truncate uppercase" :title="match.teamA">{{ match.teamA }}</span>
                                      </div>
                                      <div class="flex align-items-center gap-3">
                                         <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
-                                        <span class="text-main font-black italic text-base truncate" :title="match.teamB">{{ match.teamB }}</span>
+                                        <span class="text-main font-black italic text-base truncate uppercase" :title="match.teamB">{{ match.teamB }}</span>
                                      </div>
                                   </div>
                                </td>
@@ -503,8 +522,8 @@ const saveMatchResult = async () => {
                </div>
              </div>
              <div v-if="Object.keys(classification).length === 0" class="text-center py-10 opacity-30">
-               <i class="pi pi-info-circle text-4xl mb-4"></i>
-               <p class="font-bold">{{ t('tournament_view.classification.empty') }}</p>
+                <i class="pi pi-info-circle text-4xl mb-4"></i>
+                <p class="font-bold">{{ t('tournament_view.classification.empty') }}</p>
              </div>
            </div>
 
@@ -518,39 +537,39 @@ const saveMatchResult = async () => {
                </div>
                
                <div v-else class="bracket-viewport" ref="bracketContainer" :class="{ 'is-fullscreen': isFullscreen }">
-                 <!-- Fullscreen Header (Only visible in FS) -->
-                 <div v-if="isFullscreen" class="flex justify-content-between align-items-center mb-10 px-4 fs-controls">
-                    <div class="flex align-items-center gap-5">
-                       <img src="/logo.png" class="h-14" alt="Logo" />
-                        <div>
-                           <h2 class="text-4xl font-black text-main italic uppercase tracking-tighter m-0">{{ tournament.name }}</h2>
-                           <div class="text-[12px] font-bold text-secondary uppercase tracking-[0.4em] mt-1">CUADRO DE ELIMINATORIAS - RESULTADOS EN VIVO</div>
-                        </div>
+                  <!-- Fullscreen Header (Only visible in FS) -->
+                  <div v-if="isFullscreen" class="flex justify-content-between align-items-center mb-10 px-4 fs-controls">
+                     <div class="flex align-items-center gap-5">
+                        <img src="/logo.png" class="h-14" alt="Logo" />
+                         <div>
+                            <h2 class="text-4xl font-black text-main italic uppercase tracking-tighter m-0">{{ tournament.name }}</h2>
+                            <div class="text-[12px] font-bold text-secondary uppercase tracking-[0.4em] mt-1">CUADRO DE ELIMINATORIAS - RESULTADOS EN VIVO</div>
+                         </div>
 
-                        <!-- QR Code for Public Access -->
-                        <div class="flex align-items-center gap-4 ml-12 bg-white/5 p-3 rounded-2xl border border-white/10">
-                           <div class="text-right">
-                              <div class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] mb-1">SIGUE EL TORNEO</div>
-                              <div class="text-[8px] font-bold text-slate-500 uppercase">RESULTADOS EN VIVO</div>
-                           </div>
-                           <div class="relative p-1 bg-white rounded-lg shadow-xl">
-                              <img :src="qrCodeUrl" class="w-14 h-14 block" alt="QR Code" />
-                           </div>
+                         <!-- QR Code for Public Access -->
+                         <div class="flex align-items-center gap-4 ml-12 bg-white/5 p-3 rounded-2xl border border-white/10">
+                            <div class="text-right">
+                               <div class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] mb-1">SIGUE EL TORNEO</div>
+                               <div class="text-[8px] font-bold text-slate-500 uppercase">RESULTADOS EN VIVO</div>
+                            </div>
+                            <div class="relative p-1 bg-white rounded-lg shadow-xl">
+                               <img :src="qrCodeUrl" class="w-14 h-14 block" alt="QR Code" />
+                            </div>
+                         </div>
+                     </div>
+                      <div class="flex align-items-center gap-6">
+                        <div class="flex align-items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                           <i class="pi pi-search-minus text-slate-400 text-xs"></i>
+                           <input type="range" v-model="zoomLevel" min="0.1" max="1.5" step="0.05" class="w-32 accent-secondary" />
+                           <i class="pi pi-search-plus text-slate-400 text-xs"></i>
+                           <span class="text-xs font-bold text-secondary ml-1 min-w-[45px]">{{ Math.round(zoomLevel * 100) }}%</span>
                         </div>
-                    </div>
-                     <div class="flex align-items-center gap-6">
-                       <div class="flex align-items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10">
-                          <i class="pi pi-search-minus text-slate-400 text-xs"></i>
-                          <input type="range" v-model="zoomLevel" min="0.1" max="1.5" step="0.05" class="w-32 accent-secondary" />
-                          <i class="pi pi-search-plus text-slate-400 text-xs"></i>
-                          <span class="text-xs font-bold text-secondary ml-1 min-w-[45px]">{{ Math.round(zoomLevel * 100) }}%</span>
-                       </div>
-                       <div class="text-right">
-                          <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Cerrar con ESC</div>
-                          <button @click="toggleFullscreen" class="mus-btn-secondary px-4 py-2 text-[10px] font-black uppercase">SALIR</button>
-                       </div>
-                    </div>
-                 </div>
+                        <div class="text-right">
+                           <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Cerrar con ESC</div>
+                           <button @click="toggleFullscreen" class="mus-btn-secondary px-4 py-2 text-[10px] font-black uppercase">SALIR</button>
+                        </div>
+                     </div>
+                  </div>
 
                   <div class="bracket-wrapper px-4 overflow-auto custom-scrollbar pb-10" 
                        :style="{ height: isFullscreen ? 'calc(100vh - 150px)' : '750px' }">
@@ -571,11 +590,11 @@ const saveMatchResult = async () => {
                                    <!-- Standard Card -->
                                    <div class="bracket-match-card mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
-                                         <span class="text-xs font-black text-main uppercase italic">{{ m.teamA || 'TBD' }}</span>
+                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA || 'TBD' }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
                                       </div>
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3">
-                                         <span class="text-xs font-black text-main uppercase italic">{{ m.teamB || 'TBD' }}</span>
+                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamB || 'TBD' }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
                                       </div>
                                    </div>
@@ -585,23 +604,56 @@ const saveMatchResult = async () => {
                           </div>
                        </div>
 
-                       <!-- Central Final -->
-                       <div class="flex flex-column justify-content-center px-20 gap-10">
-                          <div class="text-center">
-                             <div class="w-32 h-1 bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mb-4"></div>
-                             <Tag value="GRAND FINAL" severity="warning" class="font-black italic uppercase tracking-[0.4em] text-lg px-6 py-3" />
-                             <div class="w-32 h-1 bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mt-4"></div>
-                          </div>
-                          <div v-for="m in splitBracketMatches.final" :key="'final-'+m.id" 
-                               class="bracket-match-card mus-glass border-secondary/30 w-[400px] scale-110 shadow-2xl"
-                               @click="canManage ? openEditModal(m) : null">
-                             <div class="p-4 border-b border-white/10 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreA > m.scoreB }">
-                                <span class="text-xl font-black text-main italic uppercase">{{ m.teamA || 'FINALISTA A' }}</span>
-                                <span class="text-4xl font-black text-secondary">{{ m.scoreA }}</span>
+                       <!-- Central Column: Final & 3rd Place -->
+                       <div class="px-20 relative" style="min-width: 600px; display: grid; grid-template-rows: 1fr auto 1fr; min-height: 100%;">
+                          
+                          <!-- Top Spacer to ensure perfect centering of row 2 -->
+                          <div style="grid-row: 1;"></div>
+
+                          <!-- Row 2: GRAND FINAL (Centered) -->
+                          <div style="grid-row: 2;" class="flex flex-column align-items-center gap-6 py-10">
+                             <div v-for="m in splitBracketMatches.final.filter(f => f.bracketPosition === 0)" :key="'final-'+m.id" 
+                                  class="flex flex-column align-items-center gap-6">
+                                <div class="text-center">
+                                   <div class="w-32 h-px bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mb-4"></div>
+                                   <Tag value="GRAND FINAL" severity="warning" class="font-black italic uppercase tracking-[0.4em] text-xl px-6 py-3" />
+                                   <div class="w-32 h-px bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mt-4"></div>
+                                </div>
+                                <div class="bracket-match-card mus-glass border-secondary/50 w-[480px] shadow-2xl scale-110 bg-secondary/5"
+                                     @click="canManage ? openEditModal(m) : null">
+                                   <div class="p-5 border-b border-white/10 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreA > m.scoreB }">
+                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA || 'FINALISTA A' }}</span>
+                                      <span class="text-5xl font-black text-secondary">{{ m.scoreA }}</span>
+                                   </div>
+                                   <div class="p-5 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreB > m.scoreA }">
+                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB || 'FINALISTA B' }}</span>
+                                      <span class="text-5xl font-black text-secondary">{{ m.scoreB }}</span>
+                                   </div>
+                                </div>
                              </div>
-                             <div class="p-4 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreB > m.scoreA }">
-                                <span class="text-xl font-black text-main italic uppercase">{{ m.teamB || 'FINALISTA B' }}</span>
-                                <span class="text-4xl font-black text-secondary">{{ m.scoreB }}</span>
+                          </div>
+
+                          <!-- Row 3: 3rd PLACE (Directly below) -->
+                          <div style="grid-row: 3;" class="flex flex-column align-items-center pt-12">
+                             <div v-for="m in splitBracketMatches.final.filter(f => f.bracketPosition === 1)" :key="'third-'+m.id" 
+                                  class="flex flex-column align-items-center gap-6">
+                                <div class="text-center">
+                                   <div class="w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto mb-3"></div>
+                                   <Tag :value="t('tournament_view.knockout.third_place')" severity="secondary" 
+                                        class="font-black italic uppercase tracking-[0.3em] text-sm px-4 py-2" />
+                                   <div class="w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto mt-3"></div>
+                                </div>
+                                <div class="bracket-match-card mus-glass border-white/20 w-[480px] shadow-2xl scale-100"
+                                     @click="canManage ? openEditModal(m) : null">
+                                   <div class="p-4 border-b border-white/10 flex justify-content-between align-items-center" :class="{ 'bg-white/5': m.scoreA > m.scoreB }">
+                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA || 'SEMIFINALISTA A' }}</span>
+                                      <span class="text-4xl font-black text-slate-400">{{ m.scoreA }}</span>
+                                   </div>
+                                   <div class="p-4 flex justify-content-between align-items-center" :class="{ 'bg-white/5': m.scoreB > m.scoreA }">
+                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB || 'SEMIFINALISTA B' }}</span>
+                                      <span class="text-4xl font-black text-slate-400">{{ m.scoreB }}</span>
+                                   </div>
+                                </div>
                              </div>
                           </div>
                        </div>
@@ -618,11 +670,11 @@ const saveMatchResult = async () => {
                                 <div v-for="(m, i) in col.matches" :key="m.id" class="bracket-match-container relative right-wing">
                                    <div class="bracket-match-card mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
-                                         <span class="text-xs font-black text-main uppercase italic">{{ m.teamA || 'TBD' }}</span>
+                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA || 'TBD' }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
                                       </div>
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3">
-                                         <span class="text-xs font-black text-main uppercase italic">{{ m.teamB || 'TBD' }}</span>
+                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamB || 'TBD' }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
                                       </div>
                                    </div>
@@ -633,55 +685,37 @@ const saveMatchResult = async () => {
                        </div>
                     </div>
                   </div>
-
-                 <!-- 3rd Place Match (Special Footer) -->
-                 <div v-if="thirdPlaceMatch" class="mt-12 pt-8 border-t border-white/5 flex flex-column align-items-center">
-                    <div class="text-center mb-6">
-                      <Tag :value="t('tournament_view.knockout.third_place')" severity="secondary" class="font-black italic uppercase tracking-[0.2em] text-[10px]" />
-                    </div>
-                    <div class="bracket-match-card mus-glass border-white/10 w-[300px] overflow-hidden hover:border-[#f4d125]/30 transition-all cursor-pointer"
-                         @click="canManage ? openEditModal(thirdPlaceMatch) : null">
-                       <div class="flex justify-content-between align-items-center p-3 border-b border-white/5" :class="{ 'bg-amber-500/5': thirdPlaceMatch.scoreA > thirdPlaceMatch.scoreB }">
-                          <span class="text-xs font-black text-main italic uppercase tracking-tighter">{{ thirdPlaceMatch.teamA || 'TBD' }}</span>
-                          <span class="font-black italic text-lg" :class="thirdPlaceMatch.scoreA > thirdPlaceMatch.scoreB ? 'text-amber-500' : 'text-slate-600'">{{ thirdPlaceMatch.scoreA }}</span>
-                       </div>
-                       <div class="flex justify-content-between align-items-center p-3" :class="{ 'bg-amber-500/5': thirdPlaceMatch.scoreB > thirdPlaceMatch.scoreA }">
-                          <span class="text-xs font-black text-main italic uppercase tracking-tighter">{{ thirdPlaceMatch.teamB || 'TBD' }}</span>
-                          <span class="font-black italic text-lg" :class="thirdPlaceMatch.scoreB > thirdPlaceMatch.scoreA ? 'text-amber-500' : 'text-slate-600'">{{ thirdPlaceMatch.scoreB }}</span>
-                       </div>
-                    </div>
-                 </div>
                </div>
             </div>
 
-           <div v-else-if="activeTab === 'teams'">
-              <div v-if="tournament.tournamentTeams?.length" class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5">
-                 <table class="w-full text-left border-collapse">
-                    <tbody>
-                       <tr v-for="tt in tournament.tournamentTeams" :key="tt.id" class="border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors group">
-                          <td class="p-4 w-16 text-center border-r border-white/5">
-                             <div class="w-10 h-10 mx-auto rounded-full bg-[#e9c349]/10 border border-[#e9c349]/20 flex align-items-center justify-center">
-                                <i class="pi pi-users text-[#e9c349]"></i>
-                             </div>
-                          </td>
-                          <td class="p-4 font-bold text-main text-lg">
-                             {{ tt.team?.name }}
-                          </td>
-                          <td class="p-4 text-right w-1/3 border-l border-white/5">
-                             <span class="text-slate-400 text-xs font-black uppercase tracking-widest">{{ tt.groupName || '-' }}</span>
-                          </td>
-                       </tr>
-                    </tbody>
-                 </table>
-              </div>
-              
-              <div v-if="!tournament.tournamentTeams?.length" class="text-center py-10 opacity-30">
-                 <i class="pi pi-users text-4xl mb-4"></i>
-                 <p class="font-bold">{{ t('tournament_view.teams.empty') }}</p>
-              </div>
-           </div>
+            <div v-else-if="activeTab === 'teams'">
+               <div v-if="tournament.tournamentTeams?.length" class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5">
+                  <table class="w-full text-left border-collapse">
+                     <tbody>
+                        <tr v-for="tt in tournament.tournamentTeams" :key="tt.id" class="border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors group">
+                           <td class="p-4 w-16 text-center border-r border-white/5">
+                              <div class="w-10 h-10 mx-auto rounded-full bg-[#e9c349]/10 border border-[#e9c349]/20 flex align-items-center justify-center">
+                                 <i class="pi pi-users text-[#e9c349]"></i>
+                              </div>
+                           </td>
+                           <td class="p-4 font-bold text-main text-lg uppercase italic">
+                              {{ tt.team?.name }}
+                           </td>
+                           <td class="p-4 text-right w-1/3 border-l border-white/5">
+                              <span class="text-slate-400 text-xs font-black uppercase tracking-widest">{{ tt.groupName || '-' }}</span>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+               
+               <div v-if="!tournament.tournamentTeams?.length" class="text-center py-10 opacity-30">
+                  <i class="pi pi-users text-4xl mb-4"></i>
+                  <p class="font-bold">{{ t('tournament_view.teams.empty') }}</p>
+               </div>
+            </div>
 
-        </div>
+         </div>
       </div>
 
       <!-- Sidebar -->
@@ -719,7 +753,7 @@ const saveMatchResult = async () => {
             
             <div class="flex flex-column align-items-center relative z-10 text-center">
               <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#e9c349] mb-2 opacity-60">{{ t('tournament_view.match_edit.local') }}</span>
-              <span class="font-black text-main italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamA }}</span>
+              <span class="font-black text-main italic text-2xl truncate max-w-[340px] leading-tight uppercase">{{ editingMatch.teamA }}</span>
             </div>
 
             <div class="flex align-items-center justify-content-center gap-5 relative z-10">
@@ -750,7 +784,7 @@ const saveMatchResult = async () => {
             
             <div class="flex flex-column align-items-center relative z-10 text-center">
               <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[#e9c349] mb-2 opacity-60">{{ t('tournament_view.match_edit.visitor') }}</span>
-              <span class="font-black text-main italic text-2xl truncate max-w-[340px] leading-tight">{{ editingMatch.teamB }}</span>
+              <span class="font-black text-main italic text-2xl truncate max-w-[340px] leading-tight uppercase">{{ editingMatch.teamB }}</span>
             </div>
 
             <div class="flex align-items-center justify-content-center gap-5 relative z-10">

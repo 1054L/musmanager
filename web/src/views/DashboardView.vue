@@ -237,7 +237,7 @@ onMounted(() => {
               <h3 class="text-4xl font-black italic text-main leading-none">{{ stat.value }}</h3>
             </div>
             <div class="w-12 h-12 shrink-0 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
-              <i :class="['pi', stat.icon, 'text-xl']" :style="{ color: stat.color }"></i>
+              <i :class="['pi', stat.icon, 'text-lg']" :style="{ color: stat.color }"></i>
             </div>
           </div>
         </div>

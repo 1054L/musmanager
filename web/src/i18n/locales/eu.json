@@ -389,7 +389,7 @@
       "location": "Lekua (Taberna, Kalea...)",
       "province": "Probintzia",
       "town": "Herria / Hiria",
-      "poster": "Txapelketaren Kartela (Irudia)",
+      "poster": "Txapelketaren Kartela ",
       "rulesFile": "Arauak (PDF)",
       "gameSystem": "Joko Sistema",
       "status": "Egoera",
@@ -412,8 +412,10 @@
       "tablesCount": "Mahai Kopurua",
       "rules_section": "Arauak eta Kudeaketa",
       "other": "Beste bat",
-      "private": "Pribatutasuna",
-      "private_desc": "Txapelketa Pribatua (ez da zerrenda publikoan agertuko)"
+      "private": "Txapelketa Pribatua",
+      "private_desc": "Txapelketa Pribatua (ez da zerrenda publikoan agertuko)",
+      "hasThirdPlace": "3. eta 4. postuak jokatu",
+      "hasThirdPlace_help": "Markatuz gero, finalaurrekoetako galdetzaileen arteko partida gehigarri bat sortuko da."
     },
     "placeholders": {
       "name": "Adib.: Udaberriko Txapelketa Handia",
@@ -621,15 +623,15 @@
     "match_edit": {
       "title": "Emaitzen Kudeaketa",
       "panel_title": "Kontrol Panela",
-      "score_games": "UMEEEN MARKAGAILUA",
+      "score_games": "JOKUEN MARKAGAILUA",
       "regulation": "ERREGLAMENTUA",
       "best_of": "{total}-(e)tik onenera ({needed} irabazi) {points}-ra",
       "save_btn": "GORDE",
       "saving_btn": "GORDETZEN...",
       "cancel_btn": "UTZI",
-      "games_breakdown": "Umeen Xehetasunak",
-      "points_per_game": "{points} tanto/ume",
-      "game_label": "Umea",
+      "games_breakdown": "Jokuen Xehetasunak",
+      "points_per_game": "{points} tanto",
+      "game_label": "Partida",
       "win_tooltip": "Irabazi"
     },
     "stats": {

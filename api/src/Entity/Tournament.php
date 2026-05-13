@@ -72,6 +72,9 @@ class Tournament
 
     #[ORM\Column(options: ['default' => false])]
     private bool $private = false;
+ 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $hasThirdPlace = false;
 
     /**
      * @var Collection<int, User>
@@ -378,6 +381,17 @@ class Tournament
     public function setRulesPath(?string $rulesPath): static
     {
         $this->rulesPath = $rulesPath;
+        return $this;
+    }
+
+    public function isHasThirdPlace(): bool
+    {
+        return $this->hasThirdPlace;
+    }
+
+    public function setHasThirdPlace(bool $hasThirdPlace): static
+    {
+        $this->hasThirdPlace = $hasThirdPlace;
         return $this;
     }
 }

@@ -29,7 +29,8 @@ const form = ref({
   townId: null,
   poster: null,
   rulesFile: null,
-  private: false
+  private: false,
+  hasThirdPlace: false
 })
 const existingPosterPath = ref(null)
 const existingRulesPath = ref(null)
@@ -107,7 +108,8 @@ onMounted(async () => {
       townId: data.townId || null,
       poster: null,
       rulesFile: null,
-      private: data.private || false
+      private: data.private || false,
+      hasThirdPlace: data.hasThirdPlace || false
     }
     existingPosterPath.value = data.posterPath
     existingRulesPath.value = data.rulesPath
@@ -171,6 +173,7 @@ const handleSave = async () => {
     if (form.value.rulesFile) formData.append('rulesFile', form.value.rulesFile)
     
     formData.append('private', form.value.private)
+    formData.append('hasThirdPlace', form.value.hasThirdPlace)
 
     await tournamentService.updateTournament(uuid, formData)
     success.value = true
@@ -275,25 +278,39 @@ const handleSave = async () => {
               <div class="grid grid-cols-1 gap-6">
                 <!-- Poster -->
                 <div class="file-box">
-                  <label class="mus-label">{{ t('tournament_form.labels.poster') }}</label>
-                  <div class="file-upload-wrapper-compact" :class="{ 'has-file': form.poster || existingPosterPath }">
-                    <input type="file" @change="onFileChange" accept="image/*" id="poster-upload" class="hidden-input">
-                    <label for="poster-upload" class="file-upload-label-compact">
-                      <i class="pi" :class="form.poster ? 'pi-check-circle' : 'pi-image'"></i>
-                      <span>{{ form.poster ? form.poster.name : (existingPosterPath ? $t('tournament_form.labels.posterChange') : $t('tournament_form.labels.posterSelect')) }}</span>
-                    </label>
+                  <div class="flex gap-2">
+                    <div class="file-upload-wrapper-compact option-card flex-1 flex align-items-center justify-content-between px-4" :class="{ active: form.poster || existingPosterPath }">
+                      <input type="file" @change="onFileChange" accept="image/*,application/pdf" id="poster-upload" class="hidden-input">
+                      <label for="poster-upload" class="file-upload-label-compact flex align-items-center justify-content-between w-full cursor-pointer">
+                        <div class="flex align-items-center gap-3">
+                          <i class="pi" :class="form.poster ? (form.poster.type === 'application/pdf' ? 'pi-file-pdf text-red-500' : 'pi-check-circle text-green-500') : (existingPosterPath ? (existingPosterPath.toLowerCase().endsWith('.pdf') ? 'pi-file-pdf text-red-500' : 'pi-image text-green-500') : 'pi-image')"></i>
+                          <span class="option-label !text-xs !m-0">{{ form.poster ? form.poster.name : (existingPosterPath ? (existingPosterPath.split('/').pop()) : $t('tournament_form.labels.poster')) }}</span>
+                        </div>
+                        <i v-if="!form.poster && !existingPosterPath" class="pi pi-plus-circle text-slate-500"></i>
+                      </label>
+                    </div>
+                    <button v-if="form.poster || existingPosterPath" type="button" @click="form.poster = null; posterPreview = null; existingPosterPath = null" class="remove-file-btn">
+                      <i class="pi pi-times"></i>
+                    </button>
                   </div>
                 </div>
 
                 <!-- Rules PDF -->
                 <div class="file-box">
-                  <label class="mus-label">{{ t('tournament_form.labels.rulesFile') }}</label>
-                  <div class="file-upload-wrapper-compact rules-pdf" :class="{ 'has-file': form.rulesFile || existingRulesPath }">
-                    <input type="file" @change="onRulesFileChange" accept="application/pdf" id="rules-upload" class="hidden-input">
-                    <label for="rules-upload" class="file-upload-label-compact">
-                      <i class="pi" :class="form.rulesFile ? 'pi-file-pdf' : 'pi-file'"></i>
-                      <span>{{ form.rulesFile ? form.rulesFile.name : (existingRulesPath ? $t('tournament_form.labels.rulesFileChange') : $t('tournament_form.labels.rulesFileSelect')) }}</span>
-                    </label>
+                  <div class="flex gap-2">
+                    <div class="file-upload-wrapper-compact option-card flex-1 flex align-items-center justify-content-between px-4" :class="{ active: form.rulesFile || existingRulesPath }">
+                      <input type="file" @change="onRulesFileChange" accept="application/pdf" id="rules-upload" class="hidden-input">
+                      <label for="rules-upload" class="file-upload-label-compact flex align-items-center justify-content-between w-full cursor-pointer">
+                        <div class="flex align-items-center gap-3">
+                          <i class="pi" :class="form.rulesFile ? 'pi-file-pdf text-red-500' : (existingRulesPath ? 'pi-file-pdf text-red-500' : 'pi-file')"></i>
+                          <span class="option-label !text-xs !m-0">{{ form.rulesFile ? form.rulesFile.name : (existingRulesPath ? (existingRulesPath.split('/').pop()) : $t('tournament_form.labels.rulesFile')) }}</span>
+                        </div>
+                        <i v-if="!form.rulesFile && !existingRulesPath" class="pi pi-plus-circle text-slate-500"></i>
+                      </label>
+                    </div>
+                    <button v-if="form.rulesFile || existingRulesPath" type="button" @click="form.rulesFile = null; existingRulesPath = null" class="remove-file-btn">
+                      <i class="pi pi-times"></i>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -338,10 +355,15 @@ const handleSave = async () => {
                <div class="flex flex-wrap gap-2 mb-4">
                   <button type="button" v-for="opt in statuses" :key="opt.value" @click="form.status = opt.value" class="status-pill" :class="{ active: form.status === opt.value }">{{ opt.label }}</button>
                </div>
-               <div @click="form.private = !form.private" class="option-card" :class="{ active: form.private }">
-                  <span class="option-label text-[10px]">{{ t('tournament_form.labels.private_desc') }}</span>
+               <div @click="form.private = !form.private" class="option-card flex align-items-center justify-content-between px-4 mb-3" :class="{ active: form.private }">
+                  <span class="option-label text-[10px]">{{ t('tournament_form.labels.private') }}</span>
+                  <i class="pi pi-question-circle text-slate-500 cursor-help ml-2" v-tooltip.top="t('tournament_form.tooltips.private')" @click.stop></i>
                </div>
-            </section>
+                <div @click="form.hasThirdPlace = !form.hasThirdPlace" class="option-card flex align-items-center justify-content-between px-4" :class="{ active: form.hasThirdPlace }">
+                  <span class="option-label text-[10px]">{{ t('tournament_form.labels.hasThirdPlace') }}</span>
+                  <i class="pi pi-question-circle text-slate-500 cursor-help ml-2" v-tooltip.top="t('tournament_form.labels.hasThirdPlace_help')" @click.stop></i>
+                </div>
+             </section>
           </div>
         </div>
 
@@ -393,6 +415,8 @@ const handleSave = async () => {
 .mus-btn-gold-small { background: var(--secondary); border: none; border-radius: 12px; padding: 12px 20px; color: black; cursor: pointer; }
 .mus-btn-secondary { background: var(--surface-hover); border: 1px solid var(--border); border-radius: 14px; padding: 14px; color: var(--text-main); font-size: 11px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 .cancel-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #64748b; border-radius: 16px; padding: 18px 32px; font-size: 12px; font-weight: 900; cursor: pointer; }
+.remove-file-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; border-radius: 12px; width: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+.remove-file-btn:hover { background: #ef4444; color: white; border-color: #ef4444; }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 .poster-preview img { width: 100%; height: 250px; object-fit: cover; border-radius: 20px; }
