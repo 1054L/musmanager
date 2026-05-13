@@ -5,7 +5,8 @@
     "save": "Gorde",
     "success": "Arrakasta",
     "error": "Errorea",
-    "delete": "Ezabatu"
+    "delete": "Ezabatu",
+    "edit": "Editatu"
   },
   "nav": {
     "features": "Ezaugarriak",
@@ -16,6 +17,7 @@
     "dashboard": "Dashboard",
     "home": "Hasiera",
     "logout": "Irten",
+    "organizer": "Antolatzailea",
     "about": "Guri Buruz",
     "howItWorks": "Nola Funtzionatzen Du?",
     "theme": "Aldatu Gaia",

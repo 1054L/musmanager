@@ -15,11 +15,14 @@ use App\Repository\ProvinceRepository;
 use App\Repository\TownRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TournamentController extends AbstractController
@@ -598,10 +601,13 @@ class TournamentController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
+    private array $affectedMatches = [];
+
     #[Route('/api/admin/match/{id}', name: 'app_match_update', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function updateMatch(int $id, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function updateMatch(int $id, Request $request, EntityManagerInterface $entityManager, HubInterface $hub, LoggerInterface $logger): JsonResponse
     {
+        $logger->info(sprintf('TournamentController: Entering updateMatch for match %d', $id));
         $match = $entityManager->getRepository(MusMatch::class)->find($id);
         if (!$match) return new JsonResponse(['error' => 'Partido no encontrado'], 404);
 
@@ -657,7 +663,7 @@ class TournamentController extends AbstractController
         $this->recalculateTournamentStats($tournament, $entityManager);
         
         // AUTOMATIC ADVANCEMENT FOR ELIMINATORY
-        $this->advanceWinnerInBracket($match, $entityManager);
+        $this->advanceWinnerInBracket($match, $entityManager, $hub);
 
         $entityManager->flush();
 
@@ -675,7 +681,41 @@ class TournamentController extends AbstractController
 
         $entityManager->flush();
 
+        $this->affectedMatches[] = $match;
+        foreach ($this->affectedMatches as $m) {
+            $this->publishMatchUpdate($m, $hub, $logger);
+        }
+
         return new JsonResponse(['success' => true]);
+    }
+
+    private function publishMatchUpdate(MusMatch $match, HubInterface $hub, LoggerInterface $logger): void
+    {
+        $tournament = $match->getTournament();
+        $topic = sprintf('tournament/%s', $tournament->getUuidAccessToken());
+        $data = json_encode([
+            'matchId' => $match->getId(),
+            'score1' => $match->getScoreTeam1(),
+            'score2' => $match->getScoreTeam2(),
+            'stage' => $match->getStage(),
+            'bracketRound' => $match->getBracketRound(),
+            'bracketPosition' => $match->getBracketPosition(),
+            'team1' => $match->getTeam1() ? $match->getTeam1()->getName() : 'TBD',
+            'team2' => $match->getTeam2() ? $match->getTeam2()->getName() : 'TBD',
+            'winnerId' => $match->getWinner() ? $match->getWinner()->getId() : null,
+            'status' => $match->getWinner() ? 'finished' : 'pending'
+        ]);
+
+        $logger->info(sprintf('Mercure debug: Publishing to topic %s', $topic));
+        $logger->info(sprintf('Mercure debug: Data: %s', $data));
+
+        try {
+            $update = new Update($topic, $data);
+            $hub->publish($update);
+            $logger->info(sprintf('Mercure debug: Successfully published to %s', $topic));
+        } catch (\Exception $e) {
+            $logger->error(sprintf('Mercure debug: FAILED to publish to %s. Error: %s', $topic, $e->getMessage()));
+        }
     }
 
     private function recalculateTournamentStats(Tournament $tournament, EntityManagerInterface $entityManager): void
@@ -800,7 +840,7 @@ class TournamentController extends AbstractController
         }, $tournaments));
     }
 
-    private function advanceWinnerInBracket(MusMatch $match, EntityManagerInterface $entityManager): void
+    private function advanceWinnerInBracket(MusMatch $match, EntityManagerInterface $entityManager, HubInterface $hub): void
     {
         $tournament = $match->getTournament();
         if ($tournament->getType() !== 'eliminatory' || !$match->getWinner() || $match->getBracketRound() <= 1) {
@@ -823,6 +863,7 @@ class TournamentController extends AbstractController
             } else {
                 $nextMatch->setTeam1($match->getWinner());
             }
+            $this->affectedMatches[] = $nextMatch;
         }
 
         // Logic for 3rd and 4th place (losers of semifinals)
@@ -841,6 +882,7 @@ class TournamentController extends AbstractController
                     } else {
                         $thirdPlaceMatch->setTeam2($loser);
                     }
+                    $this->affectedMatches[] = $thirdPlaceMatch;
                 }
             }
         }

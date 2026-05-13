@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { tournamentService } from '../services/api'
 import { useI18n } from 'vue-i18n'
+import { useMercure } from '../composables/useMercure'
 import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import ProgressBar from 'primevue/progressbar'
@@ -15,6 +16,7 @@ import MusLoader from '../components/MusLoader.vue'
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const { subscribe } = useMercure()
 const activeTab = ref('matches')
 const classification = ref({})
 const tournament = ref(null)
@@ -173,6 +175,27 @@ const fetchTournament = async () => {
 
 onMounted(() => {
   fetchTournament();
+  
+  // Subscribe to Mercure real-time updates
+  subscribe(`tournament/${uuid}`, (data) => {
+    if (data.matchId) {
+      const matchId = Number(data.matchId);
+      const match = matches.value.find(m => Number(m.id) === matchId);
+      if (match) {
+        match.scoreA = data.score1;
+        match.scoreB = data.score2;
+        match.status = data.status === 'finished' ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending');
+        
+        // Update team names for advancements
+        if (data.team1) match.teamA = data.team1;
+        if (data.team2) match.teamB = data.team2;
+      } else {
+        // If match not found locally, might be new or need full refresh
+        fetchTournament();
+      }
+    }
+  });
+
   document.addEventListener('fullscreenchange', () => {
     isFullscreen.value = !!document.fullscreenElement;
   });

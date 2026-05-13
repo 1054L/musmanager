@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { tournamentService, teamService } from '../services/api'
 import { useI18n } from 'vue-i18n'
@@ -12,10 +12,12 @@ import MusLoader from '../components/MusLoader.vue'
 import TournamentEnrollmentForm from '../components/TournamentEnrollmentForm.vue'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
+import { useMercure } from '../composables/useMercure'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const { subscribe } = useMercure()
 const toast = useToast()
 const confirm = useConfirm()
 const uuid = route.params.uuid
@@ -70,7 +72,28 @@ const fetchTournamentData = async (silent = false) => {
   }
 }
 
-onMounted(fetchTournamentData)
+onMounted(async () => {
+  await fetchTournamentData()
+  
+  // Subscribe to Mercure updates to keep all admins in sync
+  subscribe(`tournament/${uuid}`, (data) => {
+    if (data.matchId) {
+      const matchId = Number(data.matchId);
+      const match = matches.value.find(m => Number(m.id) === matchId);
+      if (match) {
+        match.scoreA = data.score1;
+        match.scoreB = data.score2;
+        
+        // Also update team names if provided (for advancements)
+        if (data.team1) match.teamA = data.team1;
+        if (data.team2) match.teamB = data.team2;
+      } else {
+        // If match not found in current list, re-fetch
+        fetchTournamentData(true);
+      }
+    }
+  });
+})
 
 const handleStatusChange = async (newStatus) => {
   if (tournament.value.status === newStatus) return

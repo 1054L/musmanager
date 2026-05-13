@@ -5,7 +5,8 @@
     "save": "Save",
     "success": "Success",
     "error": "Error",
-    "delete": "Delete"
+    "delete": "Delete",
+    "edit": "Edit"
   },
   "nav": {
     "features": "Features",

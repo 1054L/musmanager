@@ -59,6 +59,37 @@ services:
         aliases:
           - mus-web
 
+  mercure:
+    image: dunglas/mercure
+    restart: always
+    environment:
+      # SERVER_NAME must be set to :3000 as requested for NPM forward port
+      SERVER_NAME: :3000
+      MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      # Extra directives as requested
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins https://yourdomain.com
+        anonymous 1
+        subscriptions 1
+    # No ports mapping as requested, reachable only via internal network
+    networks:
+      - internal
+      - proxy
+
+# In Nginx Proxy Manager, create a Proxy Host for Mercure with:
+# - Domain: yourdomain.com (or a subdomain like mercure.yourdomain.com)
+# - Forward Hostname: mercure (Docker container name)
+# - Forward Port: 3000
+# - Enable SSL with Let's Encrypt
+# - In "Advanced" tab, add these custom Nginx directives:
+#     proxy_set_header Connection '';
+#     proxy_http_version 1.1;
+#     proxy_buffering off;
+#     proxy_cache off;
+#     proxy_read_timeout 24h;
+#     chunked_transfer_encoding on;
+
 networks:
   internal:
     driver: bridge

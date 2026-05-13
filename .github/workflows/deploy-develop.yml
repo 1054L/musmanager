@@ -1,0 +1,60 @@
+# Development deploy — triggered on push to develop
+name: Deploy to Develop
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_SERVER_HOST }}
+          username: ${{ secrets.DEV_SERVER_USER }}
+          key: ${{ secrets.DEV_SERVER_SSH_KEY }}
+          script: |
+            set -e
+            cd /var/www/mus-dev
+            
+            # 1. Pull latest changes
+            echo "Pulling latest changes from develop..."
+            git pull origin develop
+            
+            # 2. Install PHP dependencies
+            echo "Installing composer dependencies (dev)..."
+            docker compose run --rm api composer install --optimize-autoloader
+            
+            # 3. Install and build Vue frontend
+            echo "Building frontend (dev)..."
+            docker compose run --rm web npm ci
+            docker compose run --rm web npm run build
+            
+            # 4. Build and restart containers
+            echo "Restarting containers..."
+            docker compose up -d --build --remove-orphans
+            
+            # 5. Wait for api container to be ready
+            echo "Waiting for API to stabilize..."
+            sleep 5
+            
+            # 6. Run database migrations
+            echo "Running migrations..."
+            docker compose exec -T api php bin/console doctrine:migrations:migrate --no-interaction --env=dev
+            
+            # 7. Clear and warmup cache
+            echo "Clearing and warming up cache..."
+            docker compose exec -T api php bin/console cache:clear --env=dev
+            docker compose exec -T api php bin/console cache:warmup --env=dev
+
+      - name: Notify Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "🚀 Deployment to Develop SUCCEEDED"
+          else
+            echo "❌ Deployment to Develop FAILED"
+          fi

@@ -47,8 +47,25 @@ services:
     environment:
       - VITE_PORT=5173
       - VITE_API_BASE_URL=http://localhost:8002
+      - VITE_MERCURE_URL=http://localhost:8081/.well-known/mercure
     depends_on:
       - api
+
+  mercure:
+    image: dunglas/mercure
+    restart: unless-stopped
+    environment:
+      # SERVER_NAME must be set to :80 or :443 for Mercure to listen on these ports
+      SERVER_NAME: :80
+      MERCURE_PUBLISHER_JWT_KEY: "!ChangeMeMercurePublisherJWTKey!"
+      MERCURE_EXTRA_DIRECTIVES: |
+        anonymous
+        demo
+        cors_origins http://localhost:5173 http://127.0.0.1:5173 http://localhost:8002
+      # Keep CORS_ALLOWED_ORIGINS for double safety
+      CORS_ALLOWED_ORIGINS: "*"
+    ports:
+      - "8081:80"
 
 volumes:
   database_data:
