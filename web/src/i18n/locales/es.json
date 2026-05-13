@@ -260,26 +260,7 @@
     "vision_title": "Nuestra Visión a Largo Plazo",
     "vision_text": "Aspiramos a convertirnos en el estándar global de gestión para todos los deportes mentales y juegos de mesa tradicionales. Queremos crear una red interconectada donde los jugadores puedan tener un perfil único, acumular méritos en diferentes torneos y federaciones, y donde los organizadores puedan profesionalizar sus eventos sin importar su escala. La tecnología debe ser un puente, no una barrera, y Mus Manager es el primer paso hacia una comunidad de Mus global, transparente y tecnológicamente avanzada."
   },
-  "auth": {
-    "welcome": "Bienvenido de nuevo",
-    "join": "Únete a Mus Manager",
-    "loginDesc": "Accede a tu panel de control de Mus Manager",
-    "registerDesc": "Crea tu cuenta gratuita en Mus Manager",
-    "email": "Correo Electrónico",
-    "emailPlaceholder": "tu@email.com",
-    "password": "Contraseña",
-    "passwordPlaceholder": "Tu contraseña secreta",
-    "confirm": "Confirmar Contraseña",
-    "submitLogin": "Entrar ahora",
-    "noAccount": "¿No tienes cuenta?",
-    "createAccount": "Regístrate gratis",
-    "haveAccount": "¿Ya tienes cuenta?",
-    "loginHere": "Inicia sesión",
-    "passwordMismatch": "Las contraseñas no coinciden",
-    "role": "Rol de Usuario",
-    "roleUser": "Usuario",
-    "roleAdmin": "Administrador"
-  },
+
   "legal": {
     "privacy_title": "Política de Privacidad",
     "privacy_last_updated": "Última actualización: 1 de mayo de 2026",
