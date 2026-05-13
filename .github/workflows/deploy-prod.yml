@@ -9,7 +9,48 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      # 1. Obtener el código en el entorno de GitHub Actions
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Configurar Node.js y compilar Vue
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Ajusta la versión si usas otra en tu proyecto
+
+      - name: Build Vue frontend
+        working-directory: ./web
+        run: |
+          npm ci
+          npm run build
+
+      # 3. Preparar el servidor (Bajar últimos cambios de backend y configuración)
+      - name: Pull latest code on server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            cd /var/www/mus
+            echo "Pulling latest changes from main..."
+            git pull origin main
+
+      # 4. Copiar los archivos compilados de Vue (dist) al servidor
+      - name: Upload compiled frontend
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "web/dist/*"
+          target: "/var/www/mus/web/dist"
+          strip_components: 2 # Quita 'web/dist/' de la ruta para que los archivos caigan directamente en el target
+
+      # 5. Actualizar dependencias de PHP y reiniciar contenedores
+      - name: Deploy Backend & Restart Services
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -19,36 +60,23 @@ jobs:
             set -e
             cd /var/www/mus
             
-            # 1. Pull latest changes
-            echo "Pulling latest changes from main..."
-            git pull origin main
-            
-            # 2. Install PHP dependencies
             echo "Installing composer dependencies..."
             docker compose -f docker-compose.prod.yml run --rm api composer install --no-dev --optimize-autoloader
             
-            # 3. Install and build Vue frontend
-            echo "Building frontend..."
-            docker compose -f docker-compose.prod.yml run --rm web npm ci
-            docker compose -f docker-compose.prod.yml run --rm web npm run build
-            
-            # 4. Build and restart containers
             echo "Restarting containers..."
             docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
             
-            # 5. Wait for api container to be ready
             echo "Waiting for API to stabilize..."
             sleep 5
             
-            # 6. Run database migrations
             echo "Running migrations..."
             docker compose -f docker-compose.prod.yml exec -T api php bin/console doctrine:migrations:migrate --no-interaction --env=prod
             
-            # 7. Clear and warmup cache
             echo "Clearing and warming up cache..."
             docker compose -f docker-compose.prod.yml exec -T api php bin/console cache:clear --env=prod
             docker compose -f docker-compose.prod.yml exec -T api php bin/console cache:warmup --env=prod
 
+      # 6. Notificar estado final
       - name: Notify Status
         if: always()
         run: |
