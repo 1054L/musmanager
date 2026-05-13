@@ -370,8 +370,8 @@ class TournamentController extends AbstractController
                 return [
                     'id' => $match->getId(),
                     'stage' => $match->getStage(),
-                    'team1' => $match->getTeam1() ? $match->getTeam1()->getName() : 'TBD',
-                    'team2' => $match->getTeam2() ? $match->getTeam2()->getName() : 'TBD',
+                    'team1' => $match->getTeam1() ? $match->getTeam1()->getTeam()->getName() : 'TBD',
+                    'team2' => $match->getTeam2() ? $match->getTeam2()->getTeam()->getName() : 'TBD',
                     'score1' => $match->getScoreTeam1(),
                     'score2' => $match->getScoreTeam2(),
                     'bracketRound' => $match->getBracketRound(),
@@ -539,10 +539,10 @@ class TournamentController extends AbstractController
                         $teamIndex2 = $p * 2 + 1;
                         
                         if (isset($teams[$teamIndex1])) {
-                            $match->setTeam1($teams[$teamIndex1]->getTeam());
+                            $match->setTeam1($teams[$teamIndex1]);
                         }
                         if (isset($teams[$teamIndex2])) {
-                            $match->setTeam2($teams[$teamIndex2]->getTeam());
+                            $match->setTeam2($teams[$teamIndex2]);
                         }
 
                         // Handle Bye (if team2 is null, team1 wins immediately)
@@ -577,7 +577,7 @@ class TournamentController extends AbstractController
             $groups = [];
             foreach ($teams as $tt) {
                 $gn = $tt->getGroupName() ?: 'Sin Grupo';
-                $groups[$gn][] = $tt->getTeam();
+                $groups[$gn][] = $tt;
             }
 
             foreach ($groups as $groupName => $groupTeams) {
@@ -700,8 +700,8 @@ class TournamentController extends AbstractController
             'stage' => $match->getStage(),
             'bracketRound' => $match->getBracketRound(),
             'bracketPosition' => $match->getBracketPosition(),
-            'team1' => $match->getTeam1() ? $match->getTeam1()->getName() : 'TBD',
-            'team2' => $match->getTeam2() ? $match->getTeam2()->getName() : 'TBD',
+            'team1' => $match->getTeam1() ? $match->getTeam1()->getTeam()->getName() : 'TBD',
+            'team2' => $match->getTeam2() ? $match->getTeam2()->getTeam()->getName() : 'TBD',
             'winnerId' => $match->getWinner() ? $match->getWinner()->getId() : null,
             'status' => $match->getWinner() ? 'finished' : 'pending'
         ]);
@@ -741,11 +741,8 @@ class TournamentController extends AbstractController
 
             if (!$team1 || !$team2) continue;
 
-            $tt1 = null; $tt2 = null;
-            foreach ($tournament->getTournamentTeams() as $tt) {
-                if ($team1 && $tt->getTeam()->getId() === $team1->getId()) $tt1 = $tt;
-                if ($team2 && $tt->getTeam()->getId() === $team2->getId()) $tt2 = $tt;
-            }
+            $tt1 = $team1; 
+            $tt2 = $team2;
 
             if ($tt1) {
                 $tt1->setMatchesPlayed($tt1->getMatchesPlayed() + 1);

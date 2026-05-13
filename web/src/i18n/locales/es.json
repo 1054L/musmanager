@@ -629,7 +629,10 @@
       "start_btn": "EMPEZAR TORNEO",
       "initial_draw": "SORTEO INICIAL",
       "teams_label": "Parejas",
-      "system_label": "Sistema"
+      "system_label": "Sistema",
+      "draw_confirm_title": "Confirmar Sorteo",
+      "draw_confirm_msg": "¿Estás seguro de que quieres realizar el sorteo? Esto generará los emparejamientos definitivos, no se podrá deshacer y el torneo pasará a estar activo inmediatamente.",
+      "draw_confirm_btn": "Realizar Sorteo"
     },
     "matches": {
       "title": "Partidos del Torneo",

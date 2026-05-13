@@ -20,13 +20,13 @@ class MusMatch
     #[ORM\JoinColumn(nullable: false)]
     private ?Tournament $tournament = null;
 
-    #[ORM\ManyToOne(inversedBy: 'matchesAsTeam1')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Team $team1 = null;
+    private ?TournamentTeam $team1 = null;
 
-    #[ORM\ManyToOne(inversedBy: 'matchesAsTeam2')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true)]
-    private ?Team $team2 = null;
+    private ?TournamentTeam $team2 = null;
 
     #[ORM\Column]
     private ?int $scoreTeam1 = 0;
@@ -35,7 +35,7 @@ class MusMatch
     private ?int $scoreTeam2 = 0;
 
     #[ORM\ManyToOne]
-    private ?Team $winner = null;
+    private ?TournamentTeam $winner = null;
 
     #[ORM\Column(length: 100)]
     private ?string $stage = null;
@@ -101,23 +101,23 @@ class MusMatch
         return $this;
     }
 
-    public function getTeam1(): ?Team
+    public function getTeam1(): ?TournamentTeam
     {
         return $this->team1;
     }
 
-    public function setTeam1(?Team $team1): static
+    public function setTeam1(?TournamentTeam $team1): static
     {
         $this->team1 = $team1;
         return $this;
     }
 
-    public function getTeam2(): ?Team
+    public function getTeam2(): ?TournamentTeam
     {
         return $this->team2;
     }
 
-    public function setTeam2(?Team $team2): static
+    public function setTeam2(?TournamentTeam $team2): static
     {
         $this->team2 = $team2;
         return $this;
@@ -145,12 +145,12 @@ class MusMatch
         return $this;
     }
 
-    public function getWinner(): ?Team
+    public function getWinner(): ?TournamentTeam
     {
         return $this->winner;
     }
 
-    public function setWinner(?Team $winner): static
+    public function setWinner(?TournamentTeam $winner): static
     {
         $this->winner = $winner;
         return $this;

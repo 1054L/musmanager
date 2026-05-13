@@ -611,7 +611,10 @@
       "start_btn": "TXAPELKETA HASI",
       "initial_draw": "HASIERAKO ZOZKETA",
       "teams_label": "Bikoteak",
-      "system_label": "Sistema"
+      "system_label": "Sistema",
+      "draw_confirm_title": "Zozketa Berretsi",
+      "draw_confirm_msg": "Ziur zaude zozketa egin nahi duzula? Honek behin betiko parekatzeak sortuko ditu, ezin da atzera egin eta txapelketa berehala AKTIBO egongo da.",
+      "draw_confirm_btn": "Zozketa Egin"
     },
     "matches": {
       "title": "Txapelketako Partidak",

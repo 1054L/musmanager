@@ -171,20 +171,37 @@ const handleGenerateGroups = async () => {
   }
 }
 
-const handleGenerateMatches = async () => {
-  processing.value = true
-  try {
-    await tournamentService.generateMatches(uuid)
-    // Automatically switch to active phase
-    await tournamentService.updateTournament(uuid, { status: 'active' })
-    const msg = tournament.value?.type === 'eliminatory' ? 'Sorteo realizado con éxito. ¡Torneo en marcha!' : t('dashboard.matches_success')
-    toast.add({ severity: 'success', summary: t('common.success'), detail: msg, life: 3000 })
-    await fetchTournamentData(true)
-  } catch (e) {
-    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
-  } finally {
-    processing.value = false
-  }
+const handleGenerateMatches = async (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: t('tournament_admin.preparation.draw_confirm_msg'),
+    header: t('tournament_admin.preparation.draw_confirm_title'),
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+        label: t('tournament_admin.match_edit.cancel_btn'),
+        severity: 'secondary',
+        outlined: true
+    },
+    acceptProps: {
+        label: t('tournament_admin.preparation.draw_confirm_btn'),
+        severity: 'primary'
+    },
+    accept: async () => {
+      processing.value = true
+      try {
+        await tournamentService.generateMatches(uuid)
+        // Automatically switch to active phase
+        await tournamentService.updateTournament(uuid, { status: 'active' })
+        const msg = tournament.value?.type === 'eliminatory' ? 'Sorteo realizado con éxito. ¡Torneo en marcha!' : t('dashboard.matches_success')
+        toast.add({ severity: 'success', summary: t('common.success'), detail: msg, life: 3000 })
+        await fetchTournamentData(true)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+      } finally {
+        processing.value = false
+      }
+    }
+  })
 }
 
 const editGames = ref([])
@@ -536,10 +553,10 @@ const normalizeStageKey = (stage) => {
                     </div>
                   </div>
 
-                  <button @click="handleGenerateMatches" 
+                  <button @click="handleGenerateMatches($event)" 
                           :disabled="processing || enrolledTeams.length < 2" 
-                          class="mus-btn-primary px-12 py-5 text-lg">
-                    <i class="pi pi-bolt mr-3"></i>
+                          class="mus-btn-primary px-6 py-3 text-sm">
+                    <i class="pi pi-bolt mr-2 text-xs"></i>
                     {{ tournament.type === 'eliminatory' ? t('tournament_admin.preparation.initial_draw') : t('tournament_mgmt.generate_matches') }}
                   </button>
                 </div>

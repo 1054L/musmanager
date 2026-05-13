@@ -620,7 +620,10 @@
       "start_btn": "START TOURNAMENT",
       "initial_draw": "INITIAL DRAW",
       "teams_label": "Pairs",
-      "system_label": "System"
+      "system_label": "System",
+      "draw_confirm_title": "Confirm Draw",
+      "draw_confirm_msg": "Are you sure you want to perform the draw? This will generate the final matchups, it cannot be undone, and the tournament will become ACTIVE immediately.",
+      "draw_confirm_btn": "Perform Draw"
     },
     "matches": {
       "title": "Tournament Matches",
