@@ -22,8 +22,8 @@ security:
             lazy: true
             stateless: true
             provider: app_user_provider
-            http_basic:
-                realm: Secured Area
+            http_basic: ~
+            entry_point: null
 
     # Note: Only the *first* matching rule is applied
     access_control:
@@ -32,6 +32,8 @@ security:
         - { path: ^/api/admin, roles: ROLE_ADMIN }
         - { path: ^/api/tournament, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/public, roles: PUBLIC_ACCESS }
+        - { path: ^/api/location, roles: PUBLIC_ACCESS }
+        - { path: ^/api/me, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }
 
 when@test:

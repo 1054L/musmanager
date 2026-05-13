@@ -141,12 +141,9 @@ onMounted(() => {
                 <input v-model="userProfile.phone" type="tel" class="mus-input-field" :placeholder="t('profile.phonePlaceholder') || 'Móvil'">
               </div>
             </div>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6 items-center">
-            <div class="input-group md:col-span-2">
+            <div class="input-group">
               <label class="input-label">{{ t('auth.email') }}</label>
-              <div class="input-wrapper opacity-50 cursor-not-allowed">
+              <div class="input-wrapper opacity-75 cursor-not-allowed">
                 <i class="pi pi-envelope input-icon"></i>
                 <input v-model="userProfile.email" type="email" disabled class="mus-input-field" title="El correo electrónico no se puede cambiar">
               </div>

@@ -8,10 +8,13 @@ import CookieBanner from '../components/CookieBanner.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Toast from 'primevue/toast'
 
+import { useThemeStore } from '../stores/themeStore'
+
 // Global Auth Modal State
 const showAuthModal = ref(false)
 const authModalMode = ref('login')
 
+const themeStore = useThemeStore()
 const user = ref(authService.getUser())
 const isSidebarOpen = ref(true)
 
@@ -39,14 +42,14 @@ provide('logout', handleLogout)
     <ConfirmDialog />
     <CookieBanner />
     
-    <!-- Background Elements -->
-    <div class="bg-elements">
-       <div class="bg-gradient"></div>
-       <div class="bg-noise"></div>
-       <div class="bg-grid"></div>
-       <div class="bg-glow"></div>
-       <div class="bg-glow-2"></div>
-       <div class="bg-vignette"></div>
+    <!-- Fondo y Efectos Atmosféricos (Solo en Modo Oscuro) -->
+    <div v-if="themeStore.isDark" class="bg-elements">
+      <div class="bg-gradient"></div>
+      <div class="bg-noise"></div>
+      <div class="bg-vignette"></div>
+      <div class="bg-grid"></div>
+      <div class="bg-glow"></div>
+      <div class="bg-glow-2"></div>
     </div>
 
     <!-- Header / Navbar -->
@@ -143,13 +146,14 @@ provide('logout', handleLogout)
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 50% 50%, var(--bg-app) 0%, var(--bg-gradient-end) 100%);
+  opacity: var(--bg-elements-opacity, 1);
 }
 
 .bg-noise {
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.1;
+  opacity: calc(var(--bg-elements-opacity, 1) * 0.5);
   mix-blend-mode: overlay;
 }
 
@@ -157,7 +161,7 @@ provide('logout', handleLogout)
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 50% 50%, transparent 20%, var(--bg-app) 100%);
-  opacity: 0.4;
+  opacity: calc(var(--bg-elements-opacity, 1) * 0.4);
 }
 
 .bg-grid {
@@ -165,7 +169,7 @@ provide('logout', handleLogout)
   inset: 0;
   background-image: url('/grid.svg');
   background-size: 60px 60px;
-  opacity: 0.02;
+  opacity: calc(var(--bg-elements-opacity, 1) * 0.02);
 }
 
 .bg-glow {
@@ -176,7 +180,7 @@ provide('logout', handleLogout)
   height: 50%;
   background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
   filter: blur(140px);
-  opacity: 0.05;
+  opacity: calc(var(--bg-elements-opacity, 1) * 0.05);
 }
 
 .bg-glow-2 {
@@ -187,7 +191,7 @@ provide('logout', handleLogout)
   height: 60%;
   background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
   filter: blur(160px);
-  opacity: 0.03;
+  opacity: calc(var(--bg-elements-opacity, 1) * 0.03);
 }
 
 .mus-main {
@@ -373,4 +377,5 @@ provide('logout', handleLogout)
   text-transform: uppercase;
   letter-spacing: 0.2em;
 }
+
 </style>

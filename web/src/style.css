@@ -2,28 +2,43 @@
 
 :root {
   /* Mus Masters (Gold Edition) - Based on "Grand Table Mus Tournament" */
-  --bg-app: #021709; /* Championship Green (Foundation) */
+  --bg-app: #021709;
+  /* Championship Green (Foundation) */
   --bg-gradient-end: #000000;
-  --surface: #0d2415; /* Deep Baize (Containers) */
+  --surface: #0d2415;
+  /* Deep Baize (Containers) */
   --surface-hover: #182f1f;
-  --text-main: #ceead1; /* Cream/Light Green (Prestigious Text) */
+  --text-main: #ceead1;
+  /* Cream/Light Green (Prestigious Text) */
   --text-muted: #8b938a;
-  
-  --primary: #a1d2ab; /* Light green highlights */
+
+  --primary: #a1d2ab;
+  /* Light green highlights */
   --primary-hover: #bdefc6;
-  
-  --secondary: #e9c349; /* Burnished Gold (Metallic) */
+
+  --secondary: #e9c349;
+  /* Burnished Gold (Metallic) */
   --action: #e9c349;
-  --action-hover: #fcf6ba; /* High-noon gold highlight */
-  --text-on-action: #0d2415; /* Contrast for gold buttons */
-  
+  --action-hover: #fcf6ba;
+  /* High-noon gold highlight */
+  --text-on-action: #0d2415;
+  /* Contrast for gold buttons */
+
   --border-gold: 1px solid #e9c349;
   --border: rgba(233, 195, 73, 0.15);
-  
+
   --shadow-gold: 0 10px 30px rgba(233, 195, 73, 0.15);
   --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 20px 40px rgba(0, 0, 0, 0.5);
-  
+
+  --nav-surface: var(--surface);
+  --nav-surface-hover: var(--surface-hover);
+  --nav-text: var(--text-main);
+  --nav-muted: var(--text-muted);
+  --nav-border: var(--border);
+  --bg-noise-img: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  --bg-elements-opacity: 1;
+
   /* Fonts */
   --font-main: 'Inter', sans-serif;
   --font-display: 'Public Sans', 'Inter', sans-serif;
@@ -36,61 +51,107 @@
   --surface-hover: #f0f7f2;
   --text-main: #0d2415;
   --text-muted: #4a5d4f;
-  
+
   --primary: #2d6a4f;
   --primary-hover: #40916c;
-  
+
   --border: rgba(13, 36, 21, 0.1);
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 20px 40px rgba(0, 0, 0, 0.1);
+
+  --nav-surface: #0d2415;
+  --nav-surface-hover: #182f1f;
+  --nav-text: #ceead1;
+  --nav-muted: #8b938a;
+  --nav-border: rgba(233, 195, 73, 0.15);
+  --bg-noise-img: none;
+  --bg-elements-opacity: 0;
 }
 
-/* Theme-aware Utility Overrides */
-[data-theme="light"] .text-white,
-[data-theme="light"] .mus-text-white {
-  color: var(--text-main) !important;
+/* Global Light Mode Contrast Fixes */
+.light-mode .text-white,
+.light-mode .text-main,
+.light-mode .text-slate-100,
+.light-mode .text-slate-200,
+.light-mode .text-slate-300 {
+  color: #0f172a !important;
 }
 
-[data-theme="light"] .text-slate-300,
-[data-theme="light"] .text-slate-400 {
-  color: var(--text-muted) !important;
+.light-mode .text-slate-400,
+.light-mode .text-slate-500 {
+  color: #475569 !important;
 }
 
-[data-theme="light"] .text-slate-500,
-[data-theme="light"] .text-slate-600,
-[data-theme="light"] .text-slate-700 {
-  color: var(--text-main) !important;
-  opacity: 0.8;
+.light-mode .bg-white\/5,
+.light-mode .bg-white\/10,
+.light-mode .bg-white\/20,
+.light-mode .bg-black\/40 {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
 }
 
-[data-theme="light"] .bg-white\/5,
-[data-theme="light"] .bg-white\/\[0\.02\] {
-  background-color: rgba(0, 0, 0, 0.03) !important;
+.light-mode .mus-glass,
+.light-mode .mus-glass-dark {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
 }
 
-[data-theme="light"] .border-white\/5,
-[data-theme="light"] .border-white\/10 {
-  border-color: rgba(0, 0, 0, 0.05) !important;
+/* Base Body Style */
+body.light-mode {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  min-height: 100vh;
+}
+
+/* Ensure dark navigation remains legible in light mode */
+[data-theme="light"] .navbar-wrapper,
+[data-theme="light"] .mus-sidebar,
+[data-theme="light"] .mobile-menu-overlay {
+  --text-main: #ceead1 !important;
+  --text-muted: #8b938a !important;
 }
 
 /* Base Utility Classes */
-.text-main { color: var(--text-main); }
-.text-muted { color: var(--text-muted); }
-.text-secondary { color: var(--secondary); }
-.text-primary { color: var(--primary); }
-.text-surface { color: var(--surface); }
-.bg-surface { background-color: var(--surface); }
-.bg-surface-hover { background-color: var(--surface-hover); }
-.border-main { border-color: var(--border); }
+.text-main {
+  color: var(--text-main);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-secondary {
+  color: var(--secondary);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.text-surface {
+  color: var(--surface);
+}
+
+.bg-surface {
+  background-color: var(--surface);
+}
+
+.bg-surface-hover {
+  background-color: var(--surface-hover);
+}
+
+.border-main {
+  border-color: var(--border);
+}
 
 body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
   background-color: var(--bg-app);
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(26, 71, 42, 0.2) 0%, transparent 100%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-image: var(--bg-noise-img);
   background-blend-mode: overlay;
   color: var(--text-main);
   font-family: var(--font-main);
@@ -119,7 +180,8 @@ body {
 }
 
 /* Gold Ingot Button Style */
-.mus-button-primary, .mus-btn-primary {
+.mus-button-primary,
+.mus-btn-primary {
   display: inline-block;
   text-align: center;
   padding: 1rem 2.5rem;
@@ -127,7 +189,7 @@ body {
   background-size: 200% auto;
   color: var(--text-on-action) !important;
   font-weight: 700;
-  border-radius: 4px; /* Soft rounding as per design system */
+  border-radius: 4px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(233, 195, 73, 0.3);
   text-transform: uppercase;
@@ -140,17 +202,9 @@ body {
 }
 
 @keyframes shine {
-  to { background-position: 200% center; }
-}
-
-.mus-button-primary:hover, .mus-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(233, 195, 73, 0.5);
-  filter: brightness(1.1);
-}
-
-.mus-button-primary:active, .mus-btn-primary:active {
-  transform: translateY(0);
+  to {
+    background-position: 200% center;
+  }
 }
 
 .mus-gold-text {
@@ -159,164 +213,234 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 700;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
 /* Global PrimeVue Popover Overrides */
-.p-popover, 
+.p-popover,
 .p-popover-content {
   background: var(--surface) !important;
   color: var(--text-main) !important;
   border: 1px solid var(--secondary) !important;
-  border-radius: 8px !important;
 }
 
 /* Global PrimeVue Dialog Overrides */
 .p-dialog {
   background: var(--surface) !important;
   border: 2px solid var(--secondary) !important;
-  box-shadow: var(--shadow-md) !important;
-  border-radius: 12px !important;
 }
 
-.p-dialog-header {
-  background: rgba(233, 195, 73, 0.05) !important;
-  border-bottom: 1px solid var(--border) !important;
-  padding: 24px 32px !important;
-  color: var(--secondary) !important;
+/* PrimeVue Paginator Overrides */
+.p-paginator {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: none !important;
+  border-top: 1px solid var(--border) !important;
+  padding: 1.25rem !important;
+  justify-content: center !important;
+  gap: 6px !important;
 }
 
-.p-dialog-title {
-  font-family: var(--font-display) !important;
-  font-size: 1.5rem !important;
-  font-weight: 700 !important;
-  color: var(--secondary) !important;
-}
-
-/* Global PrimeVue Dropdown Overrides */
-.p-dropdown {
-  background: var(--surface-hover) !important;
+.p-paginator .p-paginator-pages .p-paginator-page {
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: var(--text-muted) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 16px !important;
-  color: var(--text-main) !important;
+  border-radius: 10px !important;
+  min-width: 2.25rem !important;
+  height: 2.25rem !important;
+  margin: 0 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  font-family: var(--font-display) !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: linear-gradient(135deg, #af8d11 0%, #e9c349 100%) !important;
+  color: #000 !important;
+  border-color: var(--secondary) !important;
+  box-shadow: 0 4px 12px rgba(233, 195, 73, 0.4) !important;
+  transform: translateY(-1px) scale(1.05) !important;
+}
+
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last {
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  min-width: 2.25rem !important;
+  height: 2.25rem !important;
+  margin: 0 !important;
   transition: all 0.3s !important;
 }
 
-.p-dropdown:not(.p-disabled).p-focus {
+.p-paginator button:not(.p-disabled):not(.p-highlight):hover {
+  background: rgba(233, 195, 73, 0.15) !important;
+  color: var(--secondary) !important;
   border-color: var(--secondary) !important;
-  box-shadow: 0 0 0 1px var(--secondary) !important;
 }
 
-.p-dropdown-label {
-  padding: 18px 24px !important;
-  color: var(--text-main) !important;
-}
-
-.p-dropdown-panel {
-  background: var(--surface) !important;
-  border: 1px solid var(--secondary) !important;
-  border-radius: 12px !important;
-  box-shadow: var(--shadow-md) !important;
-}
-
-.p-dropdown-items {
-  padding: 8px !important;
-}
-
-.p-dropdown-item {
+.p-paginator .p-paginator-current {
   color: var(--text-muted) !important;
-  border-radius: 8px !important;
-  padding: 12px 16px !important;
-  transition: 0.2s !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 1rem;
 }
 
-.p-dropdown-item.p-highlight {
+/* Fix for icons appearing white */
+.p-paginator .pi {
+  font-size: 0.75rem !important;
+}
+
+/* PrimeVue Dropdown & Select Overrides */
+.p-dropdown, .p-select {
+  background: var(--surface-hover) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  transition: all 0.3s !important;
+}
+
+.p-dropdown:not(.p-disabled).p-focus, 
+.p-select:not(.p-disabled).p-focus {
+  border-color: var(--secondary) !important;
+  box-shadow: 0 0 0 2px rgba(233, 195, 73, 0.2) !important;
+}
+
+.p-dropdown .p-dropdown-label,
+.p-select .p-select-label {
+  color: var(--text-main) !important;
+  padding: 12px 16px !important;
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+}
+
+.p-dropdown .p-dropdown-trigger,
+.p-select .p-select-trigger {
+  color: var(--secondary) !important;
+}
+
+/* Dropdown Panel (The part that opens) */
+.p-dropdown-panel, .p-select-panel {
+  background: #0d2415 !important; /* Deep Baize */
+  border: 1px solid var(--secondary) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6) !important;
+  margin-top: 8px !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+.p-select-panel .p-select-items .p-select-option {
+  margin: 4px 8px !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  color: var(--text-main) !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  transition: all 0.2s !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
+.p-select-panel .p-select-items .p-select-option:not(.p-highlight):not(.p-disabled):hover {
   background: rgba(233, 195, 73, 0.1) !important;
   color: var(--secondary) !important;
 }
 
-.p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
-  background: var(--primary-glow) !important;
-  color: var(--primary) !important;
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+.p-select-panel .p-select-items .p-select-option.p-highlight {
+  background: var(--secondary) !important;
+  color: #000 !important;
 }
 
-.p-dropdown-header {
-  background: var(--surface-hover) !important;
-  padding: 12px !important;
+/* Fix for Dropdown Filter */
+.p-dropdown-filter-container, .p-select-filter-container {
+  padding: 10px !important;
+  background: rgba(0,0,0,0.2) !important;
   border-bottom: 1px solid var(--border) !important;
 }
 
-.p-dropdown-filter {
-  background: var(--surface) !important;
+.p-dropdown-filter, .p-select-filter {
+  background: var(--surface-hover) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 8px !important;
   color: var(--text-main) !important;
-  padding: 8px 12px !important;
 }
 
-/* Global PrimeVue Paginator Overrides */
-.p-paginator {
-  background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-  border-top: none !important;
-  border-radius: 0 0 24px 24px !important;
-  padding: 1rem !important;
-  color: var(--text-muted) !important;
+/* Light Mode Overrides */
+.light-mode .p-paginator {
+  background: #f8fafc !important;
+  border-top-color: #e2e8f0 !important;
 }
 
-.p-paginator-page, 
-.p-paginator-next, 
-.p-paginator-last, 
-.p-paginator-first, 
-.p-paginator-prev {
-  background: transparent !important;
-  border: 1px solid transparent !important;
-  color: var(--text-muted) !important;
-  min-width: 36px !important;
-  height: 36px !important;
-  border-radius: 8px !important;
-  margin: 0 2px !important;
-  transition: all 0.2s !important;
+.light-mode .p-paginator .p-paginator-pages .p-paginator-page,
+.light-mode .p-paginator .p-paginator-first,
+.light-mode .p-paginator .p-paginator-prev,
+.light-mode .p-paginator .p-paginator-next,
+.light-mode .p-paginator .p-paginator-last {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #64748b !important;
 }
 
-.p-paginator-page.p-highlight {
+.light-mode .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
   background: var(--secondary) !important;
   color: #000 !important;
-  font-weight: 900 !important;
-}
-
-.p-paginator-page:not(.p-highlight):hover,
-.p-paginator-next:hover, 
-.p-paginator-last:hover, 
-.p-paginator-first:hover, 
-.p-paginator-prev:hover {
-  background: var(--surface-hover) !important;
   border-color: var(--secondary) !important;
-  color: var(--secondary) !important;
 }
 
-.p-datatable-footer {
-  background: var(--surface) !important;
-  border-top: 1px solid var(--border) !important;
+.light-mode .p-dropdown, .light-mode .p-select {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light-mode .p-dropdown .p-dropdown-label,
+.light-mode .p-select .p-select-label {
+  color: #1e293b !important;
+}
+
+.light-mode .p-dropdown-panel, .light-mode .p-select-panel {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+.light-mode .p-select-panel .p-select-items .p-select-option {
+  color: #475569 !important;
+}
+
+.light-mode .p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover,
+.light-mode .p-select-panel .p-select-items .p-select-option:not(.p-highlight):not(.p-disabled):hover {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+
+/* Native Select Options Override */
+select option {
+  background: #0d2415 !important;
   color: var(--text-main) !important;
-  padding: 1rem 2rem !important;
+  padding: 8px !important;
 }
 
-/* Ensure no default PrimeVue styles leak white backgrounds */
-.p-paginator-bottom, .p-paginator-top {
-  border-left: none !important;
-  border-right: none !important;
-  border-bottom: none !important;
+.light-mode select option {
+  background: #ffffff !important;
+  color: #1e293b !important;
 }
 
 /* Global Typography & Layout */
 .mus-container {
-  max-width: 1440px; /* As per Grand Table design */
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 32px;
 }
 
-h1, h2, h3, .logo-title, .mus-h1, .mus-h2, .mus-h3 {
+h1,
+h2,
+h3,
+.logo-title,
+.mus-h1,
+.mus-h2,
+.mus-h3 {
   font-family: var(--font-display);
   font-weight: 900;
   text-transform: uppercase;
@@ -326,21 +450,19 @@ h1, h2, h3, .logo-title, .mus-h1, .mus-h2, .mus-h3 {
   color: var(--secondary);
 }
 
-.mus-h1, h1 {
+.mus-h1,
+h1 {
   font-size: clamp(2.5rem, 8vw, 5rem);
 }
 
-.mus-h2, h2 {
+.mus-h2,
+h2 {
   font-size: clamp(1.75rem, 5vw, 3rem);
-  font-weight: 700;
-  color: var(--secondary);
 }
 
-.mus-h3, h3 {
-  font-family: var(--font-display);
+.mus-h3,
+h3 {
   font-size: clamp(1.25rem, 3vw, 1.75rem);
-  font-weight: 600;
-  color: var(--primary);
 }
 
 .mus-p {
@@ -349,59 +471,15 @@ h1, h2, h3, .logo-title, .mus-h1, .mus-h2, .mus-h3 {
   color: var(--text-main);
 }
 
-.mus-divider, .mus-gold-divider {
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #e9c349 50%, transparent);
-  margin: 48px 0;
-  position: relative;
-}
-
-.mus-divider::after, .mus-gold-divider::after {
-  content: '♦';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--bg-app);
-  padding: 0 10px;
-  color: var(--secondary);
-  font-size: 14px;
-}
-
 .mus-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-top: 4px solid var(--secondary); /* The "Gold Top-border" mentioned in design */
+  border-top: 4px solid var(--secondary);
   border-radius: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-sm);
 }
 
-.mus-card:hover {
-  border-color: var(--secondary);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-gold);
-}
-
-/* Base resets */
-a {
-  text-decoration: none;
-  color: var(--primary);
-  transition: color 0.3s;
-}
-
-a:hover {
-  color: var(--secondary);
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* Page Headers & Unified Layout */
+/* Page Headers */
 .view-container {
   padding: 1.5rem 1rem 4rem 1rem;
 }
@@ -417,10 +495,8 @@ ul {
   font-weight: 950;
   text-transform: uppercase;
   font-style: italic;
-  letter-spacing: -0.025em;
   line-height: 1;
   color: var(--secondary);
-  margin: 0;
 }
 
 .mus-subtitle {
@@ -430,5 +506,157 @@ ul {
   text-transform: uppercase;
   letter-spacing: 0.15em;
   margin-top: 12px;
-  opacity: 0.8;
+}
+
+/* --- LIGHT MODE COMPONENT OVERRIDES --- */
+/* These were moved from scoped styles to prevent global leakage side effects */
+
+/* Universal Haze Killer */
+.light-mode * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* MusLoader */
+.light-mode .mus-loader-container.full-screen {
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+.light-mode .mus-loader-container.overlay {
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+.light-mode .loading-text {
+  color: #475569 !important;
+}
+
+/* TournamentEnrollmentForm */
+.light-mode .mus-input,
+.light-mode .confirm-wrapper {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+.light-mode .mus-input:focus {
+  background: white !important;
+  border-color: var(--secondary) !important;
+}
+.light-mode .mus-btn-secondary {
+  background: white !important;
+  border-color: #e2e8f0 !important;
+  color: #64748b !important;
+}
+.light-mode .confirm-wrapper:hover {
+  background: white !important;
+  border-color: #cbd5e1 !important;
+}
+.light-mode .confirm-wrapper .text-white {
+  color: #1e293b !important;
+}
+.light-mode .confirm-wrapper.is-confirmed {
+  background: #fffbeb !important;
+  border-color: #fcd34d !important;
+}
+.light-mode .confirm-wrapper.is-confirmed .text-secondary {
+  color: #92400e !important;
+}
+
+/* TournamentAdminView */
+.light-mode .admin-page {
+  background-color: #ffffff !important;
+  min-height: 100vh;
+}
+.light-mode .stat-card-premium,
+.light-mode .match-card-premium,
+.light-mode .side-panel-premium,
+.light-mode .team-list-item,
+.light-mode .status-toggle-btn {
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+}
+.light-mode .mus-card-premium {
+  background: white !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06) !important;
+}
+.light-mode .stat-value,
+.light-mode .team-name.is-winner,
+.light-mode .team-info .name,
+.light-mode .stepper-value,
+.light-mode .game-score-field,
+.light-mode .team-score.is-winner,
+.light-mode .tournament-name-header,
+.light-mode .admin-page h1,
+.light-mode .admin-page h2,
+.light-mode .admin-page h3,
+.light-mode .admin-page h4,
+.light-mode .team-row .team-name,
+.light-mode .team-row .team-score,
+.light-mode .scoreboard-premium .text-white,
+.light-mode .match-summary-panel .text-white {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+.light-mode .mus-btn-secondary-large {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+.light-mode .mus-btn-secondary:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+.light-mode .back-btn,
+.light-mode .eye-btn {
+  background: white !important;
+  border-color: #e2e8f0 !important;
+  color: #64748b !important;
+}
+.light-mode .match-card-premium:hover {
+  background: #f8fafc !important;
+  border-color: var(--secondary) !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08) !important;
+}
+.light-mode .vs-divider .line {
+  background: #e2e8f0 !important;
+}
+.light-mode .mus-select,
+.light-mode .stepper-control,
+.light-mode .game-score-field {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+.light-mode .rules-hint {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+.light-mode .team-name {
+  color: #64748b !important;
+}
+.light-mode .team-score {
+  color: #94a3b8 !important;
+}
+.light-mode .team-score.is-winner {
+  color: #8a6d1a !important;
+}
+.light-mode .match-status-tag {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+.light-mode .match-edit-icon {
+  opacity: 0.8 !important;
+  color: #8a6d1a !important;
+}
+.light-mode .remove-btn {
+  color: #94a3b8 !important;
+}
+.light-mode .remove-btn:hover {
+  background: #fff1f2 !important;
+  color: #e11d48 !important;
+}
+.light-mode .stat-icon {
+  border-color: rgba(0,0,0,0.05) !important;
 }

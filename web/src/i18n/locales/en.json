@@ -173,6 +173,9 @@
     "poster": "Poster",
     "category": "Category",
     "status": "Status",
+    "creator_email": "Creator Email",
+    "private": "Private",
+    "public": "Public",
     "tournament": "Tournament",
     "quick_actions_title": "Master Management",
     "quick_actions": {
@@ -187,7 +190,35 @@
     "invalid_groups": "Invalid number of groups",
     "groups_success": "Groups generated successfully",
     "matches_success": "Matches generated successfully",
-    "enroll_success": "Team enrolled successfully"
+    "enroll_success": "Team enrolled successfully",
+    "master_advice": "MASTER ADVICE",
+    "sections": {
+      "active_tournaments": "Active Tournaments",
+      "mus_statistics": "Master Statistics",
+      "pending_tasks": "Pending Tasks"
+    },
+    "stats_summary": {
+      "total_created": "Tournaments Created",
+      "active": "Active Tournaments",
+      "finished": "Finished Tournaments",
+      "platform_teams": "Platform Teams"
+    },
+    "active_detail": {
+      "progress": "Tournament Progress",
+      "open_spots": "{count} open spots",
+      "admin_view": "ADMIN"
+    },
+    "mus_stats": {
+      "best_streak": "Best Winning Streak",
+      "most_participatory": "Most Participatory Team",
+      "wins": "wins",
+      "tournaments": "tournaments"
+    },
+    "tasks": {
+      "draft": "Tournament in draft",
+      "late_matches": "Pending results (+3 days)",
+      "unconfirmed": "Teams to confirm"
+    }
   },
   "footer": {
     "desc": "The leading tournament management platform for the competitive Mus community. Precision, elegance, and passion.",
@@ -339,6 +370,7 @@
     "coming_soon": "Coming Soon",
     "players_count": "{count} Players",
     "pairs_count": "{count} Pairs",
+    "owner": "Organizer",
     "filters": {
       "all": "All",
       "active": "Active",
@@ -355,7 +387,9 @@
       "identity": "Tournament Identity",
       "location": "Geographic Location",
       "schedule": "Schedule",
-      "docs": "Documentation"
+      "docs": "Documentation",
+      "rules": "Rules & System",
+      "status": "Status & Privacy"
     },
     "labels": {
       "name": "Tournament Name",
@@ -381,6 +415,7 @@
       "newPoster": "New image:",
       "currentPoster": "Current poster:",
       "ruleKings": "Kings",
+      "ruleKing": "Kings",
       "rulePoints": "Points",
       "ruleGames": "Sets",
       "tablesCount": "Number of Tables",
@@ -495,6 +530,7 @@
     },
     "draft_mode": "DRAFT MODE",
     "knockout": {
+      "t64": "Round of 64",
       "t32": "Round of 32",
       "t16": "Round of 16",
       "t8": "Quarter-finals",
@@ -507,7 +543,7 @@
   "team_form": {
     "title": "New Pair",
     "name": "Pair Name",
-    "name_placeholder": "E.g.: The Invincibles",
+    "name_placeholder": "E.g.: John & Jane",
     "tournament": "Tournament",
     "submit": "Create and Enroll Pair",
     "success_msg": "Pair created and enrolled successfully! You can add another.",
@@ -546,6 +582,67 @@
     "step5": {
       "title": "History and Statistics",
       "desc": "When the tournament ends, the data is not lost. Mus Manager keeps a detailed history of all matches played, allowing you to consult who is the historical champion of your club or how many times a particular pair has won. Data is your community's legacy."
+    }
+  },
+  "tournament_admin": {
+    "panel_title": "Management Panel",
+    "back_tooltip": "Back to My Tournaments",
+    "enrollment": {
+      "title": "Pair Registration",
+      "add_btn": "REGISTER NEW PAIR",
+      "list_title": "Registered Pairs",
+      "empty": "No pairs registered yet",
+      "confirmed_tooltip": "Confirmed / Paid",
+      "delete_success": "Pair removed successfully",
+      "add_success": "Pair registered successfully",
+      "delete_confirm_title": "Confirm Removal",
+      "delete_confirm_msg": "Are you sure you want to unregister this pair? This action cannot be undone.",
+      "dialog_title": "Enroll Pair",
+      "delete_btn": "Remove"
+    },
+    "groups": {
+      "config_title": "Group Configuration",
+      "count_label": "Number of Groups",
+      "generate_btn": "DISTRIBUTE INTO GROUPS"
+    },
+    "status": {
+      "title": "Tournament Phase",
+      "update_success": "Phase updated successfully"
+    },
+    "preparation": {
+      "title": "Preparation Mode",
+      "ready_desc": "Everything is ready. Press the button below to perform the draw and officially start the tournament.",
+      "not_ready_desc": "Register at least 2 pairs to be able to perform the draw.",
+      "start_btn": "START TOURNAMENT",
+      "initial_draw": "INITIAL DRAW",
+      "teams_label": "Pairs",
+      "system_label": "System"
+    },
+    "matches": {
+      "title": "Tournament Matches",
+      "no_matchups": "No match-ups yet",
+      "error_desc": "Generate matches to start recording results",
+      "tbd": "TBD",
+      "order_asc": "FINALS AT BOTTOM",
+      "order_desc": "FINALS AT TOP"
+    },
+    "match_edit": {
+      "title": "Result Management",
+      "panel_title": "Control Panel",
+      "score_games": "SETS SCORE",
+      "regulation": "REGULATION",
+      "best_of": "Best of {total} (win {needed}) to {points}",
+      "save_btn": "SAVE",
+      "saving_btn": "SAVING...",
+      "cancel_btn": "CANCEL",
+      "games_breakdown": "Sets Breakdown",
+      "points_per_game": "{points} points/set",
+      "game_label": "Set",
+      "win_tooltip": "Win"
+    },
+    "stats": {
+      "confirmed": "Confirmed",
+      "finished": "Finished"
     }
   }
 }

@@ -30,6 +30,8 @@ const enrollmentTeamId = ref(null)
 const groupsCount = ref(2)
 const processing = ref(false)
 const showEnrollmentDialog = ref(false)
+const matchesOrder = ref('asc')
+const collapsedStages = ref({})
 
 // Match editing state
 const editingMatch = ref(null)
@@ -48,7 +50,7 @@ const fetchTournamentData = async (silent = false) => {
     if (data.matches) {
       matches.value = data.matches.map(m => ({
         id: m.id,
-        status: m.score1 > 0 || m.score2 > 0 ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending'),
+        status: m.score1 > 0 || m.score2 > 0 ? 'finished' : 'pending',
         teamA: m.team1,
         scoreA: m.score1,
         teamB: m.team2,
@@ -74,7 +76,7 @@ const handleStatusChange = async (newStatus) => {
   processing.value = true
   try {
     await tournamentService.updateTournament(uuid, { status: newStatus })
-    toast.add({ severity: 'success', summary: t('common.success'), detail: 'Fase actualizada', life: 3000 })
+    toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_admin.status.update_success'), life: 3000 })
     await fetchTournamentData()
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
@@ -89,7 +91,7 @@ const onEnrollmentSuccess = (newTeam) => {
     enrolledTeams.value.push(newTeam)
     if (tournament.value) tournament.value.teamsCount++
   }
-  toast.add({ severity: 'success', summary: t('common.success'), detail: 'Pareja inscrita correctamente', life: 3000 })
+  toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_admin.enrollment.add_success'), life: 3000 })
 }
 
 const handleToggleConfirm = async (registrationId) => {
@@ -107,16 +109,16 @@ const handleToggleConfirm = async (registrationId) => {
 const handleRemoveTeam = async (event, registrationId) => {
   confirm.require({
     target: event.currentTarget,
-    message: '¿Estás seguro de que quieres desapuntar a esta pareja? Esta acción no se puede deshacer.',
-    header: 'Confirmar Eliminación',
+    message: t('tournament_admin.enrollment.delete_confirm_msg'),
+    header: t('tournament_admin.enrollment.delete_confirm_title'),
     icon: 'pi pi-exclamation-triangle',
     rejectProps: {
-        label: 'Cancelar',
+        label: t('tournament_admin.match_edit.cancel_btn'),
         severity: 'secondary',
         outlined: true
     },
     acceptProps: {
-        label: 'Eliminar',
+        label: t('tournament_admin.enrollment.delete_btn') || 'Eliminar',
         severity: 'danger'
     },
     accept: async () => {
@@ -124,7 +126,7 @@ const handleRemoveTeam = async (event, registrationId) => {
         await tournamentService.unenrollTeam(registrationId)
         enrolledTeams.value = enrolledTeams.value.filter(tt => tt.id !== registrationId)
         if (tournament.value) tournament.value.teamsCount--
-        toast.add({ severity: 'success', summary: t('common.success'), detail: 'Pareja eliminada correctamente', life: 3000 })
+        toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_admin.enrollment.delete_success'), life: 3000 })
       } catch (e) {
         toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
       }
@@ -151,7 +153,7 @@ const handleGenerateMatches = async () => {
     await tournamentService.generateMatches(uuid)
     // Automatically switch to active phase
     await tournamentService.updateTournament(uuid, { status: 'active' })
-    const msg = tournament.value.type === 'eliminatory' ? 'Sorteo realizado con éxito. ¡Torneo en marcha!' : t('dashboard.matches_success')
+    const msg = tournament.value?.type === 'eliminatory' ? 'Sorteo realizado con éxito. ¡Torneo en marcha!' : t('dashboard.matches_success')
     toast.add({ severity: 'success', summary: t('common.success'), detail: msg, life: 3000 })
     await fetchTournamentData(true)
   } catch (e) {
@@ -174,7 +176,7 @@ const calculatedScore2 = computed(() => {
 const openEditModal = (match) => {
   editingMatch.value = match
   
-  const toWin = tournament.value.ruleGames || 3
+  const toWin = tournament.value?.ruleGames || 3
   const maxPossibleGames = (toWin * 2) - 1
   const currentGames = match.games || []
   
@@ -230,7 +232,7 @@ const saveMatchResult = async () => {
     if (match) {
       match.scoreA = calculatedScore1.value
       match.scoreB = calculatedScore2.value
-      match.status = (calculatedScore1.value > 0 || calculatedScore2.value > 0) ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending')
+      match.status = (calculatedScore1.value > 0 || calculatedScore2.value > 0) ? 'finished' : 'pending'
       match.games = [...editGames.value]
     }
 
@@ -238,7 +240,7 @@ const saveMatchResult = async () => {
     toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_view.match_edit.save_success'), life: 3000 })
     
     // Silent check for tournament finish
-    const allFinished = matches.value.every(m => m.status === t('tournament_view.match_status.finished'))
+    const allFinished = matches.value.every(m => m.status === 'finished')
     if (allFinished && tournament.value.status === 'active') {
        tournament.value.status = 'finished'
     }
@@ -253,30 +255,35 @@ const stats = computed(() => {
   if (!tournament.value) return []
   const confirmedCount = enrolledTeams.value.filter(tt => tt.isConfirmed).length
   return [
-    { label: t('tournament_view.tabs.teams'), value: tournament.value.teamsCount || 0, icon: 'pi-users', color: '#e9c349' },
-    { label: 'Confirmadas', value: confirmedCount, icon: 'pi-verified', color: '#10b981' },
+    { label: t('tournament_view.tabs.teams'), value: tournament.value?.teamsCount || 0, icon: 'pi-users', color: '#e9c349' },
+    { label: t('tournament_admin.stats.confirmed'), value: confirmedCount, icon: 'pi-verified', color: '#10b981' },
     { label: t('tournament_view.tabs.matches'), value: matches.value.length, icon: 'pi-calendar', color: '#f4d125' },
-    { label: 'Finalizados', value: matches.value.filter(m => m.status === t('tournament_view.match_status.finished')).length, icon: 'pi-check-circle', color: '#3b82f6' }
+    { label: t('tournament_admin.stats.finished'), value: matches.value.filter(m => m.status === 'finished').length, icon: 'pi-check-circle', color: '#3b82f6' }
   ]
 })
 
 const groupedMatches = computed(() => {
-  const acc = {}
-  
-  // Sort matches by bracketRound descending and bracketPosition ascending
-  const sortedMatches = [...matches.value].sort((a, b) => {
-    if (a.bracketRound !== b.bracketRound) return b.bracketRound - a.bracketRound;
-    return a.bracketPosition - b.bracketPosition;
-  });
-
-  sortedMatches.forEach(match => {
-    const stage = match.stage || t('tournament_view.rounds.general')
-    if (!acc[stage]) acc[stage] = []
-    acc[stage].push(match)
+  const groups = {}
+  matches.value.forEach(match => {
+    const stage = normalizeStageKey(match.stage)
+    if (!groups[stage]) groups[stage] = []
+    groups[stage].push(match)
   })
   
-  return Object.entries(acc)
+  let entries = Object.entries(groups)
+  if (matchesOrder.value === 'desc') {
+    entries.reverse()
+  }
+  return entries
 })
+
+const toggleStage = (stage) => {
+  collapsedStages.value[stage] = !collapsedStages.value[stage]
+}
+
+const toggleMatchesOrder = () => {
+  matchesOrder.value = matchesOrder.value === 'asc' ? 'desc' : 'asc'
+}
 
 const statusOptions = [
   { value: 'draft', label: t('tournament_form.statuses.draft'), icon: 'pi-pencil', color: '#94a3b8' },
@@ -284,6 +291,36 @@ const statusOptions = [
   { value: 'active', label: t('tournament_form.statuses.active'), icon: 'pi-play', color: '#10b981' },
   { value: 'finished', label: t('tournament_form.statuses.finished'), icon: 'pi-flag-fill', color: '#e9c349' }
 ]
+
+const goToPublicView = () => {
+  window.open(`/tournament/${uuid}`, '_blank');
+}
+
+const normalizeStageKey = (stage) => {
+  if (!stage) return 'general'
+  const s = stage.toLowerCase().trim()
+  
+  // Check for 64 (Round of 64 / Treintadosavos)
+  if (s.includes('treintadosavos') || s.includes('treintaidosavos') || s.includes('trintadosavos') || s.includes('64') || s.includes('hirurogei')) return 't64'
+  
+  // Check for 32 (Round of 32 / Dieciseisavos)
+  if (s.includes('dieciseisavos') || s.includes('32') || s.includes('hamasei')) return 't32'
+  
+  // Check for 16 (Round of 16 / Octavos)
+  if (s.includes('octavos') || s.includes('16') || s.includes('zortzi')) return 't16'
+  
+  // Check for 8 (Quarter-finals / Cuartos)
+  if (s.includes('cuartos') || s.includes('quarter') || s.includes('8') || s.includes('laurden')) return 't8'
+  
+  // Check for 4 (Semi-finals)
+  if (s.includes('semi') || s.includes('4') || s.includes('erdi')) return 't4'
+  
+  // Final only if it's exactly "final" or common standalone terms
+  if (s === 'final' || s === 'finala' || s === 'la final' || s === 'gran final') return 'final'
+  
+  // Fallback for slugs or unknown stages
+  return stage.toLowerCase().replace(/\s+/g, '_')
+}
 </script>
 
 <template>
@@ -308,12 +345,12 @@ const statusOptions = [
       <header class="admin-header mb-12">
         <div class="flex flex-column lg:flex-row justify-content-between align-items-center gap-12">
           <div class="flex align-items-center gap-10 mr-4">
-            <button @click="router.push('/my-tournaments')" class="back-btn" v-tooltip.right="'Volver a Mis Torneos'">
+            <button @click="router.push('/my-tournaments')" class="back-btn" v-tooltip.right="t('tournament_admin.back_tooltip')">
               <i class="pi pi-chevron-left"></i>
             </button>
             <div class="flex flex-column gap-2">
               <div class="flex align-items-center gap-2">
-                <span class="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em]">Panel de Gestión</span>
+                <span class="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em]">{{ t('tournament_admin.panel_title') }}</span>
                 <span class="h-1 w-1 rounded-full bg-slate-700"></span>
                 <span class="text-secondary text-[9px] font-black uppercase tracking-[0.2em] italic">{{ t('tournament_form.types.' + tournament.type) }}</span>
               </div>
@@ -330,8 +367,8 @@ const statusOptions = [
           </div>
           
           <div class="flex gap-4">
-            <button @click="router.push(`/tournament/${uuid}`)" class="mus-btn-secondary px-8 py-4">
-              <i class="pi pi-eye mr-2"></i> {{ t('tournament_view.public_view') || 'Vista Pública' }}
+            <button @click="goToPublicView" class="eye-btn" v-tooltip.left="t('tournament_view.public_view') || 'Vista Pública'">
+              <i class="pi pi-eye"></i>
             </button>
           </div>
         </div>
@@ -358,11 +395,11 @@ const statusOptions = [
         <div v-if="['draft', 'pending'].includes(tournament.status)" class="col-12 lg:col-5 space-y-8">
           <!-- Enrollment Panel -->
           <section v-if="['draft', 'pending'].includes(tournament.status)" class="side-panel-premium">
-            <h3 class="panel-title"><i class="pi pi-user-plus"></i> Inscripción de Parejas</h3>
+            <h3 class="panel-title"><i class="pi pi-user-plus"></i> {{ t('tournament_admin.enrollment.title') }}</h3>
             <div class="p-6">
               <button @click="showEnrollmentDialog = true" class="mus-btn-primary-large w-full">
                 <i class="pi pi-plus"></i>
-                <span>INSCRIBIR NUEVA PAREJA</span>
+                <span>{{ t('tournament_admin.enrollment.add_btn') }}</span>
               </button>
             </div>
           </section>
@@ -370,24 +407,24 @@ const statusOptions = [
           <!-- Enrolled Teams List -->
           <section v-if="['draft', 'pending'].includes(tournament.status)" class="side-panel-premium">
             <div class="panel-title flex align-items-center justify-content-between">
-              <span><i class="pi pi-users"></i> Parejas Inscritas</span>
+              <span><i class="pi pi-users"></i> {{ t('tournament_admin.enrollment.list_title') }}</span>
               <span class="text-xs opacity-40 font-black">{{ enrolledTeams.length }}</span>
             </div>
             <div class="p-4">
               <div v-if="enrolledTeams.length === 0" class="text-center py-10 opacity-30">
                 <i class="pi pi-info-circle text-2xl mb-2"></i>
-                <p class="text-[9px] font-black uppercase tracking-widest">No hay parejas todavía</p>
+                <p class="text-[9px] font-black uppercase tracking-widest">{{ t('tournament_admin.enrollment.empty') }}</p>
               </div>
               <div v-else class="teams-list-scroll custom-scrollbar">
                 <div v-for="tt in enrolledTeams" :key="tt.id" class="team-list-item flex align-items-center justify-content-between">
                   <div class="flex align-items-center gap-3">
-                    <Checkbox :modelValue="tt.isConfirmed" :binary="true" @change="handleToggleConfirm(tt.id)" v-tooltip.top="'Confirmado / Pagado'" />
+                    <Checkbox :modelValue="tt.isConfirmed" :binary="true" @change="handleToggleConfirm(tt.id)" v-tooltip.top="t('tournament_admin.enrollment.confirmed_tooltip')" />
                     <div class="team-info">
                       <span class="name" :class="{ 'opacity-50': !tt.isConfirmed }">{{ tt.team?.name }}</span>
                       <span class="group-tag" v-if="tt.groupName">{{ tt.groupName }}</span>
                     </div>
                   </div>
-                  <button v-if="['draft', 'pending'].includes(tournament.status)" @click="handleRemoveTeam($event, tt.id)" class="remove-btn" v-tooltip.left="'Eliminar'">
+                  <button v-if="['draft', 'pending'].includes(tournament.status)" @click="handleRemoveTeam($event, tt.id)" class="remove-btn" v-tooltip.left="t('tournament_admin.enrollment.delete_btn') || 'Eliminar'">
                     <i class="pi pi-times"></i>
                   </button>
                 </div>
@@ -397,11 +434,11 @@ const statusOptions = [
 
           <!-- Logistics Panel -->
           <section v-if="tournament.type === 'groups' && ['draft', 'pending'].includes(tournament.status)" class="side-panel-premium">
-            <h3 class="panel-title"><i class="pi pi-sitemap"></i> Configuración de Grupos</h3>
+            <h3 class="panel-title"><i class="pi pi-sitemap"></i> {{ t('tournament_admin.groups.config_title') }}</h3>
             <div class="p-6">
               <div class="flex flex-column gap-6">
                 <div class="flex align-items-center justify-content-between">
-                  <label class="text-[10px] font-black uppercase text-slate-500">Número de Grupos</label>
+                  <label class="text-[10px] font-black uppercase text-slate-500">{{ t('tournament_admin.groups.count_label') }}</label>
                   <div class="stepper-control">
                     <button @click="groupsCount = Math.max(2, groupsCount - 1)" class="stepper-action"><i class="pi pi-minus"></i></button>
                     <span class="stepper-value">{{ groupsCount }}</span>
@@ -409,7 +446,7 @@ const statusOptions = [
                   </div>
                 </div>
                 <button @click="handleGenerateGroups" :disabled="processing || enrolledTeams.length < 2" class="mus-btn-secondary-large w-full">
-                  <i class="pi pi-sync mr-2"></i> REPARTIR EN GRUPOS
+                  <i class="pi pi-sync mr-2"></i> {{ t('tournament_admin.groups.generate_btn') }}
                 </button>
               </div>
             </div>
@@ -420,7 +457,7 @@ const statusOptions = [
         <div :class="['draft', 'pending'].includes(tournament.status) ? 'col-12 lg:col-7' : 'col-12'" class="space-y-8">
           <!-- Phase / Status Control (Only in Preparation) -->
           <section v-if="['draft', 'pending'].includes(tournament.status)" class="side-panel-premium">
-            <h3 class="panel-title"><i class="pi pi-step-forward"></i> Fase del Torneo</h3>
+            <h3 class="panel-title"><i class="pi pi-step-forward"></i> {{ t('tournament_admin.status.title') }}</h3>
             <div class="p-6">
               <div class="grid">
                 <div v-for="option in statusOptions" :key="option.value" class="col-3">
@@ -445,20 +482,20 @@ const statusOptions = [
                 <div class="section-icon mx-auto mb-6 w-20 h-20 bg-secondary/10 flex items-center justify-center rounded-full border border-secondary/20">
                   <i class="pi pi-cog text-3xl text-secondary animate-spin-slow"></i>
                 </div>
-                <h2 class="text-3xl font-black text-main italic uppercase tracking-tighter mb-4">Modo Preparación</h2>
+                <h2 class="text-3xl font-black text-main italic uppercase tracking-tighter mb-4">{{ t('tournament_admin.preparation.title') }}</h2>
                 <p class="text-slate-500 font-bold text-xs uppercase tracking-widest max-w-md mx-auto mb-10 leading-relaxed">
-                  {{ enrolledTeams.length < 2 ? 'Inscribe al menos a 2 parejas para poder realizar el sorteo.' : 'Todo listo. Pulsa el botón inferior para realizar el sorteo y comenzar el torneo oficialmente.' }}
+                  {{ enrolledTeams.length < 2 ? t('tournament_admin.preparation.not_ready_desc') : t('tournament_admin.preparation.ready_desc') }}
                 </p>
                 
                 <div class="flex flex-column items-center gap-6">
                   <div class="flex align-items-center gap-10 bg-black/40 p-6 rounded-2xl border border-white/5">
                     <div class="text-center">
-                      <span class="block text-[9px] font-black text-slate-600 uppercase mb-1">Parejas</span>
+                      <span class="block text-[9px] font-black text-slate-600 uppercase mb-1">{{ t('tournament_admin.preparation.teams_label') }}</span>
                       <span class="text-2xl font-black italic text-white">{{ enrolledTeams.length }}</span>
                     </div>
                     <div class="h-8 w-px bg-white/10"></div>
                     <div class="text-center">
-                      <span class="block text-[9px] font-black text-slate-600 uppercase mb-1">Sistema</span>
+                      <span class="block text-[9px] font-black text-slate-600 uppercase mb-1">{{ t('tournament_admin.preparation.system_label') }}</span>
                       <span class="text-2xl font-black italic text-secondary">{{ t('tournament_form.types.' + tournament.type) }}</span>
                     </div>
                   </div>
@@ -467,38 +504,45 @@ const statusOptions = [
                           :disabled="processing || enrolledTeams.length < 2" 
                           class="mus-btn-primary px-12 py-5 text-lg">
                     <i class="pi pi-bolt mr-3"></i>
-                    {{ tournament.type === 'eliminatory' ? 'SORTEO INICIAL' : t('tournament_mgmt.generate_matches') }}
+                    {{ tournament.type === 'eliminatory' ? t('tournament_admin.preparation.initial_draw') : t('tournament_mgmt.generate_matches') }}
                   </button>
                 </div>
               </div>
             </section>
 
             <!-- ACTIVE MODE (Active/Finished) -->
-            <section v-else class="admin-section">
-              <div class="section-header-premium mb-8">
-                <div class="flex align-items-center gap-4">
-                  <div class="section-icon"><i class="pi pi-bolt"></i></div>
-                  <h2 class="m-0 uppercase italic font-black text-2xl tracking-tight text-main">Control de Resultados</h2>
-                </div>
-              </div>
+            <section v-else class="active-tournament-view">
+               <div class="flex align-items-center justify-content-between mb-8 px-2">
+                  <h3 class="m-0 text-main font-black uppercase italic tracking-tighter text-2xl">
+                     <i class="pi pi-calendar mr-3 text-secondary"></i>
+                     {{ t('tournament_view.tabs.matches') }}
+                  </h3>
+                  <button @click="toggleMatchesOrder" class="mus-btn-secondary px-4 py-2 text-[9px] gap-2">
+                     <i :class="matchesOrder === 'asc' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'"></i>
+                     {{ matchesOrder === 'asc' ? t('tournament_admin.matches.order_asc') : t('tournament_admin.matches.order_desc') }}
+                  </button>
+               </div>
 
-              <div v-if="matches.length === 0" class="empty-state-card p-12 text-center rounded-3xl border-dashed border-white/10 mb-10">
-                <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
-                  <i class="pi pi-calendar-times text-4xl text-slate-700"></i>
-                </div>
-                <h3 class="text-main font-black uppercase italic mb-2">No hay enfrentamientos</h3>
-                <p class="text-slate-500 font-bold text-xs uppercase tracking-widest mb-8">Algo ha ido mal. Intenta generar el calendario de nuevo.</p>
-              </div>
+               <div v-if="matches.length === 0" class="text-center py-20 opacity-30">
+                 <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
+                   <i class="pi pi-calendar-times text-4xl text-slate-700"></i>
+                 </div>
+                 <h3 class="text-main font-black uppercase italic mb-2">{{ t('tournament_admin.matches.no_matchups') }}</h3>
+                 <p class="text-slate-500 font-bold text-xs uppercase tracking-widest mb-8">{{ t('tournament_admin.matches.error_desc') }}</p>
+               </div>
 
-              <div v-else class="space-y-12">
+               <div v-else class="space-y-12">
                 <div v-for="([stage, stageMatches]) in groupedMatches" :key="stage" class="stage-group">
-                  <div class="stage-header flex align-items-center gap-4 mb-6">
-                    <span class="stage-dot"></span>
-                    <h4 class="m-0 text-secondary font-black italic uppercase tracking-[0.25em] text-sm">{{ stage }}</h4>
+                  <div class="stage-header flex align-items-center gap-4 mb-6 cursor-pointer hover:opacity-80 transition-all" @click="toggleStage(stage)">
+                    <span class="stage-dot" :class="{ 'is-collapsed': collapsedStages[stage] }"></span>
+                    <h4 class="m-0 text-secondary font-black italic uppercase tracking-[0.25em] text-sm">
+                      {{ t('tournament_view.knockout.' + stage) || t('tournament_view.rounds.' + stage) || stage }}
+                    </h4>
                     <div class="h-px flex-1 bg-gradient-to-r from-secondary/20 to-transparent"></div>
+                    <i class="pi text-xs text-slate-500" :class="collapsedStages[stage] ? 'pi-chevron-down' : 'pi-chevron-up'"></i>
                   </div>
                   
-                    <div class="grid">
+                    <div v-show="!collapsedStages[stage]" class="grid">
                       <div v-for="match in stageMatches" :key="match.id" 
                            @click="openEditModal(match)"
                            class="col-12 md:col-6 lg:col-3">
@@ -507,36 +551,38 @@ const statusOptions = [
                       <div class="relative z-10">
                         <div class="flex justify-content-between align-items-center mb-4">
                           <div class="flex flex-column gap-1">
-                            <span class="text-[8px] font-black text-secondary uppercase tracking-[0.2em]">{{ match.stage }}</span>
-                            <span class="match-status-tag" :class="{ 'is-finished': match.status === t('tournament_view.match_status.finished') }">
-                              {{ match.status }}
-                            </span>
+                            <span class="text-[8px] font-black text-secondary uppercase tracking-[0.2em]">
+                               {{ t('tournament_view.knockout.' + normalizeStageKey(match.stage)) || t('tournament_view.rounds.' + normalizeStageKey(match.stage)) || match.stage }}
+                             </span>
+                             <span class="match-status-tag" :class="{ 'is-finished': match.status === 'finished' }">
+                               {{ t('tournament_view.match_status.' + match.status) }}
+                             </span>
                           </div>
                           <div class="match-edit-icon"><i class="pi pi-pencil"></i></div>
                         </div>
                         <div class="team-row">
-                          <span class="team-name" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.teamA || 'POR DECIDIR' }}</span>
+                          <span class="team-name" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.teamA || t('tournament_admin.matches.tbd') }}</span>
                           <span class="team-score" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.scoreA }}</span>
                         </div>
                         <div class="team-row mt-2">
-                          <span class="team-name" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.teamB || 'POR DECIDIR' }}</span>
+                          <span class="team-name" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.teamB || t('tournament_admin.matches.tbd') }}</span>
                           <span class="text-slate-700 font-black italic text-xl" v-if="match.scoreA === 0 && match.scoreB === 0 && !match.teamA && !match.teamB">VS</span>
                           <span v-else class="team-score" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.scoreB }}</span>
                         </div>
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
     </div>
-    </template>
+  </div>
+</template>
 
     <!-- Score Edit Dialog (Redesigned for Games - Side by Side - Ultra Wide - Fixed) -->
-    <Dialog v-model:visible="editingMatch" modal :header="'Gestión de Resultado'" :style="{ width: '1000px' }" :dismissableMask="true" class="mus-dialog-premium no-scroll">
+    <Dialog v-model:visible="editingMatch" modal :header="t('tournament_admin.match_edit.title')" :style="{ width: '1000px' }" :dismissableMask="true" class="mus-dialog-premium no-scroll">
       <div v-if="editingMatch" class="p-0 overflow-hidden">
         <div class="grid grid-nogutter">
           <!-- LEFT COLUMN: INFO & SUMMARY (Horizontal alignment - Optimized) -->
@@ -544,28 +590,27 @@ const statusOptions = [
             <div class="flex flex-column h-full">
               <div class="flex align-items-center gap-3 mb-6">
                 <div class="h-1 w-6 bg-secondary rounded-full"></div>
-                <span class="text-[9px] font-black text-secondary uppercase tracking-[0.4em]">Panel de Control</span>
+                <span class="text-[9px] font-black text-secondary uppercase tracking-[0.4em]">{{ t('tournament_admin.match_edit.panel_title') }}</span>
               </div>
 
               <!-- Teams Scoreboard Style -->
               <div class="scoreboard-premium">
-                 <div class="flex justify-content-between align-items-center gap-4 mb-6">
+                  <div class="flex justify-content-between align-items-center gap-4 mb-6">
                     <div class="flex-1 min-w-0">
-                      <span class="text-[9px] font-black text-secondary/60 uppercase tracking-[0.3em] block mb-1">LOCAL</span>
+                      <span class="text-[9px] font-black text-secondary/60 uppercase tracking-[0.3em] block mb-1">{{ t('tournament_view.match_edit.local') }}</span>
                       <div class="text-xl font-black text-white italic truncate" v-tooltip.bottom="editingMatch.teamA">{{ editingMatch.teamA }}</div>
                     </div>
                     <div class="flex-shrink-0 px-2">
                       <span class="text-xl font-black italic text-white/10">VS</span>
                     </div>
                     <div class="flex-1 min-w-0 text-right">
-                      <span class="text-[9px] font-black text-secondary/60 uppercase tracking-[0.3em] block mb-1">VISITANTE</span>
+                      <span class="text-[9px] font-black text-secondary/60 uppercase tracking-[0.3em] block mb-1">{{ t('tournament_view.match_edit.visitor') }}</span>
                       <div class="text-xl font-black text-white italic truncate" v-tooltip.bottom="editingMatch.teamB">{{ editingMatch.teamB }}</div>
                     </div>
                  </div>
-
                  <div class="match-summary-panel p-6 bg-secondary/10 border border-secondary/20 rounded-[32px] text-center shadow-2xl relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-20"></div>
-                    <span class="text-[9px] font-black text-secondary uppercase tracking-[0.5em] block mb-4">PUNTUACIÓN CHICOS</span>
+                    <span class="text-[9px] font-black text-secondary uppercase tracking-[0.5em] block mb-4">{{ t('tournament_admin.match_edit.score_games') }}</span>
                     <div class="flex align-items-center justify-content-center gap-10">
                       <div class="flex flex-column align-items-center">
                         <span class="text-7xl font-black italic text-white leading-none tracking-tighter">{{ calculatedScore1 }}</span>
@@ -581,19 +626,23 @@ const statusOptions = [
               <div class="rules-hint mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex align-items-center gap-4">
                 <i class="pi pi-info-circle text-emerald-500 text-lg"></i>
                 <div class="flex flex-column">
-                  <span class="text-[9px] font-black text-white uppercase tracking-widest">REGLAMENTO</span>
-                  <span class="text-[9px] font-bold text-emerald-500/80 uppercase tracking-widest">
-                    Al mejor de {{ (tournament.ruleGames * 2) - 1 }} (ganar {{ tournament.ruleGames }}) a {{ tournament.rulePoints }}
+                  <span class="text-[9px] font-black text-white uppercase tracking-widest">{{ t('tournament_admin.match_edit.regulation') }}</span>
+                  <span v-if="tournament" class="text-[9px] font-bold text-emerald-500/80 uppercase tracking-widest">
+                    {{ t('tournament_admin.match_edit.best_of', { 
+                      total: (tournament?.ruleGames || 3) * 2 - 1, 
+                      needed: tournament?.ruleGames || 3, 
+                      points: tournament?.rulePoints || 40 
+                    }) }}
                   </span>
                 </div>
               </div>
 
               <!-- MOVED ACTIONS: NOW ON THE LEFT -->
               <div class="dialog-actions mt-8 grid grid-cols-2 gap-4">
-                <button @click="editingMatch = null" class="mus-btn-secondary px-4 py-3 text-[10px]">CANCELAR</button>
+                <button @click="editingMatch = null" class="mus-btn-secondary px-4 py-3 text-[10px]">{{ t('tournament_admin.match_edit.cancel_btn') }}</button>
                 <button @click="saveMatchResult" :disabled="isSavingResult" class="mus-btn-primary px-4 py-3 text-[10px]">
                   <i v-if="isSavingResult" class="pi pi-spin pi-spinner mr-2"></i>
-                  {{ isSavingResult ? 'GUARDANDO...' : 'GUARDAR' }}
+                  {{ isSavingResult ? t('tournament_admin.match_edit.saving_btn') : t('tournament_admin.match_edit.save_btn') }}
                 </button>
               </div>
             </div>
@@ -602,15 +651,15 @@ const statusOptions = [
           <!-- RIGHT COLUMN: GAMES EDITOR -->
           <div class="col-12 md:col-6 p-5">
             <div class="flex align-items-center justify-content-between mb-6">
-               <h4 class="m-0 text-white font-black italic uppercase tracking-widest">Desglose de Juegos</h4>
-               <span class="text-[10px] font-bold text-slate-500">{{ tournament.rulePoints }} tantos/juego</span>
+               <h4 class="m-0 text-white font-black italic uppercase tracking-widest">{{ t('tournament_admin.match_edit.games_breakdown') }}</h4>
+               <span v-if="tournament" class="text-[10px] font-bold text-slate-500">{{ t('tournament_admin.match_edit.points_per_game', { points: tournament?.rulePoints || 40 }) }}</span>
             </div>
 
             <div class="games-editor-container">
                <div class="grid mb-4 px-4 opacity-40">
-                 <div class="col-2 text-[9px] font-black uppercase tracking-[0.2em]">Juego</div>
-                 <div class="col-5 text-[9px] font-black uppercase tracking-[0.2em] text-center">Local</div>
-                 <div class="col-5 text-[9px] font-black uppercase tracking-[0.2em] text-center">Visitante</div>
+                 <div class="col-2 text-[9px] font-black uppercase tracking-[0.2em]">{{ t('tournament_admin.match_edit.game_label') }}</div>
+                 <div class="col-5 text-[9px] font-black uppercase tracking-[0.2em] text-center">{{ t('tournament_view.match_edit.local') }}</div>
+                 <div class="col-5 text-[9px] font-black uppercase tracking-[0.2em] text-center">{{ t('tournament_view.match_edit.visitor') }}</div>
                </div>
 
                <div class="games-list custom-scrollbar max-h-[500px] overflow-y-auto pr-2">
@@ -624,11 +673,11 @@ const statusOptions = [
                         <input type="number" 
                                v-model.number="game.points1" 
                                :min="0" 
-                               :max="tournament.rulePoints"
+                               :max="tournament?.rulePoints || 40"
                                @input="enforceMaxPoints(game, 1)"
                                class="game-score-field text-sm"
-                               :class="{ 'is-winner': game.points1 >= tournament.rulePoints }">
-                        <button @click="setWinnerPoints(game, 1)" class="quick-win-btn" v-tooltip.top="'Ganar'">
+                               :class="{ 'is-winner': game.points1 >= (tournament?.rulePoints || 40) }">
+                        <button @click="setWinnerPoints(game, 1)" class="quick-win-btn" v-tooltip.top="t('tournament_admin.match_edit.win_tooltip')">
                           <i class="pi pi-check"></i>
                         </button>
                       </div>
@@ -638,11 +687,11 @@ const statusOptions = [
                         <input type="number" 
                                v-model.number="game.points2" 
                                :min="0" 
-                               :max="tournament.rulePoints"
+                               :max="tournament?.rulePoints || 40"
                                @input="enforceMaxPoints(game, 2)"
                                class="game-score-field text-sm"
-                               :class="{ 'is-winner': game.points2 >= tournament.rulePoints }">
-                        <button @click="setWinnerPoints(game, 2)" class="quick-win-btn" v-tooltip.top="'Ganar'">
+                               :class="{ 'is-winner': game.points2 >= (tournament?.rulePoints || 40) }">
+                        <button @click="setWinnerPoints(game, 2)" class="quick-win-btn" v-tooltip.top="t('tournament_admin.match_edit.win_tooltip')">
                           <i class="pi pi-check"></i>
                         </button>
                       </div>
@@ -656,7 +705,7 @@ const statusOptions = [
     </Dialog>
 
     <!-- Enrollment Dialog -->
-    <Dialog v-model:visible="showEnrollmentDialog" modal :header="'Inscribir Pareja'" :style="{ width: '450px' }" class="mus-dialog-premium">
+    <Dialog v-model:visible="showEnrollmentDialog" modal :header="t('tournament_admin.enrollment.dialog_title')" :style="{ width: '450px' }" class="mus-dialog-premium">
       <div class="p-4">
         <TournamentEnrollmentForm :tournamentUuid="uuid" @success="onEnrollmentSuccess" @cancel="showEnrollmentDialog = false" />
       </div>
@@ -665,11 +714,21 @@ const statusOptions = [
 </template>
 
 <style scoped>
-.admin-page { max-width: 1500px; margin: 0 auto; padding: 40px 60px 100px 60px; }
+.admin-page { 
+  max-width: 1500px; 
+  margin: 0 auto; 
+  padding: 40px 60px 100px 60px; 
+  opacity: 1 !important; 
+  visibility: visible !important; 
+  position: relative;
+  z-index: 1;
+}
 
 /* Header & Back Button */
 .back-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 12px; color: #64748b; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
 .back-btn:hover { background: rgba(255,255,255,0.08); color: white; border-color: rgba(255,255,255,0.2); transform: translateX(-3px); }
+.eye-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 12px; color: #64748b; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
+.eye-btn:hover { background: rgba(255,255,255,0.08); color: var(--secondary); border-color: var(--secondary); transform: translateX(3px); }
 
 /* Buttons */
 .mus-btn-primary { 
@@ -755,7 +814,7 @@ const statusOptions = [
 }
 
 /* Premium Cards */
-.mus-card-premium { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 32px; }
+.mus-card-premium { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 32px; }
 
 /* Stat Cards */
 .stat-card-premium { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; padding: 24px; display: flex; align-items: center; gap: 20px; position: relative; overflow: hidden; }
@@ -904,6 +963,12 @@ const statusOptions = [
 .sticky-sidebar { position: sticky; top: 40px; }
 
 .generate-matches-btn { background: rgba(233, 195, 73, 0.1); border: 1px solid rgba(233, 195, 73, 0.3); color: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 9px; font-weight: 950; cursor: pointer; transition: 0.3s; }
+.generate-matches-btn:hover:not(:disabled) { background: var(--secondary); color: black; }
+
+/* Stage Headers & Dots */
+.stage-dot { width: 8px; height: 8px; background: var(--secondary); border-radius: 2px; transition: 0.3s; }
+.stage-dot.is-collapsed { background: #475569; transform: scale(0.8); }
+.rotate-180 { transform: rotate(180deg); }
 .generate-matches-btn:hover:not(:disabled) { background: var(--secondary); color: black; }
 
 /* Status Toggle Buttons */

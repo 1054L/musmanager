@@ -152,7 +152,7 @@
     "retry": "Berriro saiatu",
     "manage": "Kudeatu",
     "live": "Zuzenean",
-    "empty": "Ez dago txapelketarik zure kudeaketapean.",
+    "empty": "Ez da egoera honetako txapelketarik aurkitu.",
     "empty_title": "Zure arbela hutsik dago",
     "empty_cta": "Sortu zure lehen txapelketa",
     "empty_subtitle": "Hasi zure ondarea Mus Manager antolatzaile gisa gaur bertan.",
@@ -164,6 +164,9 @@
     "poster": "Kartela",
     "category": "Kategoria",
     "status": "Egoera",
+    "creator_email": "Sortzailearen Emaila",
+    "private": "Pribatua",
+    "public": "Publikoa",
     "tournament": "Txapelketa",
     "quick_actions_title": "Kudeaketa Nagusia",
     "quick_actions": {
@@ -178,7 +181,35 @@
     "invalid_groups": "Talde kopuru baliogabea",
     "groups_success": "Taldeak ongi sortu dira",
     "matches_success": "Partiden egutegia ongi sortu da",
-    "enroll_success": "Bikotea ongi izena eman du"
+    "enroll_success": "Bikotea ongi izena eman du",
+    "master_advice": "EGUNEKO AHOLKUA",
+    "sections": {
+      "active_tournaments": "Abian diren Txapelketak",
+      "mus_statistics": "Estatistikak",
+      "pending_tasks": "Egin beharrekoak"
+    },
+    "stats_summary": {
+      "total_created": "Sortutako Txapelketak",
+      "active": "Txapelketa Aktiboak",
+      "finished": "Amaitutako Txapelketak",
+      "platform_teams": "Bikoteak Plataforman"
+    },
+    "active_detail": {
+      "progress": "Txapelketaren Aurrerapena",
+      "open_spots": "{count} plaza libre",
+      "admin_view": "KUDEATU"
+    },
+    "mus_stats": {
+      "best_streak": "Garaipen Segida Onena",
+      "most_participatory": "Bikote Parte-hartzaileena",
+      "wins": "garaipen",
+      "tournaments": "txapelketa"
+    },
+    "tasks": {
+      "draft": "Zirriborroan dagoen txapelketa",
+      "late_matches": "Emaitzak zain (+3 egun)",
+      "unconfirmed": "Baieztatu beharreko bikoteak"
+    }
   },
   "footer": {
     "desc": "Mus komunitate lehiakorrarentzako txapelketak kudeatzeko plataforma nagusia. Zehaztasuna, dotorezia eta pasioa.",
@@ -330,6 +361,7 @@
     "coming_soon": "Laster",
     "players_count": "{count} Jokalari",
     "pairs_count": "{count} Bikote",
+    "owner": "Antolatzailea",
     "filters": {
       "all": "Guztiak",
       "active": "Abian",
@@ -346,7 +378,9 @@
       "identity": "Txapelketaren Nortasuna",
       "location": "Kokapen Geografikoa",
       "schedule": "Kronograma",
-      "docs": "Dokumentazioa"
+      "docs": "Dokumentazioa",
+      "rules": "Arauak eta Sistema",
+      "status": "Egoera eta Pribatutasuna"
     },
     "labels": {
       "name": "Txapelketaren Izena",
@@ -372,8 +406,9 @@
       "newPoster": "Irudi berria:",
       "currentPoster": "Egungo kartela:",
       "ruleKings": "Erregeak",
+      "ruleKing": "Errege",
       "rulePoints": "Tantuak",
-      "ruleGames": "Umeak",
+      "ruleGames": "Jokuak",
       "tablesCount": "Mahai Kopurua",
       "rules_section": "Arauak eta Kudeaketa",
       "other": "Beste bat",
@@ -383,10 +418,10 @@
     "placeholders": {
       "name": "Adib.: Udaberriko Txapelketa Handia",
       "location": "Adib.: Txoko Taberna, Kale Nagusia 1",
-      "province": "Adib.: Bizkaia",
-      "town": "Adib.: Bilbo",
+      "province": "Adib.: Gipuzkoa",
+      "town": "Adib.: Donostia",
       "customPoints": "Zehaztu tantuak",
-      "customGames": "Zehaztu umeak"
+      "customGames": "Zehaztu jokuak"
     },
     "tooltips": {
       "private": "Kutxa hau markatzen baduzu, txapelketa ez da bilatzaile publikoan edo hasierako orrian agertuko. Lotura zuzena dutenek bakarrik sartu ahal izango dira."
@@ -486,8 +521,9 @@
     },
     "draft_mode": "ZIRRIBORRO MODUA",
     "knockout": {
-      "t32": "Hogeitahamabitarrenak",
-      "t16": "Hamaseirenak",
+      "t64": "Final-hogeitahamarrenak",
+      "t32": "Final-hamaseirenak",
+      "t16": "Final-zortzirenak",
       "t8": "Final-laurdenak",
       "t4": "Finalerdiak",
       "final": "Finala",
@@ -498,7 +534,7 @@
   "team_form": {
     "title": "Bikote Berria",
     "name": "Bikotearen Izena",
-    "name_placeholder": "Adib.: Garaiezinak",
+    "name_placeholder": "Adib.: Pello ta Joseba",
     "tournament": "Txapelketa",
     "submit": "Sortu eta Inskribatu Bikotea",
     "success_msg": "Bikotea ongi sortu eta inskribatu da! Beste bat gehi dezakezu.",
@@ -524,7 +560,7 @@
     },
     "step2": {
       "title": "Ekitaldiaren Sorkuntza",
-      "desc": "Egin klik 'Sortu Txapelketa Berria' botoian eta bete oinarrizko datuak: izena, data, lekua eta kartela. Garrantzitsuena hemen joko-sistema aukeratzea da (liga, kanporaketa, taldeak, zeroak) eta arau espezifikoak definitzea (tantuak, umeak, erregeak). Mus Manager txapelketaren logika guztia lehentasun hauetara egokitzeaz arduratuko da."
+      "desc": "Egin klik 'Sortu Txapelketa Berria' botoian eta bete oinarrizko datuak: izena, data, lekua eta kartela. Garrantzitsuena hemen joko-sistema aukeratzea da (liga, kanporaketa, taldeak, zeroak) eta arau espezifikoak definitzea (tantuak, jokuak, erregeak). Mus Manager txapelketaren logika guztia lehentasun hauetara egokitzeaz arduratuko da."
     },
     "step3": {
       "title": "Inskripzioak eta Zozketa",
@@ -537,6 +573,68 @@
     "step5": {
       "title": "Historikoa eta Estatistikak",
       "desc": "Txapelketa amaitzean, datuak ez dira galtzen. Mus Manager-ek jokatutako partida guztien historiko zehatza gordetzen du, zure peñako 'txapeldun' historikoa nor den edo bikote jakin batek zenbat aldiz irabazi duen kontsultatzeko aukera emanez. Datuak zure komunitatearen ondarea dira."
+    }
+  },
+  "tournament_admin": {
+    "panel_title": "Kudeaketa Panela",
+    "back_tooltip": "Itzuli nire txapelketetara",
+    "enrollment": {
+      "title": "Bikoteen Inskripzioa",
+      "add_btn": "INSKRIBATU BIKOTE BERRIA",
+      "list_title": "Inskribatutako Bikoteak",
+      "empty": "Ez dago bikoterik oraindik",
+      "confirmed_tooltip": "Konfirmatuta / Ordainduta",
+      "delete_success": "Bikotea ongi ezabatu da",
+      "add_success": "Bikotea ongi inskribatu da",
+      "delete_confirm_title": "Ezabatzea Baieztatu",
+      "delete_confirm_msg": "Ziur al zaude bikote hau desapuntatu nahi duzula? Ekintza hau ezin da desegin.",
+      "dialog_title": "Inskribatu Bikotea",
+      "delete_btn": "Ezabatu"
+    },
+    "groups": {
+      "config_title": "Taldeen Konfigurazioa",
+      "count_label": "Talde Kopurua",
+      "generate_btn": "TALDETAN BANATU"
+    },
+    "status": {
+      "title": "Txapelketaren Fasea",
+      "update_success": "Fasea ongi eguneratu da"
+    },
+    "preparation": {
+      "title": "Prestakuntza Modua",
+      "ready_desc": "Dena prest dago. Sakatu beheko botoia zozketa egiteko eta txapelketa ofizialki hasteko.",
+      "not_ready_desc": "Inskribatu gutxienez 2 bikote zozketa egin ahal izateko.",
+      "start_btn": "TXAPELKETA HASI",
+      "initial_draw": "HASIERAKO ZOZKETA",
+      "teams_label": "Bikoteak",
+      "system_label": "Sistema"
+    },
+    "matches": {
+      "title": "Txapelketako Partidak",
+      "empty": "Ez dago partidarik sortuta oraindik",
+      "no_matchups": "Ez dago norgehiagokarik",
+      "error_desc": "Zerbaitek huts egin du. Saiatu egutegia berriro sortzen.",
+      "tbd": "ERABAKITZEKE",
+      "order_asc": "FINALA BEHEAN",
+      "order_desc": "FINALA GOIAN"
+    },
+    "match_edit": {
+      "title": "Emaitzen Kudeaketa",
+      "panel_title": "Kontrol Panela",
+      "score_games": "UMEEEN MARKAGAILUA",
+      "regulation": "ERREGLAMENTUA",
+      "best_of": "{total}-(e)tik onenera ({needed} irabazi) {points}-ra",
+      "save_btn": "GORDE",
+      "saving_btn": "GORDETZEN...",
+      "cancel_btn": "UTZI",
+      "games_breakdown": "Umeen Xehetasunak",
+      "points_per_game": "{points} tanto/ume",
+      "game_label": "Umea",
+      "win_tooltip": "Irabazi"
+    },
+    "stats": {
+      "confirmed": "Konfirmatuta",
+      "finished": "Amaituta"
     }
   }
 }

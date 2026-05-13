@@ -284,7 +284,7 @@ const handleCreate = async () => {
                       <button type="button" v-for="val in [4, 8]" :key="val"
                               @click="form.ruleKings = val"
                               class="compact-btn flex-1" :class="{ active: form.ruleKings === val }">
-                        {{ val }} Reyes
+                        {{ val }} {{ $t('tournament_form.labels.ruleKing') }}
                       </button>
                     </div>
                   </div>

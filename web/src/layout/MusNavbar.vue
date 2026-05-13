@@ -212,7 +212,7 @@ const closeMobileMenu = () => {
 .navbar-container {
   width: 100%;
   max-width: 1440px;
-  background: var(--surface);
+  background: var(--nav-surface);
   padding: 12px 24px;
   border-bottom: 2px solid var(--secondary);
   display: flex;
@@ -224,7 +224,7 @@ const closeMobileMenu = () => {
 }
 
 .navbar-container.menu-open {
-  background: var(--surface);
+  background: var(--nav-surface);
 }
 
 @media (min-width: 768px) {
@@ -267,7 +267,7 @@ const closeMobileMenu = () => {
 }
 
 .logo-title {
-  color: var(--text-main);
+  color: var(--nav-text);
   font-weight: 900;
   font-size: 14px;
   text-transform: uppercase;
@@ -295,7 +295,7 @@ const closeMobileMenu = () => {
 }
 
 .nav-item {
-  color: var(--text-muted);
+  color: var(--nav-muted);
   font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;
@@ -368,9 +368,9 @@ const closeMobileMenu = () => {
 }
 
 .theme-toggle-btn {
-  background: var(--surface-hover);
-  border: 1px solid var(--border);
-  color: var(--text-main);
+  background: var(--nav-surface-hover);
+  border: 1px solid var(--nav-border);
+  color: var(--nav-text);
   width: 36px;
   height: 36px;
   border-radius: 99px;
@@ -425,9 +425,9 @@ const closeMobileMenu = () => {
 }
 
 .login-icon-btn {
-  background: var(--surface-hover);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
+  background: var(--nav-surface-hover);
+  border: 1px solid var(--nav-border);
+  color: var(--nav-muted);
   width: 32px;
   height: 32px;
   border-radius: 99px;
@@ -464,10 +464,10 @@ const closeMobileMenu = () => {
 .logout-btn {
   width: 32px;
   height: 32px;
-  background: var(--surface-hover);
-  border: 1px solid var(--border);
+  background: var(--nav-surface-hover);
+  border: 1px solid var(--nav-border);
   border-radius: 99px;
-  color: var(--text-muted);
+  color: var(--nav-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -483,7 +483,7 @@ const closeMobileMenu = () => {
 
 .sidebar-toggle-desktop {
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--nav-border);
   color: var(--secondary);
   width: 40px;
   height: 40px;
@@ -533,9 +533,9 @@ const closeMobileMenu = () => {
   left: 0;
   right: 0;
   margin-top: 12px;
-  background: var(--surface);
+  background: var(--nav-surface);
   backdrop-filter: blur(40px);
-  border: 1px solid var(--border);
+  border: 1px solid var(--nav-border);
   border-radius: 24px;
   padding: 24px;
   box-shadow: var(--shadow-md);
@@ -553,7 +553,7 @@ const closeMobileMenu = () => {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  color: var(--text-muted);
+  color: var(--nav-muted);
   text-decoration: none;
   font-size: 11px;
   font-weight: 900;
@@ -601,10 +601,10 @@ const closeMobileMenu = () => {
 
 .mobile-lang-item {
   padding: 12px;
-  background: var(--surface-hover);
-  border: 1px solid var(--border);
+  background: var(--nav-surface-hover);
+  border: 1px solid var(--nav-border);
   border-radius: 12px;
-  color: var(--text-muted);
+  color: var(--nav-muted);
   font-size: 9px;
   font-weight: 900;
   text-transform: uppercase;

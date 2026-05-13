@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, inject } from 'vue'
 import { tournamentService, teamService, authService } from '../services/api'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -18,7 +18,8 @@ const { t } = useI18n()
 const router = useRouter()
 const confirm = useConfirm()
 const toast = useToast()
-const user = authService.getUser()
+const user = inject('user')
+const isSuperAdmin = computed(() => user.value?.roles?.includes('ROLE_SUPER_ADMIN'))
 const tournaments = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -230,7 +231,7 @@ onMounted(() => {
 
     <!-- Main Table Section -->
     <section class="tournaments-section mus-glass p-0 overflow-hidden mt-6">
-      <div class="section-header p-8 flex items-center justify-between">
+      <div class="section-header p-4 flex items-center justify-between">
         <h2 class="section-title m-0">{{ t('dashboard.my_tournaments') }}</h2>
         <div class="flex items-center gap-4">
            <button @click="fetchTournaments" class="refresh-btn" v-tooltip.top="t('dashboard.retry')">
@@ -284,6 +285,22 @@ onMounted(() => {
           </template>
         </Column>
  
+        <Column v-if="isSuperAdmin" field="owner.email" :header="t('dashboard.creator_email')" sortable>
+          <template #body="slotProps">
+            <span class="text-xs font-bold text-slate-400 cursor-help" 
+                  v-tooltip.top="slotProps.data.owner ? `${slotProps.data.owner.firstName || ''} ${slotProps.data.owner.lastName || ''}`.trim() || t('common.user') : '-'">
+              {{ slotProps.data.owner?.email || '-' }}
+            </span>
+          </template>
+        </Column>
+
+        <Column field="private" :header="t('dashboard.private')" sortable>
+          <template #body="slotProps">
+            <i v-if="slotProps.data.private" class="pi pi-lock text-amber-500" v-tooltip.top="t('dashboard.private')"></i>
+            <i v-else class="pi pi-globe text-slate-500" v-tooltip.top="t('dashboard.public')"></i>
+          </template>
+        </Column>
+
         <Column field="status" :header="t('dashboard.status')" sortable>
           <template #body="slotProps">
             <span class="status-indicator" :class="slotProps.data.status">
@@ -378,7 +395,7 @@ onMounted(() => {
   text-transform: uppercase;
   letter-spacing: 0.3em;
   color: #475569;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 }
 
 /* Poster Preview Popover */
@@ -497,30 +514,32 @@ onMounted(() => {
 }
 
 .custom-table :deep(.p-datatable-thead > tr > th) {
-  background: var(--surface-hover);
-  color: var(--text-muted);
-  font-size: 9px;
-  font-weight: 900;
+  background: rgba(0, 0, 0, 0.2) !important;
+  color: var(--secondary) !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  padding: 20px 32px;
-  border-color: rgba(255, 255, 255, 0.03);
+  letter-spacing: 0.2em;
+  padding: 24px 32px !important;
+  border-bottom: 1px solid var(--border) !important;
+  font-family: var(--font-display);
 }
 
 .custom-table :deep(.p-datatable-tbody > tr) {
   background: transparent;
   color: var(--text-main);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .custom-table :deep(.p-datatable-tbody > tr:hover) {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(233, 195, 73, 0.03) !important;
+  box-shadow: inset 4px 0 0 var(--secondary);
 }
 
 .custom-table :deep(.p-datatable-tbody > tr > td) {
-  padding: 18px 32px;
+  padding: 20px 32px !important;
   border: none;
 }
 

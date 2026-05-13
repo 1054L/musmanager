@@ -38,11 +38,6 @@ const loading = ref(true)
 const saving = ref(false)
 const error = ref(null)
 const success = ref(false)
-const enrolledTeams = ref([])
-const availableTeams = ref([])
-const enrollmentTeamId = ref(null)
-const groupsCount = ref(2)
-const generating = ref(false)
 
 const isOtherPoints = ref(false)
 const isOtherGames = ref(false)
@@ -122,9 +117,6 @@ onMounted(async () => {
     
     if (![20, 30, 40].includes(form.value.rulePoints)) isOtherPoints.value = true
     if (![3, 4, 5].includes(form.value.ruleGames)) isOtherGames.value = true
-
-    await loadEnrolledTeams()
-    await loadAvailableTeams()
   } catch (e) {
     error.value = t('tournament_form.messages.load_error', { uuid: uuid, error: e.message })
   } finally {
@@ -132,45 +124,6 @@ onMounted(async () => {
   }
 })
 
-const loadEnrolledTeams = async () => {
-  try {
-    const data = await tournamentService.getTournament(uuid)
-    enrolledTeams.value = data.tournamentTeams || []
-  } catch (e) { console.error(e) }
-}
-
-const loadAvailableTeams = async () => {
-  try {
-    availableTeams.value = await teamService.getTeams()
-  } catch (e) { console.error(e) }
-}
-
-const handleEnrollTeam = async () => {
-  if (!enrollmentTeamId.value) return
-  try {
-    await tournamentService.enrollTeam(uuid, enrollmentTeamId.value)
-    await loadEnrolledTeams()
-    enrollmentTeamId.value = null
-  } catch (e) { error.value = e.message }
-}
-
-const handleGenerateGroups = async () => {
-  generating.value = true
-  try {
-    await tournamentService.generateGroups(uuid, groupsCount.value)
-    await loadEnrolledTeams()
-  } catch (e) { error.value = e.message }
-  finally { generating.value = false }
-}
-
-const handleGenerateMatches = async () => {
-  generating.value = true
-  try {
-    await tournamentService.generateMatches(uuid)
-    success.value = true
-  } catch (e) { error.value = e.message }
-  finally { generating.value = false }
-}
 
 const onFileChange = (e) => {
   const file = e.target.files[0]
@@ -352,39 +305,9 @@ const handleSave = async () => {
 
           <!-- COLUMN 2: TEAMS & RULES -->
           <div class="column">
-            <section class="form-section">
-              <h3 class="section-title"><i class="pi pi-users mr-2"></i> {{ t('tournament_mgmt.team_mgmt') }}</h3>
-              <div class="management-box p-6 mus-glass-dark rounded-3xl border-white/5">
-                <div class="flex gap-2 mb-6">
-                  <select v-model="enrollmentTeamId" class="mus-input flex-1 text-xs">
-                    <option :value="null" disabled>{{ t('tournament_mgmt.select_team') }}</option>
-                    <option v-for="team in availableTeams" :key="team.id" :value="team.id">{{ team.name }}</option>
-                  </select>
-                  <button type="button" @click="handleEnrollTeam" class="mus-btn-gold-small" :disabled="!enrollmentTeamId">
-                    <i class="pi pi-plus"></i>
-                  </button>
-                </div>
-
-                <div v-if="enrolledTeams.length > 0" class="max-h-[180px] overflow-y-auto mb-6 pr-2 custom-scrollbar">
-                   <div v-for="tt in enrolledTeams" :key="tt.id" class="flex justify-between items-center p-3 border-b border-white/5 last:border-0 text-xs">
-                      <span class="font-bold text-main">{{ tt.team.name }}</span>
-                      <span class="opacity-40 uppercase font-black text-[9px]">{{ tt.groupName || t('tournament_mgmt.no_group') }}</span>
-                   </div>
-                </div>
-
-                <div class="flex flex-col gap-3">
-                  <button type="button" @click="handleGenerateGroups" class="mus-btn-secondary" :disabled="generating || enrolledTeams.length < 2">
-                    <i class="pi pi-sitemap mr-2"></i> {{ t('tournament_mgmt.draw_groups') }}
-                  </button>
-                  <button type="button" @click="handleGenerateMatches" class="mus-btn-secondary" :disabled="generating || enrolledTeams.length < 2">
-                    <i class="pi pi-calendar mr-2"></i> {{ t('tournament_mgmt.generate_matches') }}
-                  </button>
-                </div>
-              </div>
-            </section>
 
             <section class="form-section">
-               <h3 class="section-title"><i class="pi pi-cog mr-2"></i> Reglas & Sistema</h3>
+               <h3 class="section-title"><i class="pi pi-cog mr-2"></i> {{ t('tournament_form.sections.rules') }}</h3>
                <div class="grid grid-cols-2 gap-3 mb-4">
                   <div v-for="opt in types" :key="opt.value" @click="form.type = opt.value" class="option-card" :class="{ active: form.type === opt.value }">
                     <span class="option-label text-[10px]">{{ opt.label }}</span>
@@ -392,22 +315,26 @@ const handleSave = async () => {
                </div>
                <div class="rules-box p-6 mus-glass-dark rounded-3xl border-white/5 flex flex-col gap-6">
                   <div class="form-group">
-                    <label class="mus-label">Puntos por juego</label>
-                    <div class="flex gap-2">
+                    <label class="mus-label">{{ t('tournament_form.labels.rulePoints') }}</label>
+                    <div class="flex gap-2 mb-2">
                        <button type="button" v-for="val in [30, 40]" :key="val" @click="setPoints(val)" class="compact-btn flex-1" :class="{ active: !isOtherPoints && form.rulePoints === val }">{{ val }}</button>
+                       <button type="button" @click="setPoints('other')" class="compact-btn flex-1" :class="{ active: isOtherPoints }">{{ t('tournament_form.labels.other') }}</button>
                     </div>
+                    <input v-if="isOtherPoints" v-model="form.rulePoints" type="number" class="mus-input text-xs py-2 px-3" :placeholder="t('tournament_form.placeholders.customPoints')">
                   </div>
                   <div class="form-group">
-                    <label class="mus-label">Juegos por chico</label>
-                    <div class="flex gap-2">
+                    <label class="mus-label">{{ t('tournament_form.labels.ruleGames') }}</label>
+                    <div class="flex gap-2 mb-2">
                        <button type="button" v-for="val in [3, 4]" :key="val" @click="setGames(val)" class="compact-btn flex-1" :class="{ active: !isOtherGames && form.ruleGames === val }">{{ val }}</button>
+                       <button type="button" @click="setGames('other')" class="compact-btn flex-1" :class="{ active: isOtherGames }">{{ t('tournament_form.labels.other') }}</button>
                     </div>
+                    <input v-if="isOtherGames" v-model="form.ruleGames" type="number" class="mus-input text-xs py-2 px-3" :placeholder="t('tournament_form.placeholders.customGames')">
                   </div>
                </div>
             </section>
 
             <section class="form-section">
-               <h3 class="section-title"><i class="pi pi-eye mr-2"></i> Estado & Privacidad</h3>
+               <h3 class="section-title"><i class="pi pi-eye mr-2"></i> {{ t('tournament_form.sections.status') }}</h3>
                <div class="flex flex-wrap gap-2 mb-4">
                   <button type="button" v-for="opt in statuses" :key="opt.value" @click="form.status = opt.value" class="status-pill" :class="{ active: form.status === opt.value }">{{ opt.label }}</button>
                </div>

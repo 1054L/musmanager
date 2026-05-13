@@ -29,6 +29,7 @@ const uuid = route.params.uuid
 
 const bracketContainer = ref(null);
 const isFullscreen = ref(false);
+const zoomLevel = ref(1);
 
 const toggleFullscreen = () => {
   if (!bracketContainer.value) return;
@@ -90,6 +91,31 @@ const bracketMatches = computed(() => {
   return Object.values(acc).sort((a, b) => b.round - a.round);
 });
 
+const splitBracketMatches = computed(() => {
+  const left = {};
+  const right = {};
+  const final = [];
+
+  bracketMatches.value.forEach(roundData => {
+    if (roundData.matches.length === 1) {
+      final.push(roundData.matches[0]);
+    } else {
+      const half = Math.ceil(roundData.matches.length / 2);
+      left[roundData.round] = { ...roundData, matches: roundData.matches.slice(0, half) };
+      right[roundData.round] = { ...roundData, matches: roundData.matches.slice(half) };
+    }
+  });
+
+  return {
+    left: Object.values(left).sort((a, b) => b.matches.length - a.matches.length),
+    right: Object.values(right).sort((a, b) => a.matches.length - b.matches.length),
+    final
+  };
+});
+
+const publicUrl = computed(() => window.location.origin + route.path);
+const qrCodeUrl = computed(() => `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(publicUrl.value)}&color=e9c349&bgcolor=111111`);
+
 const thirdPlaceMatch = computed(() => matches.value.find(x => x.stage === t('tournament_view.knockout.third_place')))
 
 
@@ -147,6 +173,50 @@ const openPoster = () => {
     showPosterDialog.value = true;
   }
 }
+
+const editingMatch = ref(null);
+const editScore1 = ref(0);
+const editScore2 = ref(0);
+
+const openEditModal = (match) => {
+  editingMatch.value = match;
+  editScore1.value = match.scoreA || 0;
+  editScore2.value = match.scoreB || 0;
+};
+
+const adjustScore = (team, delta) => {
+  if (team === 1) {
+    editScore1.value = Math.max(0, Math.min(tournament.value.ruleGames || 40, editScore1.value + delta));
+  } else {
+    editScore2.value = Math.max(0, Math.min(tournament.value.ruleGames || 40, editScore2.value + delta));
+  }
+};
+
+const saveMatchResult = async () => {
+  if (!editingMatch.value) return;
+  isSavingResult.value = true;
+  try {
+    await tournamentService.updateMatch(editingMatch.value.id, {
+      score1: editScore1.value,
+      score2: editScore2.value
+    });
+    // Update local state
+    editingMatch.value.scoreA = editScore1.value;
+    editingMatch.value.scoreB = editScore2.value;
+    editingMatch.value.status = (editScore1.value > 0 || editScore2.value > 0) ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending');
+    
+    // Refresh classification if needed
+    if (tournament.value.type === 'groups' || tournament.value.type === 'league') {
+       classification.value = await tournamentService.getClassification(route.params.uuid);
+    }
+    
+    editingMatch.value = null;
+  } catch (e) {
+    console.error('Error saving result:', e);
+  } finally {
+    isSavingResult.value = false;
+  }
+};
 </script>
 
 <template>
@@ -206,21 +276,21 @@ const openPoster = () => {
                     <i class="pi pi-crown text-xl text-[#e9c349]"></i>
                     <span class="text-xs font-black ml-2">{{ tournament.ruleKings }}</span>
                   </div>
-                  <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.rulePoints') + ': ' + tournament.rulePoints">
+                  <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.rulePoints') + ': ' + (tournament?.rulePoints || 40)">
                     <i class="pi pi-hashtag text-xl text-[#e9c349]"></i>
-                    <span class="text-xs font-black ml-2">{{ tournament.rulePoints }}</span>
+                    <span class="text-xs font-black ml-2">{{ tournament?.rulePoints || 40 }}</span>
                   </div>
-                  <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.ruleGames') + ': ' + tournament.ruleGames">
+                  <div class="rule-icon-item border-l border-white/10 pl-4" v-tooltip.top="t('tournament_form.labels.ruleGames') + ': ' + (tournament?.ruleGames || 3)">
                     <i class="pi pi-bolt text-xl text-[#e9c349]"></i>
-                    <span class="text-xs font-black ml-2">{{ tournament.ruleGames }}</span>
+                    <span class="text-xs font-black ml-2">{{ tournament?.ruleGames || 3 }}</span>
                   </div>
-              </div>
               
               <button v-if="canManage" @click="router.push(`/tournament/${uuid}/manage`)" 
-                      class="mus-btn-gold px-6 py-3 flex align-items-center gap-2">
+                      class="mus-btn-gold px-4 py-2 flex align-items-center gap-2">
                 <i class="pi pi-cog"></i>
-                <span>GESTIONAR</span>
+                <span class="text-[10px] font-black uppercase tracking-widest">{{ t('dashboard.manage') }}</span>
               </button>
+              </div>
             </div>
           </div>
         </div>
@@ -254,13 +324,21 @@ const openPoster = () => {
                 </button>
               </div>
 
-              <!-- Fullscreen Button at tab level -->
-              <button v-if="activeTab === 'bracket' && bracketMatches.length > 0" 
-                      @click="toggleFullscreen" 
-                      class="mus-btn-gold px-3 py-1.5 flex align-items-center gap-2">
-                <i class="pi" :class="isFullscreen ? 'pi-window-minimize' : 'pi-external-link'"></i>
-                <span class="text-[9px] font-black uppercase">{{ isFullscreen ? 'SALIR' : 'TV MODE' }}</span>
-              </button>
+              <!-- Controls Button at tab level -->
+              <div class="flex align-items-center gap-3">
+                <div v-if="activeTab === 'bracket' && bracketMatches.length > 0" class="flex align-items-center gap-2 mr-2">
+                   <i class="pi pi-search-minus text-slate-500 text-[10px]"></i>
+                   <input type="range" v-model="zoomLevel" min="0.1" max="1.5" step="0.05" class="w-20 accent-secondary" />
+                   <i class="pi pi-search-plus text-slate-500 text-[10px]"></i>
+                   <span class="text-[9px] font-bold text-secondary ml-1">{{ Math.round(zoomLevel * 100) }}%</span>
+                </div>
+                <button v-if="activeTab === 'bracket' && bracketMatches.length > 0" 
+                        @click="toggleFullscreen" 
+                        class="mus-btn-gold px-3 py-1.5 flex align-items-center gap-2">
+                  <i class="pi" :class="isFullscreen ? 'pi-window-minimize' : 'pi-external-link'"></i>
+                  <span class="text-[9px] font-black uppercase">{{ isFullscreen ? 'SALIR' : 'TV MODE' }}</span>
+                </button>
+              </div>
            </div>
 
            <!-- Content according to active tab -->
@@ -444,73 +522,117 @@ const openPoster = () => {
                  <div v-if="isFullscreen" class="flex justify-content-between align-items-center mb-10 px-4 fs-controls">
                     <div class="flex align-items-center gap-5">
                        <img src="/logo.png" class="h-14" alt="Logo" />
-                       <div>
-                          <h2 class="text-4xl font-black text-main italic uppercase tracking-tighter m-0">{{ tournament.name }}</h2>
-                          <div class="text-[12px] font-bold text-secondary uppercase tracking-[0.4em] mt-1">CUADRO DE ELIMINATORIAS - RESULTADOS EN VIVO</div>
+                        <div>
+                           <h2 class="text-4xl font-black text-main italic uppercase tracking-tighter m-0">{{ tournament.name }}</h2>
+                           <div class="text-[12px] font-bold text-secondary uppercase tracking-[0.4em] mt-1">CUADRO DE ELIMINATORIAS - RESULTADOS EN VIVO</div>
+                        </div>
+
+                        <!-- QR Code for Public Access -->
+                        <div class="flex align-items-center gap-4 ml-12 bg-white/5 p-3 rounded-2xl border border-white/10">
+                           <div class="text-right">
+                              <div class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] mb-1">SIGUE EL TORNEO</div>
+                              <div class="text-[8px] font-bold text-slate-500 uppercase">RESULTADOS EN VIVO</div>
+                           </div>
+                           <div class="relative p-1 bg-white rounded-lg shadow-xl">
+                              <img :src="qrCodeUrl" class="w-14 h-14 block" alt="QR Code" />
+                           </div>
+                        </div>
+                    </div>
+                     <div class="flex align-items-center gap-6">
+                       <div class="flex align-items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                          <i class="pi pi-search-minus text-slate-400 text-xs"></i>
+                          <input type="range" v-model="zoomLevel" min="0.1" max="1.5" step="0.05" class="w-32 accent-secondary" />
+                          <i class="pi pi-search-plus text-slate-400 text-xs"></i>
+                          <span class="text-xs font-bold text-secondary ml-1 min-w-[45px]">{{ Math.round(zoomLevel * 100) }}%</span>
+                       </div>
+                       <div class="text-right">
+                          <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Cerrar con ESC</div>
+                          <button @click="toggleFullscreen" class="mus-btn-secondary px-4 py-2 text-[10px] font-black uppercase">SALIR</button>
                        </div>
                     </div>
-                    <div class="text-right">
-                       <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Cerrar con ESC</div>
-                       <button @click="toggleFullscreen" class="mus-btn-secondary px-4 py-2 text-[10px] font-black uppercase">SALIR</button>
+                 </div>
+
+                  <div class="bracket-wrapper px-4 overflow-auto custom-scrollbar pb-10" 
+                       :style="{ height: isFullscreen ? 'calc(100vh - 150px)' : '750px' }">
+                    <!-- Symmetrical Championship Layout (Always Active) -->
+                    <div class="flex transition-transform origin-top-left align-items-stretch" 
+                         :style="{ transform: `scale(${zoomLevel * 0.9})`, width: 'max-content', minHeight: '100%' }">
+                       
+                       <!-- Left Wing (Converging L -> R) -->
+                       <div class="flex flex-row gap-12">
+                          <div v-for="(col, colIdx) in splitBracketMatches.left" :key="'left-'+col.round" 
+                               class="bracket-round flex flex-column min-w-[300px] w-[320px]" style="min-height: 100%">
+                             <div class="round-title mb-8 px-4 text-right">
+                                <h4 class="m-0 font-black uppercase italic tracking-widest text-[11px] text-secondary">{{ col.stageName }}</h4>
+                                <div class="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-1">{{ col.matches.length }} Matches</div>
+                             </div>
+                             <div class="flex-grow-1 flex flex-column justify-content-around relative pb-4" style="min-height: 500px">
+                                <div v-for="(m, i) in col.matches" :key="m.id" class="bracket-match-container relative">
+                                   <!-- Standard Card -->
+                                   <div class="bracket-match-card mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
+                                      <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
+                                         <span class="text-xs font-black text-main uppercase italic">{{ m.teamA || 'TBD' }}</span>
+                                         <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
+                                      </div>
+                                      <div class="team-row-bracket flex justify-content-between align-items-center p-3">
+                                         <span class="text-xs font-black text-main uppercase italic">{{ m.teamB || 'TBD' }}</span>
+                                         <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
+                                      </div>
+                                   </div>
+                                   <div v-if="colIdx < splitBracketMatches.left.length - 1" class="bracket-connector"></div>
+                                </div>
+                             </div>
+                          </div>
+                       </div>
+
+                       <!-- Central Final -->
+                       <div class="flex flex-column justify-content-center px-20 gap-10">
+                          <div class="text-center">
+                             <div class="w-32 h-1 bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mb-4"></div>
+                             <Tag value="GRAND FINAL" severity="warning" class="font-black italic uppercase tracking-[0.4em] text-lg px-6 py-3" />
+                             <div class="w-32 h-1 bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mt-4"></div>
+                          </div>
+                          <div v-for="m in splitBracketMatches.final" :key="'final-'+m.id" 
+                               class="bracket-match-card mus-glass border-secondary/30 w-[400px] scale-110 shadow-2xl"
+                               @click="canManage ? openEditModal(m) : null">
+                             <div class="p-4 border-b border-white/10 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreA > m.scoreB }">
+                                <span class="text-xl font-black text-main italic uppercase">{{ m.teamA || 'FINALISTA A' }}</span>
+                                <span class="text-4xl font-black text-secondary">{{ m.scoreA }}</span>
+                             </div>
+                             <div class="p-4 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreB > m.scoreA }">
+                                <span class="text-xl font-black text-main italic uppercase">{{ m.teamB || 'FINALISTA B' }}</span>
+                                <span class="text-4xl font-black text-secondary">{{ m.scoreB }}</span>
+                             </div>
+                          </div>
+                       </div>
+
+                       <!-- Right Wing (Converging L -> R) -->
+                       <div class="flex flex-row gap-12">
+                          <div v-for="(col, colIdx) in splitBracketMatches.right" :key="'right-'+col.round" 
+                               class="bracket-round flex flex-column min-w-[300px] w-[320px]" style="min-height: 100%">
+                             <div class="round-title mb-8 px-4">
+                                <h4 class="m-0 font-black uppercase italic tracking-widest text-[11px] text-secondary">{{ col.stageName }}</h4>
+                                <div class="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-1">{{ col.matches.length }} Matches</div>
+                             </div>
+                             <div class="flex-grow-1 flex flex-column justify-content-around relative pb-4" style="min-height: 500px">
+                                <div v-for="(m, i) in col.matches" :key="m.id" class="bracket-match-container relative right-wing">
+                                   <div class="bracket-match-card mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
+                                      <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
+                                         <span class="text-xs font-black text-main uppercase italic">{{ m.teamA || 'TBD' }}</span>
+                                         <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
+                                      </div>
+                                      <div class="team-row-bracket flex justify-content-between align-items-center p-3">
+                                         <span class="text-xs font-black text-main uppercase italic">{{ m.teamB || 'TBD' }}</span>
+                                         <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
+                                      </div>
+                                   </div>
+                                   <div v-if="colIdx > 0" class="bracket-connector right-connector"></div>
+                                </div>
+                             </div>
+                          </div>
+                       </div>
                     </div>
-                 </div>
-
-                 <div class="bracket-wrapper flex px-4 gap-0 overflow-x-auto custom-scrollbar pb-10">
-                    <div v-for="(col, colIdx) in bracketMatches" :key="col.round" 
-                         class="bracket-round flex flex-column min-w-[280px] w-[300px]">
-                      
-                      <!-- Round Header -->
-                      <div class="round-title mb-8 px-4">
-                        <div class="flex align-items-center gap-3">
-                          <div class="h-4 w-1 bg-secondary rounded-full"></div>
-                          <h4 class="m-0 font-black uppercase italic tracking-widest text-[11px] text-secondary">{{ col.stageName }}</h4>
-                        </div>
-                        <div class="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-1">{{ col.matches.length }} Enfrentamientos</div>
-                      </div>
-
-                      <!-- Matches Column -->
-                      <div class="flex-1 flex flex-column justify-content-around gap-8 relative pb-4">
-                         <div v-for="(m, i) in col.matches" :key="m.id" 
-                              class="bracket-match-container relative"
-                              :class="{ 'has-connectors': colIdx < bracketMatches.length - 1 }">
-                           
-                           <div class="bracket-match-card mus-glass border-white/5 overflow-hidden transition-all hover:border-secondary/30"
-                                @click="canManage ? openEditModal(m) : null">
-                             <!-- Team A -->
-                             <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5"
-                                  :class="{ 'bg-secondary/5': m.scoreA > m.scoreB && (m.scoreA > 0 || m.scoreB > 0) }">
-                                <div class="flex align-items-center gap-3 min-w-0">
-                                   <div class="w-1.5 h-1.5 rounded-full" :class="m.scoreA > m.scoreB ? 'bg-secondary' : 'bg-white/10'"></div>
-                                   <span class="text-xs font-bold truncate text-main uppercase italic tracking-tighter" :class="{ 'opacity-40': m.scoreB > m.scoreA }">
-                                     {{ m.teamA || 'POR DECIDIR' }}
-                                   </span>
-                                </div>
-                                <span class="font-black italic text-lg ml-4" :class="m.scoreA > m.scoreB ? 'text-secondary' : 'text-slate-600'">
-                                  {{ m.scoreA }}
-                                </span>
-                             </div>
-                             
-                             <!-- Team B -->
-                             <div class="team-row-bracket flex justify-content-between align-items-center p-3"
-                                  :class="{ 'bg-secondary/5': m.scoreB > m.scoreA && (m.scoreA > 0 || m.scoreB > 0) }">
-                                <div class="flex align-items-center gap-3 min-w-0">
-                                   <div class="w-1.5 h-1.5 rounded-full" :class="m.scoreB > m.scoreA ? 'bg-secondary' : 'bg-white/10'"></div>
-                                   <span class="text-xs font-bold truncate text-main uppercase italic tracking-tighter" :class="{ 'opacity-40': m.scoreA > m.scoreB }">
-                                     {{ m.teamB || 'POR DECIDIR' }}
-                                   </span>
-                                </div>
-                                <span class="font-black italic text-lg ml-4" :class="m.scoreB > m.scoreA ? 'text-secondary' : 'text-slate-600'">
-                                  {{ m.scoreB }}
-                                </span>
-                             </div>
-                           </div>
-
-                           <!-- Visual connectors (CSS based) -->
-                           <div v-if="colIdx < bracketMatches.length - 1" class="bracket-connector"></div>
-                         </div>
-                      </div>
-                   </div>
-                 </div>
+                  </div>
 
                  <!-- 3rd Place Match (Special Footer) -->
                  <div v-if="thirdPlaceMatch" class="mt-12 pt-8 border-t border-white/5 flex flex-column align-items-center">
@@ -828,33 +950,95 @@ input[type=number] { -moz-appearance: textfield; }
 
 .bracket-connector {
   position: absolute;
-  right: -30px;
+  right: -48px;
   top: 50%;
-  width: 30px;
+  width: 48px; /* Matches the gap-12 (3rem = 48px) */
   height: 2px;
-  background: rgba(233, 195, 73, 0.15);
-  z-index: 1;
+  background: rgba(233, 195, 73, 0.2);
 }
 
-/* Vertical lines for meetups */
+/* Vertical Sibling Connectors */
+.bracket-match-container:nth-child(odd):not(:last-child) .bracket-connector::after {
+  content: '';
+  position: absolute;
+  right: 24px; /* Centered in the 48px gap */
+  top: 0;
+  width: 2px;
+  height: calc(50% + 65px); /* Slightly increased to ensure overlap */
+  background: rgba(233, 195, 73, 0.2);
+}
+
+.bracket-match-container:nth-child(even) .bracket-connector::after {
+  content: '';
+  position: absolute;
+  right: 24px; /* Centered in the 48px gap */
+  bottom: 0;
+  width: 2px;
+  height: calc(50% + 65px);
+  background: rgba(233, 195, 73, 0.2);
+}
+
+/* Right-connector (Mirrored) Vertical Lines */
+.right-connector::after {
+  right: auto !important;
+  left: 24px !important;
+}
+
+/* Vertical mode connectors */
+.bracket-round.is-vertical .bracket-connector {
+  right: auto;
+  bottom: -48px;
+  left: 50%;
+  width: 2px;
+  height: 80px; /* Increased to match gap-20 (5rem = 80px) */
+  top: auto;
+}
+
+/* Vertical lines for meetups - creating a proper bracket tree look */
 .bracket-match-container.has-connectors::after {
   content: '';
   position: absolute;
-  right: -30px;
+  right: -48px;
   width: 2px;
-  background: rgba(233, 195, 73, 0.15);
+  background: rgba(233, 195, 73, 0.3);
   z-index: 1;
 }
 
-/* Alternating connector heights based on bracket logic */
-/* Note: This is a simplified version of bracket connectors */
+/* Vertical mode meetups */
+.bracket-round.is-vertical .bracket-match-container.has-connectors::after {
+  right: auto;
+  bottom: -80px; /* Match the 80px connector */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  top: auto;
+}
+
+/* The vertical line spans half the distance to the sibling match */
 .bracket-round:not(:last-child) .bracket-match-container:nth-child(odd)::after {
-  height: 100%;
+  height: 50%;
   top: 50%;
 }
 .bracket-round:not(:last-child) .bracket-match-container:nth-child(even)::after {
-  height: 100%;
+  height: 50%;
   bottom: 50%;
+}
+
+/* Vertical mode logic for sibling connectors */
+.bracket-round.is-vertical .bracket-match-container:nth-child(odd)::after {
+  width: 50%;
+  left: 50%;
+  height: 2px;
+  bottom: -80px;
+  top: auto;
+}
+.bracket-round.is-vertical .bracket-match-container:nth-child(even)::after {
+  width: 50%;
+  right: 50%;
+  left: auto;
+  height: 2px;
+  bottom: -80px;
+  top: auto;
 }
 
 .round-title {
@@ -878,6 +1062,7 @@ input[type=number] { -moz-appearance: textfield; }
 
 .custom-scrollbar::-webkit-scrollbar {
   height: 6px;
+  width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.02);
@@ -904,10 +1089,20 @@ input[type=number] { -moz-appearance: textfield; }
 
 .bracket-viewport.is-fullscreen .bracket-wrapper {
   flex: 1;
-  align-items: stretch; /* Stretches columns to full height */
   mask-image: none;
   -webkit-mask-image: none;
-  padding-top: 0; /* Remove top padding to keep titles at the very top */
+  padding: 0;
+  overflow: auto !important;
+  background: #050505;
+}
+
+.bracket-viewport.is-fullscreen .bracket-round {
+  min-width: 350px;
+  width: 400px;
+  height: auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .bracket-viewport.is-fullscreen .bracket-round {
@@ -939,5 +1134,16 @@ input[type=number] { -moz-appearance: textfield; }
 
 .fs-controls {
   z-index: 100;
+}
+
+/* Right wing mirrored connectors */
+.right-wing .bracket-connector.right-connector {
+  right: auto;
+  left: -48px;
+}
+
+.right-wing.has-connectors::after {
+  right: auto;
+  left: -48px;
 }
 </style>

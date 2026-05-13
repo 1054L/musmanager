@@ -4,7 +4,8 @@ export const authService = {
   async login(email, password) {
     const response = await fetch(`${API_URL}/me`, {
       headers: {
-        'Authorization': `Basic ${btoa(`${email}:${password}`)}`
+        'X-Email': email,
+        'X-Password': password
       }
     });
 

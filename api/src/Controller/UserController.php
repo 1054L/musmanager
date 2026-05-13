@@ -12,11 +12,30 @@ class UserController extends AbstractController
 {
     #[Route('/me', name: 'app_user_me', methods: ['GET'])]
     #[Route('/api/me', name: 'app_user_me_api', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
-    public function me(): JsonResponse
+    public function me(
+        \Symfony\Component\HttpFoundation\Request $request,
+        \App\Repository\UserRepository $userRepository,
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordHasher
+    ): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
+
+        // If not authenticated via standard Basic Auth, try manual check from custom headers
+        if (!$user) {
+            $email = $request->headers->get('X-Email');
+            $password = $request->headers->get('X-Password');
+
+            if ($email && $password) {
+                $user = $userRepository->findOneBy(['email' => $email]);
+                if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
+                    return new JsonResponse(['error' => 'Invalid credentials'], 401);
+                }
+            } else {
+                return new JsonResponse(['error' => 'Unauthorized'], 401);
+            }
+        }
+
         $player = $user->getPlayer();
 
         return new JsonResponse([

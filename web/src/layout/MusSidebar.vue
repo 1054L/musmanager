@@ -67,8 +67,8 @@ const user = inject('user')
   left: 0;
   height: 100vh;
   width: 280px;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: var(--nav-surface);
+  border-right: 1px solid var(--nav-border);
   z-index: 900; /* Below Navbar wrapper which is 1000 */
   padding-top: 140px; /* Space for fixed Navbar */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -129,7 +129,7 @@ const user = inject('user')
 }
 
 .user-name {
-  color: var(--text-main);
+  color: var(--nav-text);
   font-weight: 800;
   font-size: 14px;
   white-space: nowrap;
@@ -157,7 +157,7 @@ const user = inject('user')
   align-items: center;
   gap: 16px;
   padding: 16px;
-  color: var(--text-muted);
+  color: var(--nav-muted);
   text-decoration: none;
   font-size: 11px;
   font-weight: 900;
@@ -180,7 +180,7 @@ const user = inject('user')
 }
 
 .sidebar-nav-item:hover {
-  background: var(--surface-hover);
+  background: var(--nav-surface-hover);
   color: var(--primary);
 }
 
@@ -197,7 +197,7 @@ const user = inject('user')
 
 .sidebar-divider {
   height: 1px;
-  background: var(--border);
+  background: var(--nav-border);
   margin: 16px 0;
 }
 

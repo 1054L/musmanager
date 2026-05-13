@@ -182,6 +182,9 @@
     "poster": "Cartel",
     "category": "Categoría",
     "status": "Estado",
+    "creator_email": "Email Creador",
+    "private": "Privado",
+    "public": "Público",
     "tournament": "Torneo",
     "quick_actions_title": "Gestión Maestra",
     "quick_actions": {
@@ -196,7 +199,35 @@
     "invalid_groups": "Número de grupos inválido",
     "groups_success": "Grupos generados con éxito",
     "matches_success": "Calendario generado con éxito",
-    "enroll_success": "Pareja inscrita correctamente"
+    "enroll_success": "Pareja inscrita correctamente",
+    "master_advice": "CONSEJO MAESTRO",
+    "sections": {
+      "active_tournaments": "Torneos en Curso",
+      "mus_statistics": "Estadísticas Maestras",
+      "pending_tasks": "Tareas Pendientes"
+    },
+    "stats_summary": {
+      "total_created": "Torneos Creados",
+      "active": "Torneos Activos",
+      "finished": "Torneos Finalizados",
+      "platform_teams": "Equipos en Plataforma"
+    },
+    "active_detail": {
+      "progress": "Progreso del Torneo",
+      "open_spots": "{count} plazas libres",
+      "admin_view": "ADMINISTRAR"
+    },
+    "mus_stats": {
+      "best_streak": "Mejor Racha de Victorias",
+      "most_participatory": "Equipo más Participativo",
+      "wins": "victorias",
+      "tournaments": "torneos"
+    },
+    "tasks": {
+      "draft": "Torneo en borrador",
+      "late_matches": "Resultados pendientes (+3 días)",
+      "unconfirmed": "Parejas por confirmar"
+    }
   },
   "footer": {
     "desc": "La plataforma líder de gestión de torneos para la comunidad competitiva del Mus. Precisión, elegancia y pasión.",
@@ -368,6 +399,7 @@
     "coming_soon": "Próximamente",
     "players_count": "{count} Jugadores",
     "pairs_count": "{count} Parejas",
+    "owner": "Organizador",
     "filters": {
       "all": "Todos",
       "active": "En Curso",
@@ -384,7 +416,9 @@
       "identity": "Identidad del Torneo",
       "location": "Localización Geográfica",
       "schedule": "Cronograma",
-      "docs": "Documentación"
+      "docs": "Documentación",
+      "rules": "Reglas & Sistema",
+      "status": "Estado & Privacidad"
     },
     "labels": {
       "name": "Nombre del Torneo",
@@ -410,6 +444,7 @@
       "newPoster": "Nueva imagen:",
       "currentPoster": "Cartel actual:",
       "ruleKings": "Reyes",
+      "ruleKing": "Reyes",
       "rulePoints": "Tantos",
       "ruleGames": "Chicos",
       "tablesCount": "Nº de Mesas",
@@ -421,8 +456,8 @@
     "placeholders": {
       "name": "Ej: Gran Torneo de Primavera",
       "location": "Ej: Bar Txoko, Calle Mayor 1",
-      "province": "Ej: Bizkaia",
-      "town": "Ej: Bilbao",
+      "province": "Ej: Gipuzkoa",
+      "town": "Ej: Donostia",
       "customPoints": "Especificar tantos",
       "customGames": "Especificar chicos"
     },
@@ -524,6 +559,7 @@
     },
     "draft_mode": "MODO BORRADOR",
     "knockout": {
+      "t64": "Treintadosavos de Final",
       "t32": "Dieciseisavos de Final",
       "t16": "Octavos de Final",
       "t8": "Cuartos de Final",
@@ -536,7 +572,7 @@
   "team_form": {
     "title": "Nueva Pareja",
     "name": "Nombre de la Pareja",
-    "name_placeholder": "Ej: Los Invencibles",
+    "name_placeholder": "Ej: Juan y Jose",
     "tournament": "Torneo",
     "submit": "Crear e Inscribir Pareja",
     "success_msg": "¡Pareja creada e inscrita con éxito! Puedes añadir otra.",
@@ -575,6 +611,68 @@
     "step5": {
       "title": "Histórico y Estadísticas",
       "desc": "Al finalizar el torneo, los datos no se pierden. Mus Manager guarda un histórico detallado de todas las partidas jugadas, permitiéndote consultar quién es el 'txapeldun' histórico de tu peña o cuántas veces ha ganado una pareja determinada. Los datos son el legado de tu comunidad."
+    }
+  },
+  "tournament_admin": {
+    "panel_title": "Panel de Gestión",
+    "back_tooltip": "Volver a Mis Torneos",
+    "enrollment": {
+      "title": "Inscripción de Parejas",
+      "add_btn": "INSCRIBIR NUEVA PAREJA",
+      "list_title": "Parejas Inscritas",
+      "empty": "No hay parejas todavía",
+      "confirmed_tooltip": "Confirmado / Pagado",
+      "delete_success": "Pareja eliminada correctamente",
+      "add_success": "Pareja inscrita correctamente",
+      "delete_confirm_title": "Confirmar Eliminación",
+      "delete_confirm_msg": "¿Estás seguro de que quieres desapuntar a esta pareja? Esta acción no se puede deshacer.",
+      "dialog_title": "Inscribir Pareja",
+      "delete_btn": "Eliminar"
+    },
+    "groups": {
+      "config_title": "Configuración de Grupos",
+      "count_label": "Número de Grupos",
+      "generate_btn": "REPARTIR EN GRUPOS"
+    },
+    "status": {
+      "title": "Fase del Torneo",
+      "update_success": "Fase actualizada correctamente"
+    },
+    "preparation": {
+      "title": "Modo Preparación",
+      "ready_desc": "Todo listo. Pulsa el botón inferior para realizar el sorteo y comenzar el torneo oficialmente.",
+      "not_ready_desc": "Inscribe al menos a 2 parejas para poder realizar el sorteo.",
+      "start_btn": "EMPEZAR TORNEO",
+      "initial_draw": "SORTEO INICIAL",
+      "teams_label": "Parejas",
+      "system_label": "Sistema"
+    },
+    "matches": {
+      "title": "Partidos del Torneo",
+      "empty": "No hay partidos generados",
+      "no_matchups": "No hay enfrentamientos",
+      "error_desc": "Algo ha ido mal. Intenta generar el calendario de nuevo.",
+      "tbd": "POR DECIDIR",
+      "order_asc": "FINAL ABAJO",
+      "order_desc": "FINAL ARRIBA"
+    },
+    "match_edit": {
+      "title": "Gestión de Resultado",
+      "panel_title": "Panel de Control",
+      "score_games": "PUNTUACIÓN CHICOS",
+      "regulation": "REGLAMENTO",
+      "best_of": "Al mejor de {total} (ganar {needed}) a {points}",
+      "save_btn": "GUARDAR",
+      "saving_btn": "GUARDANDO...",
+      "cancel_btn": "CANCELAR",
+      "games_breakdown": "Desglose de Juegos",
+      "points_per_game": "{points} tantos/juego",
+      "game_label": "Juego",
+      "win_tooltip": "Ganar"
+    },
+    "stats": {
+      "confirmed": "Confirmadas",
+      "finished": "Finalizados"
     }
   }
 }

@@ -68,6 +68,10 @@ onMounted(() => {
       </h1>
       <p class="mus-p opacity-60 mt-4">{{ t('tournaments_page.subtitle') }}</p>
     </header>
+
+    <div class="col-12 px-4">
+      <GoogleAd :key="'ad1'" />
+    </div>
     
     <!-- Sub-menu Filter Bar -->
     <nav class="filter-bar-container">
@@ -133,8 +137,7 @@ onMounted(() => {
                 <span class="uppercase tracking-widest">Admin Info</span>
               </div>
               <div class="mt-1 text-[11px] text-slate-300 font-bold">
-                <span class="text-slate-500">Owner:</span> {{ tny.owner.name }} 
-                <span class="text-slate-600 bg-black/40 px-2 py-0.5 rounded ml-2">ID: {{ tny.owner.id }}</span>
+                <span class="text-slate-500">{{ t('tournaments_page.owner') }}:</span> {{ tny.owner.firstName || '' }} {{ tny.owner.lastName || tny.owner.name || '' }} 
               </div>
             </div>
           </div>
@@ -181,11 +184,11 @@ onMounted(() => {
   gap: 4px;
   max-width: 100%;
   overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
 
 .filter-bar::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
+  display: none;
 }
 
 .filter-btn {
@@ -231,10 +234,6 @@ onMounted(() => {
   height: 4px;
   background: #050505;
   border-radius: 50%;
-}
-
-.page-header {
-  text-align: center;
 }
 
 .loading-state, .empty-state {
@@ -385,8 +384,6 @@ onMounted(() => {
   border-color: #0fb361;
   box-shadow: 0 10px 20px rgba(15, 179, 97, 0.3);
 }
-
-
 
 .line-clamp-1 {
   display: -webkit-box;

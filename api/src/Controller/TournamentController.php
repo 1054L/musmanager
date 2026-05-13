@@ -30,15 +30,16 @@ class TournamentController extends AbstractController
     public function listManaged(TournamentRepository $tournamentRepository): JsonResponse
     {
         $user = $this->getUser();
+        $isSuperAdmin = $this->isGranted('ROLE_SUPER_ADMIN');
         
-        if ($this->isGranted('ROLE_SUPER_ADMIN')) {
+        if ($isSuperAdmin) {
             $tournaments = $tournamentRepository->findBy([], ['id' => 'DESC']);
         } else {
             $tournaments = $tournamentRepository->findManagedByUser($user);
         }
-
-        return new JsonResponse(array_map(function(Tournament $t) {
-            return [
+        
+        return new JsonResponse(array_map(function(Tournament $t) use ($isSuperAdmin) {
+            $data = [
                 'id' => $t->getId(),
                 'name' => $t->getName(),
                 'uuid' => $t->getUuidAccessToken(),
@@ -61,6 +62,18 @@ class TournamentController extends AbstractController
                 'hasMatches' => count($t->getMatches()) > 0,
                 'private' => $t->isPrivate(),
             ];
+
+            if ($isSuperAdmin) {
+                $owner = $t->getCreatedBy();
+                $data['owner'] = $owner ? [
+                    'id' => $owner->getId(),
+                    'email' => $owner->getEmail(),
+                    'firstName' => $owner->getFirstName(),
+                    'lastName' => $owner->getLastName(),
+                ] : null;
+            }
+
+            return $data;
         }, $tournaments));
     }
 
@@ -136,8 +149,10 @@ class TournamentController extends AbstractController
             'ruleGames'  => $tournament->getRuleGames(),
             'tablesCount'=> $tournament->getTablesCount(),
             'location'   => $tournament->getLocation(),
-            'province'   => $tournament->getProvince(),
-            'town'       => $tournament->getTown(),
+            'provinceId' => $tournament->getProvince() ? $tournament->getProvince()->getId() : null,
+            'provinceName' => $tournament->getProvince() ? $tournament->getProvince()->getName() : null,
+            'townId' => $tournament->getTown() ? $tournament->getTown()->getId() : null,
+            'townName' => $tournament->getTown() ? $tournament->getTown()->getName() : null,
             'posterPath' => $tournament->getPosterPath(),
             'rulesPath'  => $tournament->getRulesPath(),
         ]);
@@ -232,8 +247,10 @@ class TournamentController extends AbstractController
             'ruleGames'  => $tournament->getRuleGames(),
             'tablesCount'=> $tournament->getTablesCount(),
             'location'   => $tournament->getLocation(),
-            'province'   => $tournament->getProvince(),
-            'town'       => $tournament->getTown(),
+            'provinceId' => $tournament->getProvince() ? $tournament->getProvince()->getId() : null,
+            'provinceName' => $tournament->getProvince() ? $tournament->getProvince()->getName() : null,
+            'townId' => $tournament->getTown() ? $tournament->getTown()->getId() : null,
+            'townName' => $tournament->getTown() ? $tournament->getTown()->getName() : null,
             'posterPath' => $tournament->getPosterPath(),
             'rulesPath'  => $tournament->getRulesPath(),
         ]);
@@ -318,8 +335,10 @@ class TournamentController extends AbstractController
             'ruleGames' => $tournament->getRuleGames(),
             'tablesCount' => $tournament->getTablesCount(),
             'location' => $tournament->getLocation(),
-            'province' => $tournament->getProvince(),
-            'town' => $tournament->getTown(),
+            'provinceId' => $tournament->getProvince() ? $tournament->getProvince()->getId() : null,
+            'provinceName' => $tournament->getProvince() ? $tournament->getProvince()->getName() : null,
+            'townId' => $tournament->getTown() ? $tournament->getTown()->getId() : null,
+            'townName' => $tournament->getTown() ? $tournament->getTown()->getName() : null,
             'posterPath' => $tournament->getPosterPath(),
             'rulesPath' => $tournament->getRulesPath(),
             'private' => $tournament->isPrivate(),
@@ -583,23 +602,28 @@ class TournamentController extends AbstractController
         $gamesWon2 = 0;
         $limit = $tournament->getRulePoints();
 
-        foreach ($gamesData as $index => $g) {
-            $points1 = (int) ($g['points1'] ?? 0);
-            $points2 = (int) ($g['points2'] ?? 0);
-            
-            if ($points1 === 0 && $points2 === 0) continue;
+        if (empty($gamesData) && (isset($data['score1']) || isset($data['score2']))) {
+            $gamesWon1 = (int)($data['score1'] ?? 0);
+            $gamesWon2 = (int)($data['score2'] ?? 0);
+        } else {
+            foreach ($gamesData as $index => $g) {
+                $points1 = (int) ($g['points1'] ?? 0);
+                $points2 = (int) ($g['points2'] ?? 0);
+                
+                if ($points1 === 0 && $points2 === 0) continue;
 
-            $game = new MusMatchGame();
-            $game->setMusMatch($match);
-            $game->setGameNumber($index + 1);
-            $game->setPointsTeam1($points1);
-            $game->setPointsTeam2($points2);
-            
-            if ($points1 >= $limit) $gamesWon1++;
-            elseif ($points2 >= $limit) $gamesWon2++;
-            
-            $entityManager->persist($game);
-            $match->addGame($game);
+                $game = new MusMatchGame();
+                $game->setMusMatch($match);
+                $game->setGameNumber($index + 1);
+                $game->setPointsTeam1($points1);
+                $game->setPointsTeam2($points2);
+                
+                if ($points1 >= $limit) $gamesWon1++;
+                elseif ($points2 >= $limit) $gamesWon2++;
+                
+                $entityManager->persist($game);
+                $match->addGame($game);
+            }
         }
 
         $match->setScoreTeam1($gamesWon1);
@@ -656,10 +680,12 @@ class TournamentController extends AbstractController
             // Skip if no score yet (unless winner set manually, but we use scores)
             if ($s1 === 0 && $s2 === 0 && !$winner) continue;
 
+            if (!$team1 || !$team2) continue;
+
             $tt1 = null; $tt2 = null;
             foreach ($tournament->getTournamentTeams() as $tt) {
-                if ($tt->getTeam()->getId() === $team1->getId()) $tt1 = $tt;
-                if ($tt->getTeam()->getId() === $team2->getId()) $tt2 = $tt;
+                if ($team1 && $tt->getTeam()->getId() === $team1->getId()) $tt1 = $tt;
+                if ($team2 && $tt->getTeam()->getId() === $team2->getId()) $tt2 = $tt;
             }
 
             if ($tt1) {
@@ -776,14 +802,6 @@ class TournamentController extends AbstractController
                 $nextMatch->setTeam2($match->getWinner());
             } else {
                 $nextMatch->setTeam1($match->getWinner());
-            }
-            
-            // If the next match also becomes a Bye (cascading BYE)
-            if ($nextMatch->getTeam1() && !$nextMatch->getTeam2()) {
-                $nextMatch->setWinner($nextMatch->getTeam1());
-                $nextMatch->setScoreTeam1(1);
-                $nextMatch->setScoreTeam2(0);
-                $this->advanceWinnerInBracket($nextMatch, $entityManager);
             }
         }
     }
