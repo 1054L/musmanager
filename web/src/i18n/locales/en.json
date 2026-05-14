@@ -483,6 +483,9 @@
     "public_view": "Public View",
     "matches_in_progress": "Matches in Progress",
     "view_full_bracket": "View Full Bracket",
+    "tv_mode": "TV MODE",
+    "exit": "EXIT",
+    "grand_final": "GRAND FINAL",
     "match_status": {
       "finished": "Finished",
       "pending": "Pending"
@@ -519,6 +522,7 @@
     "match_edit": {
       "title": "Enter Result",
       "save": "Save Result",
+      "save_success": "Result saved successfully",
       "local": "Local",
       "visitor": "Visitor",
       "rule_summary": "Match to {games} sets of {points} points"

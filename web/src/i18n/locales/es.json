@@ -492,6 +492,9 @@
     "matches_in_progress": "Partidas en Curso",
     "public_view": "Vista Pública",
     "view_full_bracket": "Ver Cuadro Completo",
+    "tv_mode": "MODO TV",
+    "exit": "SALIR",
+    "grand_final": "GRAN FINAL",
     "match_status": {
       "finished": "Finalizado",
       "pending": "Pendiente"
@@ -528,6 +531,7 @@
     "match_edit": {
       "title": "Ingresar Resultado",
       "save": "Guardar Resultado",
+      "save_success": "Resultado guardado correctamente",
       "local": "Local",
       "visitor": "Visitante",
       "rule_summary": "Partida a {games} chicos de {points} tantos"

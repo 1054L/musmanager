@@ -474,6 +474,9 @@
     "public_view": "Ikuspegi Publikoa",
     "matches_in_progress": "Partidak Abian",
     "view_full_bracket": "Ikusi Koadro Osoa",
+    "tv_mode": "TV MODUA",
+    "exit": "IRTEN",
+    "grand_final": "FINALA HANDIA",
     "match_status": {
       "finished": "Amaitua",
       "pending": "Zain"
@@ -510,6 +513,7 @@
     "match_edit": {
       "title": "Sartu Emaitza",
       "save": "Gorde Emaitza",
+      "save_success": "Emaitza ondo gorde da",
       "local": "Etxekoa",
       "visitor": "Kanpokoa",
       "rule_summary": "{games} umeko eta {points} tantoko partida"

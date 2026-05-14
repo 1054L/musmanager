@@ -12,10 +12,12 @@ import Timeline from 'primevue/timeline'
 import Dialog from 'primevue/dialog'
 import GoogleAd from '../components/GoogleAd.vue'
 import MusLoader from '../components/MusLoader.vue'
+import { useToast } from 'primevue/usetoast'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 const { subscribe } = useMercure()
 const activeTab = ref('matches')
 const classification = ref({})
@@ -249,6 +251,7 @@ const saveMatchResult = async () => {
     }
     
     editingMatch.value = null;
+    toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_view.match_edit.save_success'), life: 3000 });
     await fetchTournament();
   } catch (e) {
     console.error('Error saving result:', e);
@@ -379,7 +382,7 @@ const saveMatchResult = async () => {
                         @click="toggleFullscreen" 
                         class="mus-btn-gold px-3 py-1.5 flex align-items-center gap-2">
                   <i class="pi" :class="isFullscreen ? 'pi-window-minimize' : 'pi-external-link'"></i>
-                  <span class="text-[9px] font-black uppercase">{{ isFullscreen ? 'SALIR' : 'TV MODE' }}</span>
+                  <span class="text-[9px] font-black uppercase">{{ isFullscreen ? $t('tournament_view.exit') : $t('tournament_view.tv_mode') }}</span>
                 </button>
               </div>
            </div>
@@ -416,7 +419,7 @@ const saveMatchResult = async () => {
                                       </td>
                                       <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
                                          <div class="flex flex-column align-items-center justify-center gap-4">
-                                            <Tag value="GRAND FINAL" severity="warning" class="text-[10px] font-black italic uppercase tracking-widest px-4 py-2" />
+                                            <Tag :value="$t('tournament_view.grand_final')" severity="warning" class="text-[10px] font-black italic uppercase tracking-widest px-4 py-2" />
                                             <button v-if="tournament.isManager" @click="openEditModal(match)" class="text-[9px] font-black text-secondary uppercase border border-secondary/30 px-3 py-1.5 rounded bg-secondary/5 hover:bg-secondary/20 transition-all">
                                                {{ t('dashboard.manage') }}
                                             </button>
@@ -639,7 +642,7 @@ const saveMatchResult = async () => {
                                   class="flex flex-column align-items-center gap-6">
                                 <div class="text-center">
                                    <div class="w-32 h-px bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mb-4"></div>
-                                   <Tag value="GRAND FINAL" severity="warning" class="font-black italic uppercase tracking-[0.4em] text-xl px-6 py-3" />
+                                   <Tag :value="$t('tournament_view.grand_final')" severity="warning" class="font-black italic uppercase tracking-[0.4em] text-xl px-6 py-3" />
                                    <div class="w-32 h-px bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mt-4"></div>
                                 </div>
                                 <div class="bracket-match-card mus-glass border-secondary/50 w-[480px] shadow-2xl scale-110 bg-secondary/5"
