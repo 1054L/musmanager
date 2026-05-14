@@ -93,10 +93,17 @@ onMounted(() => {
 
 <template>
   <div class="view-container animate-in fade-in duration-500">
-    <div class="mus-page-header">
-      <h1 class="mus-title">{{ t('profile.title') || 'Mi Perfil' }}</h1>
-      <p class="mus-subtitle">{{ t('profile.desc') || 'Gestiona tu información personal y credenciales' }}</p>
-    </div>
+    <!-- Header Style Replicated from Dashboard -->
+    <header class="flex justify-between items-center mb-12 px-2">
+      <div>
+        <h1 class="text-3xl font-black uppercase tracking-tighter text-white m-0 italic">
+          {{ t('nav.profile_label') || 'MI' }} <span class="text-secondary">{{ t('nav.profile_gold') || 'PERFIL' }}</span>
+        </h1>
+        <p class="text-[10px] uppercase font-bold tracking-[0.3em] text-slate-500 mt-1">
+          {{ t('profile.desc') || 'Gestiona tu información personal y credenciales' }}
+        </p>
+      </div>
+    </header>
 
     <MusLoader v-if="loading" />
 

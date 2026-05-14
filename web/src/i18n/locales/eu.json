@@ -22,7 +22,9 @@
     "howItWorks": "Nola Funtzionatzen Du?",
     "theme": "Aldatu Gaia",
     "lightMode": "Modu Argia",
-    "darkMode": "Modu Iluna"
+    "darkMode": "Modu Iluna",
+    "profile_label": "NIRE",
+    "profile_gold": "PROFILA"
   },
   "hero": {
     "partner": "Mus Elkarte Ofiziala",
@@ -160,6 +162,11 @@
     "empty_cta": "Sortu zure lehen txapelketa",
     "empty_subtitle": "Hasi zure ondarea Mus Manager antolatzaile gisa gaur bertan.",
     "my_tournaments": "Nire Txapelketak",
+    "view_all": "Ikusi guztiak",
+    "recent": "Azken",
+    "recent_gold": "Txapelketak",
+    "recent_tournaments": "Azken Txapelketak",
+    "recent_teams": "AZKEN BIKOTEAK",
     "copy_link": "Kopiatu Esteka",
     "copy_link_help": "Partekatu esteka hau muslarien artean",
     "link_copied": "Esteka kopiatua!",
@@ -185,17 +192,31 @@
     "groups_success": "Taldeak ongi sortu dira",
     "matches_success": "Partiden egutegia ongi sortu da",
     "enroll_success": "Bikotea ongi izena eman du",
-    "master_advice": "EGUNEKO AHOLKUA",
+    "master_advice": "AHOLKU NAGUSIA",
     "sections": {
-      "active_tournaments": "Abian diren Txapelketak",
-      "mus_statistics": "Estatistikak",
-      "pending_tasks": "Egin beharrekoak"
+      "active_tournaments": "MARTXAN DIREN TXAPELKETAK",
+      "mus_statistics": "ESTATISTIKA NAGUSIAK",
+      "pending_tasks": "EGIN BEHARREKOAK",
+      "master_management": "KUDEAKETA",
+      "master_management_gold": "ZENTROA",
+      "operational_status": "EGOERA",
+      "operational_status_blue": "OPERATIBOA",
+      "global_stats": "ESTATISTIKA",
+      "global_stats_purple": "OROKORRAK",
+      "alert_center": "ALERTA",
+      "alert_center_orange": "ZENTROA",
+      "operational_card": "OPERATIBOA",
+      "general_card": "OROKORRAK",
+      "center_card": "ZENTROA",
+      "operational_status_desc": "SISTEMA ONLINE %100",
+      "general_status_desc": "ESTATISTIKAK EGUNERATUTA",
+      "center_status_desc": "0 ALERTA KRITIKO"
     },
     "stats_summary": {
       "total_created": "Sortutako Txapelketak",
       "active": "Txapelketa Aktiboak",
       "finished": "Amaitutako Txapelketak",
-      "platform_teams": "Bikoteak Plataforman"
+      "platform_teams": "Izena emandako bikoteak"
     },
     "active_detail": {
       "progress": "Txapelketaren Aurrerapena",
@@ -212,6 +233,13 @@
       "draft": "Zirriborroan dagoen txapelketa",
       "late_matches": "Emaitzak zain (+3 egun)",
       "unconfirmed": "Baieztatu beharreko bikoteak"
+    },
+    "labels": {
+      "victories": "Garaipenak",
+      "tournaments": "Txapelketak",
+      "pairs": "Bikoteak",
+      "results": "Emaitzak",
+      "live_round": "Zuzenean • Egungo Jardunaldia"
     }
   },
   "footer": {

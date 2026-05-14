@@ -31,7 +31,9 @@
     "howItWorks": "¿Cómo funciona?",
     "theme": "Cambiar Tema",
     "lightMode": "Modo Claro",
-    "darkMode": "Modo Oscuro"
+    "darkMode": "Modo Oscuro",
+    "profile_label": "MI",
+    "profile_gold": "PERFIL"
   },
   "hero": {
     "partner": "Socio Oficial de Mus",
@@ -153,8 +155,8 @@
     "updated": "Perfil actualizado correctamente"
   },
   "dashboard": {
-    "title": "Panel de",
-    "title_gold": "Control",
+    "title": "PANEL DE",
+    "title_gold": "CONTROL",
     "my_tournaments_title": "Mis",
     "my_tournaments_gold": "Torneos",
     "welcome": "Bienvenido de nuevo, {name}. Tienes {count} eventos bajo tu gestión.",
@@ -170,7 +172,11 @@
     "empty_subtitle": "Comienza tu legado como organizador de Mus Manager hoy mismo.",
     "my_tournaments": "Mis Torneos",
     "my_tournaments_desc": "Gestiona tus eventos competitivos y parejas registradas",
-    "recent_tournaments": "Torneos Recientes",
+    "view_all": "Ver todos",
+    "recent": "Torneos",
+    "recent_gold": "Recientes",
+    "recent_tournaments": "ULTIMOS TORNEOS",
+    "recent_teams": "ULTIMAS PAREJAS",
     "stats": {
       "total_tournaments": "Torneos Totales",
       "active_tournaments": "Torneos Activos",
@@ -206,13 +212,27 @@
     "sections": {
       "active_tournaments": "Torneos en Curso",
       "mus_statistics": "Estadísticas Maestras",
-      "pending_tasks": "Tareas Pendientes"
+      "pending_tasks": "Tareas Pendientes",
+      "master_management": "Gestión",
+      "master_management_gold": "Maestra",
+      "operational_status": "Estado",
+      "operational_status_blue": "Operativo",
+      "global_stats": "Estadísticas",
+      "global_stats_purple": "Globales",
+      "alert_center": "Centro de",
+      "alert_center_orange": "Alertas",
+      "operational_card": "OPERATIVO",
+      "general_card": "GENERALES",
+      "center_card": "CENTRO",
+      "operational_status_desc": "SISTEMA EN LINEA 100%",
+      "general_status_desc": "ESTADÍSTICAS ACTUALIZADAS",
+      "center_status_desc": "0 ALERTAS CRÍTICAS"
     },
     "stats_summary": {
       "total_created": "Torneos Creados",
       "active": "Torneos Activos",
       "finished": "Torneos Finalizados",
-      "platform_teams": "Equipos en Plataforma"
+      "platform_teams": "Parejas Inscritas"
     },
     "active_detail": {
       "progress": "Progreso del Torneo",
@@ -229,6 +249,13 @@
       "draft": "Torneo en borrador",
       "late_matches": "Resultados pendientes (+3 días)",
       "unconfirmed": "Parejas por confirmar"
+    },
+    "labels": {
+      "victories": "Victorias",
+      "tournaments": "Torneos",
+      "pairs": "Parejas",
+      "results": "Resultados",
+      "live_round": "En Vivo • Ronda Actual"
     }
   },
   "footer": {

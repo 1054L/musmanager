@@ -22,7 +22,9 @@
     "howItWorks": "How it Works",
     "theme": "Toggle Theme",
     "lightMode": "Light Mode",
-    "darkMode": "Dark Mode"
+    "darkMode": "Dark Mode",
+    "profile_label": "MY",
+    "profile_gold": "PROFILE"
   },
   "hero": {
     "partner": "Official Mus Partner",
@@ -159,9 +161,11 @@
     "empty_title": "Your dashboard is empty",
     "empty_cta": "Create your first tournament",
     "empty_subtitle": "Start your legacy as a Mus Manager organizer today.",
-    "my_tournaments": "My Tournaments",
-    "my_tournaments_desc": "Manage your competitive events and registered pairs",
+    "view_all": "View all",
+    "recent": "Recent",
+    "recent_gold": "Tournaments",
     "recent_tournaments": "Recent Tournaments",
+    "recent_teams": "LATEST PAIRS",
     "stats": {
       "total_tournaments": "Total Tournaments",
       "active_tournaments": "Active Tournaments",
@@ -195,15 +199,29 @@
     "enroll_success": "Team enrolled successfully",
     "master_advice": "MASTER ADVICE",
     "sections": {
-      "active_tournaments": "Active Tournaments",
-      "mus_statistics": "Master Statistics",
-      "pending_tasks": "Pending Tasks"
+      "active_tournaments": "ACTIVE TOURNAMENTS",
+      "mus_statistics": "MASTER STATISTICS",
+      "pending_tasks": "PENDING TASKS",
+      "master_management": "MANAGEMENT",
+      "master_management_gold": "CENTER",
+      "operational_status": "STATUS",
+      "operational_status_blue": "OPERATIONAL",
+      "global_stats": "STATS",
+      "global_stats_purple": "GLOBAL",
+      "alert_center": "CENTER",
+      "alert_center_orange": "ALERTS",
+      "operational_card": "OPERATIONAL",
+      "general_card": "GENERAL",
+      "center_card": "CENTER",
+      "operational_status_desc": "SYSTEM ONLINE 100%",
+      "general_status_desc": "STATS UPDATED",
+      "center_status_desc": "0 CRITICAL ALERTS"
     },
     "stats_summary": {
       "total_created": "Tournaments Created",
       "active": "Active Tournaments",
       "finished": "Finished Tournaments",
-      "platform_teams": "Platform Teams"
+      "platform_teams": "Enrolled Pairs"
     },
     "active_detail": {
       "progress": "Tournament Progress",
@@ -220,6 +238,13 @@
       "draft": "Tournament in draft",
       "late_matches": "Pending results (+3 days)",
       "unconfirmed": "Teams to confirm"
+    },
+    "labels": {
+      "victories": "Wins",
+      "tournaments": "Tournaments",
+      "pairs": "Pairs",
+      "results": "Results",
+      "live_round": "Live • Current Round"
     }
   },
   "footer": {

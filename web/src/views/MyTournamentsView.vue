@@ -195,18 +195,20 @@ onMounted(() => {
 <template>
   <div class="view-container animate-in fade-in slide-in-from-bottom-4 duration-700">
     
-    <!-- Section Title -->
-    <header class="mus-page-header">
-      <h1 class="mus-title">
-        {{ t('dashboard.my_tournaments_title') }} <span class="mus-gold-text">{{ t('dashboard.my_tournaments_gold') }}</span>
-      </h1>
-      <p class="mus-subtitle">
-        {{ t('dashboard.my_tournaments_desc') || 'Gestiona tus eventos competitivos y parejas registradas' }}
-      </p>
-      
-      <!-- Debug Info Panel -->
-      <div v-if="showDebug" class="debug-panel mt-4 p-4 mus-glass text-xs font-mono text-slate-400 overflow-auto max-h-[200px]">
-        <pre>{{ JSON.stringify(debugInfo, null, 2) }}</pre>
+    <!-- Header Style Replicated from Dashboard -->
+    <header class="flex justify-between items-center mb-12 px-2">
+      <div>
+        <h1 class="text-3xl font-black uppercase tracking-tighter text-white m-0 italic">
+          {{ t('dashboard.my_tournaments_title') || t('dashboard.my_tournaments') }} <span class="text-secondary">{{ t('dashboard.my_tournaments_gold') || '' }}</span>
+        </h1>
+        <p class="text-[10px] uppercase font-bold tracking-[0.3em] text-slate-500 mt-1 cursor-pointer select-none" @click="toggleDebug">
+          {{ t('dashboard.my_tournaments_desc') || 'Gestiona tus eventos competitivos y parejas registradas' }}
+        </p>
+        
+        <!-- Debug Info Panel -->
+        <div v-if="showDebug" class="debug-panel mt-4 p-4 mus-glass text-xs font-mono text-slate-400 overflow-auto max-h-[200px]">
+          <pre>{{ JSON.stringify(debugInfo, null, 2) }}</pre>
+        </div>
       </div>
     </header>
 

@@ -391,27 +391,28 @@ const normalizeStageKey = (stage) => {
     </div>
 
     <template v-else-if="tournament">
-      <!-- Header Section -->
-      <header class="admin-header mb-12">
-        <div class="flex flex-column lg:flex-row justify-content-between align-items-center gap-12">
-          <div class="flex align-items-center gap-10 mr-4">
+      <!-- Header Style Replicated from Dashboard -->
+      <header class="mb-12 px-2">
+        <div class="flex flex-column lg:flex-row justify-content-between align-items-center gap-8">
+          <div class="flex align-items-center gap-6">
             <button @click="router.push('/my-tournaments')" class="back-btn" v-tooltip.right="t('tournament_admin.back_tooltip')">
               <i class="pi pi-chevron-left"></i>
             </button>
-            <div class="flex flex-column gap-2">
-              <div class="flex align-items-center gap-2">
+            <div>
+              <div class="flex align-items-center gap-2 mb-1">
                 <span class="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em]">{{ t('tournament_admin.panel_title') }}</span>
                 <span class="h-1 w-1 rounded-full bg-slate-700"></span>
                 <span class="text-secondary text-[9px] font-black uppercase tracking-[0.2em] italic">{{ t('tournament_form.types.' + tournament.type) }}</span>
               </div>
-              <div class="flex align-items-center gap-6">
-                <h1 class="text-3xl md:text-5xl font-black text-main italic uppercase tracking-tighter m-0 leading-none">{{ tournament.name }}</h1>
-                <div class="h-10 w-px bg-white/10 hidden md:block"></div>
-                <div class="flex align-items-center gap-6 text-slate-500 text-xs font-bold uppercase tracking-widest">
-                  <span class="flex align-items-center gap-2"><i class="pi pi-map-marker text-secondary"></i>{{ tournament.location || '---' }}</span>
-                  <span class="flex align-items-center gap-2"><i class="pi pi-calendar text-secondary"></i>{{ tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : '...' }}</span>
-                </div>
-                <Tag :value="t('tournament_form.statuses.' + tournament.status)" severity="success" class="mus-tag-gold" />
+              <h1 class="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter m-0 leading-none">
+                {{ tournament.name.split(' ').slice(0, -1).join(' ') }} <span class="text-secondary">{{ tournament.name.split(' ').slice(-1)[0] }}</span>
+              </h1>
+              <div class="flex align-items-center gap-6 text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-3">
+                <span class="flex align-items-center gap-2"><i class="pi pi-map-marker text-secondary/50"></i>{{ tournament.location || '---' }}</span>
+                <div class="w-1 h-1 rounded-full bg-slate-800"></div>
+                <span class="flex align-items-center gap-2"><i class="pi pi-calendar text-secondary/50"></i>{{ tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : '...' }}</span>
+                <div class="w-1 h-1 rounded-full bg-slate-800"></div>
+                <span class="text-secondary">{{ t('tournament_form.statuses.' + tournament.status) }}</span>
               </div>
             </div>
           </div>
