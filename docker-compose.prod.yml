@@ -33,6 +33,9 @@ services:
       APP_ENV: prod
       APP_DEBUG: 0
       APP_SECRET: ${APP_SECRET}
+      MERCURE_URL: http://mercure:3000/.well-known/mercure
+      MERCURE_PUBLIC_URL: https://musmanager.com/.well-known/mercure
+      MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET}
     volumes:
       - api_var:/var/www/html/var
       - uploads_data:/var/www/html/public/uploads
