@@ -36,6 +36,8 @@ services:
     volumes:
       - api_var:/var/www/html/var
       - uploads_data:/var/www/html/public/uploads
+    ports:
+      - "8001:80"
     expose:
       - "80"
     networks:
@@ -49,6 +51,8 @@ services:
     restart: always
     depends_on:
       - api
+    ports:
+      - "8000:80"
     expose:
       - "80"
     networks:
@@ -62,6 +66,8 @@ services:
   mercure:
     image: dunglas/mercure
     restart: always
+    ports:
+      - "8002:3000"
     environment:
       # SERVER_NAME must be set to :3000 as requested for NPM forward port
       SERVER_NAME: :3000
@@ -69,7 +75,7 @@ services:
       MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
       # Extra directives as requested
       MERCURE_EXTRA_DIRECTIVES: |
-        cors_origins https://yourdomain.com
+        cors_origins https://musmanager.com
         anonymous 1
         subscriptions 1
     # No ports mapping as requested, reachable only via internal network
