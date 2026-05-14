@@ -37,6 +37,10 @@ jobs:
           script: |
             set -e
             cd /var/www/mus
+            echo "Cleaning working directory..."
+            git reset HEAD .
+            git checkout -- .
+            git clean -fd
             echo "Pulling latest changes from main..."
             git pull origin main
 
