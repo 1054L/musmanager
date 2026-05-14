@@ -1,5 +1,7 @@
+<script setup>
+import MusFooter from '../components/MusFooter.vue'
+</script>
+
 <template>
-    <div class="layout-footer">
-        <span class="font-medium ml-2">Mus Manager &copy; 2026</span>
-    </div>
+    <MusFooter />
 </template>

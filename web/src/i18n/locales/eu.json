@@ -120,6 +120,7 @@
     "haveAccount": "Baduzu kontua?",
     "loginHere": "Hasi saioa hemen",
     "passwordMismatch": "Pasahitzak ez datoz bat",
+    "age_verification": "18 urte edo gehiago ditudala eta erabilera baldintzak onartzen ditudala baieztatzen dut",
     "role": "Erabiltzaile Mota",
     "roleUser": "Jokalaria",
     "roleAdmin": "Antolatzailea"
@@ -250,7 +251,7 @@
     "privacy_sections": [
       {
         "title": "1. Tratamenduaren Arduraduna",
-        "text": "Webgune honetan biltzen diren datuen tratamenduaren arduraduna Mus Manager da, jakinarazpen-ondorioetarako helbidea [DIRECCIÓN POSTAL EN ESPAÑA]-n duena eta harremanetarako posta elektronikoa legal{'@'}musmanager.com izanik."
+        "text": "Webgune honetan biltzen diren datuen tratamenduaren arduraduna Mus Manager da, jakinarazpen-ondorioetarako helbidea Donostia, Espainia-n duena eta harremanetarako posta elektronikoa info{'@'}musmanager.com izanik."
       },
       {
         "title": "2. Biltzen ditugun Datuak",
@@ -266,7 +267,7 @@
       },
       {
         "title": "5. Zure Eskubideak",
-        "text": "Eskubide hauek dituzu: Zure datuetara sartzea, datu okerrak zuzentzea, beharrezkoak ez direnean ezabatzeko eskatzea, tratamenduari aurka egitea eta zure datuen eramangarritasuna eskatzea. Eskubide hauek legal{'@'}musmanager.com helbidera mezu bat bidaliz erabil ditzakezu, zure NANaren edo baliokidearen kopia bat erantsiz."
+        "text": "Eskubide hauek dituzu: Zure datuetara sartzea, datu okerrak zuzentzea, beharrezkoak ez direnean ezabatzeko eskatzea, tratamenduari aurka egitea eta zure datuen eramangarritasuna eskatzea. Eskubide hauek info{'@'}musmanager.com helbidera mezu bat bidaliz erabil ditzakezu, zure NANaren edo baliokidearen kopia bat erantsiz."
       },
       {
         "title": "6. Datuak Kontserbatzea",
@@ -283,7 +284,7 @@
       },
       {
         "title": "2. Erregistroa eta Erantzukizuna",
-        "text": "Erabiltzailea da bere kredentzialen konfidentzialtasuna mantentzearen arduraduna. Debekatuta dago 14 urtetik beherakoak erregistratzea tutorearen baimenik gabe. Erabiltzaileak ziurtatzen du sartutako informazioa egiazkoa dela."
+        "text": "Erabiltzailea da bere kredentzialen konfidentzialtasuna mantentzearen arduraduna. Debekatuta dago 18 urtetik beherakoak erregistratzea tutoreen baimenik gabe. Erabiltzaileak ziurtatzen du sartutako informazioa egiazkoa dela."
       },
       {
         "title": "3. Debekatutako Erabilera",
@@ -302,10 +303,16 @@
     "cookies_p1": "musmanager.com-en cookie-ak erabiltzen ditugu zure nabigazio-esperientzia hobetzeko eta publizitate pertsonalizatua erakusteko. Jarraian, zer diren eta zeintzuk erabiltzen ditugun azaltzen dugu.",
     "cookies_sections": [
       {
-        "title": "Zer da Cookie bat?",
-        "text": "Cookie bat testu-fitxategi txiki bat da, webguneak zure nabigatzailean gordetzen duena zure bisitari, lehentasunei eta ezarpenei buruzko informazioa gogoratzeko."
+        "title": "Zer da cookie bat?",
+        "text": "Cookie bat webguneak zure nabigatzailean gordetzen duen testu-fitxategi txiki bat da, zure bisitari, hobespenei eta ezarpenei buruzko informazioa gogoratzeko."
+      },
+      {
+        "title": "Nola kudeatu cookieak?",
+        "text": "Zure nabigatzailea cookieak edonoiz blokeatzeko edo ezabatzeko konfigura dezakezu. Kontuan izan cookie teknikoak desgaitzeak zure kontuaren funtzionamenduan eragina izan dezakeela. Informazio gehiago: Chrome (support.google.com/chrome), Firefox (support.mozilla.org), Safari (support.apple.com), Edge (support.microsoft.com)."
       }
     ],
+    "age_notice": "Gune honek online jokoen publizitatea erakusten du. Jokoa debekatuta dago 18 urtetik beherakoentzat. Adingabea bazara, irten gunetik. Jokoak mendekotasuna sor dezake. Jokatu arduraz. www.juegoseguro.es",
+    "contact_footer": "Politika hauekin lotutako edozein zalantza izanez gero, gurekin harremanetan jar zaitezke info{'@'}musmanager.com helbidean",
     "cookies_table_headers": {
       "type": "Mota",
       "purpose": "Helburua",

@@ -25,6 +25,10 @@ class RegistrationController extends AbstractController
             return new JsonResponse(['error' => 'Email and password are required'], 400);
         }
 
+        if (!isset($data['ageVerified']) || $data['ageVerified'] !== true) {
+            return new JsonResponse(['error' => 'You must confirm you are 18 or older to register'], 400);
+        }
+
         $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
         if ($existingUser) {
             return new JsonResponse(['error' => 'Email already registered'], 409);
@@ -32,6 +36,8 @@ class RegistrationController extends AbstractController
 
         $user = new User();
         $user->setEmail($data['email']);
+        $user->setAgeVerified(true);
+        $user->setAgeVerifiedAt(new \DateTimeImmutable());
         
         $role = $data['role'] ?? 'user';
         if ($role === 'admin') {
@@ -46,6 +52,14 @@ class RegistrationController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return new JsonResponse(['message' => 'User registered successfully'], 201);
+        return new JsonResponse([
+            'message' => 'User registered successfully',
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'ageVerified' => $user->isAgeVerified(),
+                'ageVerifiedAt' => $user->getAgeVerifiedAt()->format(\DateTimeInterface::ATOM)
+            ]
+        ], 201);
     }
 }

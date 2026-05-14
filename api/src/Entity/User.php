@@ -47,6 +47,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $ageVerified = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $ageVerifiedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -178,6 +184,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function isAgeVerified(): bool
+    {
+        return $this->ageVerified;
+    }
+
+    public function setAgeVerified(bool $ageVerified): static
+    {
+        $this->ageVerified = $ageVerified;
+
+        return $this;
+    }
+
+    public function getAgeVerifiedAt(): ?\DateTimeImmutable
+    {
+        return $this->ageVerifiedAt;
+    }
+
+    public function setAgeVerifiedAt(?\DateTimeImmutable $ageVerifiedAt): static
+    {
+        $this->ageVerifiedAt = $ageVerifiedAt;
 
         return $this;
     }

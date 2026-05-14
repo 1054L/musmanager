@@ -86,6 +86,11 @@ const closeMobileMenu = () => {
           <i class="pi" :class="themeStore.isDark ? 'pi-sun' : 'pi-moon'"></i>
         </button>
 
+        <!-- 18+ Badge -->
+        <div class="age-badge desktop-only" v-tooltip.bottom="t('legal.age_notice')">
+          18+
+        </div>
+
 
         <!-- Auth -->
         <div class="auth-actions">
@@ -144,6 +149,12 @@ const closeMobileMenu = () => {
               <i class="pi" :class="themeStore.isDark ? 'pi-sun' : 'pi-moon'"></i>
               {{ themeStore.isDark ? t('nav.lightMode') || 'Modo Claro' : t('nav.darkMode') || 'Modo Oscuro' }}
             </button>
+
+            <!-- 18+ Badge (Mobile) -->
+            <div class="mobile-nav-item age-badge-mobile">
+              <div class="age-badge-small">18+</div>
+              <span>{{ t('legal.age_notice').split('.')[0] }}</span>
+            </div>
 
             <div class="mobile-divider"></div>
             
@@ -630,5 +641,46 @@ const closeMobileMenu = () => {
 
 .scale-90 {
   transform: scale(0.9);
+}
+
+.age-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 99px;
+  border: 2px solid #ef4444;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 950;
+  background: rgba(239, 68, 68, 0.05);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+  cursor: help;
+  transition: all 0.3s;
+}
+
+.age-badge:hover {
+  transform: scale(1.1);
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+}
+
+.age-badge-mobile {
+  color: #ef4444 !important;
+  pointer-events: none;
+}
+
+.age-badge-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 900;
+  flex-shrink: 0;
 }
 </style>

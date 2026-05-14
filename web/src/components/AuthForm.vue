@@ -25,6 +25,7 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const role = ref('user')
+const ageVerified = ref(false)
 const loading = ref(false)
 const error = ref(null)
 
@@ -50,7 +51,10 @@ const handleSubmit = async () => {
       if (password.value !== confirmPassword.value) {
         throw new Error(t('auth.passwordMismatch'))
       }
-      await authService.register(email.value, password.value, role.value)
+      if (!ageVerified.value) {
+        throw new Error(t('auth.age_verification'))
+      }
+      await authService.register(email.value, password.value, role.value, ageVerified.value)
     }
     
     await authService.login(email.value, password.value)
@@ -122,28 +126,43 @@ const handleSubmit = async () => {
       </Transition>
 
       <Transition name="expand">
-        <div v-if="!isLogin" class="input-group">
-          <label class="input-label">{{ t('auth.role') }}</label>
-          <div class="flex gap-4">
-            <label class="flex-1 cursor-pointer">
-              <input type="radio" v-model="role" value="user" class="hidden peer">
-              <div class="mus-glass p-3 rounded-lg border border-[var(--border)] text-center transition-all peer-checked:border-[var(--secondary)] peer-checked:bg-[var(--surface-hover)]">
-                <i class="pi pi-user text-xs mb-1 block text-[var(--secondary)]"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--text-main)]">{{ t('auth.roleUser') }}</span>
+        <div v-if="!isLogin">
+          <div class="input-group">
+            <label class="input-label">{{ t('auth.role') }}</label>
+            <div class="flex gap-4">
+              <label class="flex-1 cursor-pointer">
+                <input type="radio" v-model="role" value="user" class="hidden peer">
+                <div class="mus-glass p-3 rounded-lg border border-[var(--border)] text-center transition-all peer-checked:border-[var(--secondary)] peer-checked:bg-[var(--surface-hover)]">
+                  <i class="pi pi-user text-xs mb-1 block text-[var(--secondary)]"></i>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--text-main)]">{{ t('auth.roleUser') }}</span>
+                </div>
+              </label>
+              <label class="flex-1 cursor-pointer">
+                <input type="radio" v-model="role" value="admin" class="hidden peer">
+                <div class="mus-glass p-3 rounded-lg border border-[var(--border)] text-center transition-all peer-checked:border-[var(--secondary)] peer-checked:bg-[var(--surface-hover)]">
+                  <i class="pi pi-star text-xs mb-1 block text-[var(--secondary)]"></i>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--text-main)]">{{ t('auth.roleAdmin') }}</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="flex items-center gap-3 cursor-pointer select-none group/check">
+              <div class="relative flex items-center justify-center">
+                <input type="checkbox" v-model="ageVerified" required class="hidden peer">
+                <div class="w-6 h-6 border-2 border-[var(--border)] rounded-lg transition-all peer-checked:bg-[var(--secondary)] peer-checked:border-[var(--secondary)] flex items-center justify-center group-hover/check:border-[var(--secondary)]">
+                  <i class="pi pi-check text-[10px] text-[var(--surface)] opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                </div>
               </div>
-            </label>
-            <label class="flex-1 cursor-pointer">
-              <input type="radio" v-model="role" value="admin" class="hidden peer">
-              <div class="mus-glass p-3 rounded-lg border border-[var(--border)] text-center transition-all peer-checked:border-[var(--secondary)] peer-checked:bg-[var(--surface-hover)]">
-                <i class="pi pi-star text-xs mb-1 block text-[var(--secondary)]"></i>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--text-main)]">{{ t('auth.roleAdmin') }}</span>
-              </div>
+              <span class="text-[11px] font-bold text-[var(--text-main)] opacity-70 group-hover/check:opacity-100 transition-opacity uppercase tracking-wider">
+                {{ t('auth.age_verification') }}
+              </span>
             </label>
           </div>
         </div>
       </Transition>
 
-      <button type="submit" :disabled="loading" class="mus-button-primary w-full py-5 mt-4 group">
+      <button type="submit" :disabled="loading || (!isLogin && !ageVerified)" class="mus-button-primary w-full py-5 mt-4 group">
         <span class="font-black uppercase tracking-widest text-sm">
           {{ isLogin ? t('auth.submitLogin') : t('auth.submitRegister') }}
         </span>

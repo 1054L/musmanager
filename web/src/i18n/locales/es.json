@@ -128,7 +128,8 @@
     "createAccount": "Crea tu cuenta aquí",
     "haveAccount": "¿Ya tienes cuenta?",
     "loginHere": "Inicia sesión",
-    "passwordMismatch": "Las contraseñas no coinciden",
+    "passwordMismatch": "¡Las contraseñas no coinciden!",
+    "age_verification": "Confirmo que soy mayor de 18 años y acepto las condiciones de uso",
     "role": "Tipo de Usuario",
     "roleUser": "Jugador",
     "roleAdmin": "Organizador"
@@ -268,7 +269,7 @@
     "privacy_sections": [
       {
         "title": "1. Responsable del Tratamiento",
-        "text": "El responsable del tratamiento de los datos recogidos en esta web es Mus Manager, con domicilio a efectos de notificaciones en [DIRECCIÓN POSTAL EN ESPAÑA] y correo electrónico de contacto: legal{'@'}musmanager.com."
+        "text": "El responsable del tratamiento de los datos recogidos en esta web es Mus Manager, con domicilio a efectos de notificaciones en San Sebastián, España y correo electrónico de contacto: info{'@'}musmanager.com."
       },
       {
         "title": "2. Datos que Recopilamos",
@@ -284,7 +285,7 @@
       },
       {
         "title": "5. Tus Derechos",
-        "text": "Tienes derecho a: Acceder a tus datos, rectificar datos inexactos, solicitar la supresión cuando ya no sean necesarios, oponerte al tratamiento y solicitar la portabilidad de tus datos. Puedes ejercer estos derechos enviando un correo a legal{'@'}musmanager.com adjuntando copia de tu DNI o documento equivalente."
+        "text": "Tienes derecho a: Acceder a tus datos, rectificar datos inexactos, solicitar la supresión cuando ya no sean necesarios, oponerte al tratamiento y solicitar la portabilidad de tus datos. Puedes ejercer estos derechos enviando un correo a info{'@'}musmanager.com adjuntando copia de tu DNI o documento equivalente."
       },
       {
         "title": "6. Conservación de Datos",
@@ -301,7 +302,7 @@
       },
       {
         "title": "2. Registro y Responsabilidad",
-        "text": "El usuario es responsable de mantener la confidencialidad de sus credenciales. Queda prohibido el registro de menores de 14 años sin consentimiento tutorial. El usuario garantiza que la información introducida es veraz."
+        "text": "El usuario es responsable de mantener la confidencialidad de sus credenciales. Queda prohibido el registro de menores de 18 años sin consentimiento tutorial. El usuario garantiza que la información introducida es veraz."
       },
       {
         "title": "3. Uso Prohibido",
@@ -322,8 +323,14 @@
       {
         "title": "¿Qué es una Cookie?",
         "text": "Una cookie es un pequeño archivo de texto que el sitio web almacena en tu navegador para recordar información sobre tu visita, preferencias y ajustes."
+      },
+      {
+        "title": "¿Cómo gestionar las cookies?",
+        "text": "Puedes configurar tu navegador para bloquear o eliminar cookies en cualquier momento. Ten en cuenta que deshabilitar las cookies técnicas puede afectar al funcionamiento de tu cuenta. Más información: Chrome (support.google.com/chrome), Firefox (support.mozilla.org), Safari (support.apple.com), Edge (support.microsoft.com)."
       }
     ],
+    "age_notice": "Este sitio muestra publicidad de juego online. El juego está prohibido a menores de 18 años. Si eres menor de edad, abandona el sitio. El juego puede crear adicción. Juega con responsabilidad. www.juegoseguro.es",
+    "contact_footer": "Para cualquier consulta relacionada con estas políticas, puedes contactarnos en info{'@'}musmanager.com",
     "cookies_table_headers": {
       "type": "Tipo",
       "purpose": "Finalidad",

@@ -23,11 +23,11 @@ export const authService = {
     return authData;
   },
 
-  async register(email, password, role = 'user') {
+  async register(email, password, role = 'user', ageVerified = false) {
     const response = await fetch(`${API_URL}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, role })
+      body: JSON.stringify({ email, password, role, ageVerified })
     });
 
     if (!response.ok) {
