@@ -6,6 +6,7 @@ import MusFooter from '../components/MusFooter.vue'
 import AuthModal from '../components/AuthModal.vue'
 import { authService } from '../services/api'
 import CookieBanner from '../components/CookieBanner.vue'
+import TermsModal from '../components/TermsModal.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Toast from 'primevue/toast'
 
@@ -18,6 +19,15 @@ const authModalMode = ref('login')
 const themeStore = useThemeStore()
 const user = ref(authService.getUser())
 const isSidebarOpen = ref(true)
+
+// Terms Modal Logic
+const showTermsModal = ref(user.value && !user.value.termsAccepted)
+
+const onTermsAccepted = () => {
+  showTermsModal.value = false
+  // Update local user reference
+  user.value = authService.getUser()
+}
 
 const openAuthModal = (mode = 'login') => {
   authModalMode.value = mode
@@ -75,6 +85,12 @@ provide('logout', handleLogout)
       :initialMode="authModalMode" 
       redirect="/dashboard"
       @close="showAuthModal = false"
+    />
+
+    <!-- Global Terms Modal -->
+    <TermsModal 
+      :isOpen="showTermsModal"
+      @accepted="onTermsAccepted"
     />
   </div>
 </template>

@@ -53,6 +53,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $ageVerifiedAt = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $termsAccepted = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $termsAcceptedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -208,6 +214,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAgeVerifiedAt(?\DateTimeImmutable $ageVerifiedAt): static
     {
         $this->ageVerifiedAt = $ageVerifiedAt;
+
+        return $this;
+    }
+
+    public function isTermsAccepted(): bool
+    {
+        return $this->termsAccepted;
+    }
+
+    public function setTermsAccepted(bool $termsAccepted): static
+    {
+        $this->termsAccepted = $termsAccepted;
+
+        return $this;
+    }
+
+    public function getTermsAcceptedAt(): ?\DateTimeImmutable
+    {
+        return $this->termsAcceptedAt;
+    }
+
+    public function setTermsAcceptedAt(?\DateTimeImmutable $termsAcceptedAt): static
+    {
+        $this->termsAcceptedAt = $termsAcceptedAt;
 
         return $this;
     }

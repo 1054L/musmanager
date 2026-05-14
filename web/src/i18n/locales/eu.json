@@ -682,5 +682,18 @@
       "confirmed": "Konfirmatuta",
       "finished": "Amaituta"
     }
+  },
+  "terms": {
+    "title": "Legezko Onarpen Derrigorrezkoa",
+    "welcome": "Baldintzak Eguneratzea",
+    "intro": "Mus Manager-ez gozatzen jarraitzeko, gure pribatutasun-politika eta erabilera-baldintza eguneratuak berrikusi eta onartu behar dituzu.",
+    "section1_title": "Erabilera Baldintzak eta Baldintzak",
+    "section1_text": "Gure plataforma erabiltzean, onartzen duzu Mus Manager-ek txapelketak antolatzeko tresna digital bat eskaintzen duela 'dagoen bezala'. Erabiltzailea da bere kredentzialen arduraduna eta debekatuta dago legez kanpoko apustuetarako edo eduki iraingarrirako erabiltzea.",
+    "section2_title": "Pribatutasun Politika",
+    "section2_text": "Zure datuak (emaila, izena, emaitzak) tratatzen ditugu zure kontua kudeatzeko eta rankingak sortzeko. Oinarri legala zure baimena eta erabilera-baldintzak gauzatzea da. Zure sarbide- eta ezabatz-eskubideak edozein unetan erabil ditzakezu.",
+    "last_updated": "Azken eguneratzea: 2026ko maiatza",
+    "checkbox_label": "Mus Manager-en Erabilera Baldintzak eta Baldintzak eta Pribatutasun Politika irakurri eta onartzen ditut.",
+    "accept_btn": "ONARTU ETA JARRAITU",
+    "error_accepting": "Errorea baldintzak onartzean. Saiatu berriro."
   }
 }

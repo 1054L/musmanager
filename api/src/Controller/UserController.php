@@ -46,6 +46,8 @@ class UserController extends AbstractController
             'nickname' => $user->getNickname(),
             'phone' => $user->getPhone(),
             'roles' => $user->getRoles(),
+            'termsAccepted' => $user->isTermsAccepted(),
+            'termsAcceptedAt' => $user->getTermsAcceptedAt() ? $user->getTermsAcceptedAt()->format(\DateTimeInterface::ATOM) : null,
             'player' => $player ? [
                 'id' => $player->getId(),
                 'name' => $player->getName(),
@@ -85,5 +87,21 @@ class UserController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['message' => 'Profile updated successfully']);
+    }
+
+    #[Route('/api/me/accept-terms', name: 'app_user_accept_terms', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function acceptTerms(
+        \Doctrine\ORM\EntityManagerInterface $entityManager
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+        
+        $user->setTermsAccepted(true);
+        $user->setTermsAcceptedAt(new \DateTimeImmutable());
+        
+        $entityManager->flush();
+        
+        return new JsonResponse(['message' => 'Terms accepted successfully']);
     }
 }

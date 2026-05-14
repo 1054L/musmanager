@@ -38,6 +38,8 @@ class RegistrationController extends AbstractController
         $user->setEmail($data['email']);
         $user->setAgeVerified(true);
         $user->setAgeVerifiedAt(new \DateTimeImmutable());
+        $user->setTermsAccepted(true);
+        $user->setTermsAcceptedAt(new \DateTimeImmutable());
         
         $role = $data['role'] ?? 'user';
         if ($role === 'admin') {

@@ -687,5 +687,18 @@
       "confirmed": "Confirmed",
       "finished": "Finished"
     }
+  },
+  "terms": {
+    "title": "Mandatory Legal Acceptance",
+    "welcome": "Terms Update",
+    "intro": "To continue enjoying Mus Manager, we need you to review and accept our updated privacy policy and terms of use.",
+    "section1_title": "Terms and Conditions of Use",
+    "section1_text": "By using our platform, you agree that Mus Manager provides a digital tool for tournament organization 'as is'. The user is responsible for their credentials and use for illegal gambling or offensive content is prohibited.",
+    "section2_title": "Privacy Policy",
+    "section2_text": "We process your data (email, name, results) to manage your account and generate rankings. The legal basis is your consent and the execution of the terms of use. You can exercise your rights of access and deletion at any time.",
+    "last_updated": "Last updated: May 2026",
+    "checkbox_label": "I have read and accept the Terms and Conditions of Use and the Privacy Policy of Mus Manager.",
+    "accept_btn": "ACCEPT AND CONTINUE",
+    "error_accepting": "Error accepting terms. Please try again."
   }
 }

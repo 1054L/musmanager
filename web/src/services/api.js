@@ -75,6 +75,29 @@ export const authService = {
       return { 'Authorization': `Basic ${btoa(`${user.email}:${user.password}`)}` };
     }
     return {};
+  },
+
+  async acceptTerms() {
+    const response = await fetch(`${API_URL}/me/accept-terms`, {
+      method: 'POST',
+      headers: this.getAuthHeader()
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al aceptar los términos');
+    }
+
+    // Update local storage
+    const currentLocalUser = this.getUser();
+    if (currentLocalUser) {
+      const newAuthData = {
+        ...currentLocalUser,
+        termsAccepted: true
+      };
+      localStorage.setItem('user', JSON.stringify(newAuthData));
+    }
+
+    return response.json();
   }
 };
 
