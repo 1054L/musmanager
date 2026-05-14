@@ -21,6 +21,8 @@ jobs:
 
       - name: Build Vue frontend
         working-directory: ./web
+        env:
+          VITE_MERCURE_URL: ${{ secrets.VITE_MERCURE_URL }}
         run: |
           npm ci
           npm run build
