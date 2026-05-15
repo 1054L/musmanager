@@ -72,7 +72,7 @@ $groupsData = [
 $teamMap = [];
 $statsMap = [];
 
-foreach ($groupsData as $groupName => $teamNames) {
+foreach ($groupsData as $mesaLabel => $teamNames) {
     foreach ($teamNames as $name) {
         $team = new Team();
         $team->setName($name);
@@ -84,7 +84,7 @@ foreach ($groupsData as $groupName => $teamNames) {
         $tt = new TournamentTeam();
         $tt->setTournament($tournament);
         $tt->setTeam($team);
-        $tt->setGroupName($groupName);
+        $tt->setMesa($mesaLabel);
         $tt->setMatchesPlayed(0);
         $tt->setGamesWon(0);
         $tt->setGamesLost(0);

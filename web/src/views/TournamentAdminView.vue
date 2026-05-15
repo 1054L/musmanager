@@ -32,8 +32,17 @@ const enrollmentTeamId = ref(null)
 const groupsCount = ref(2)
 const processing = ref(false)
 const showEnrollmentDialog = ref(false)
+const enrollmentForm = ref(null)
 const matchesOrder = ref('asc')
 const collapsedStages = ref({})
+
+const onEnrollmentDialogShow = () => {
+  setTimeout(() => {
+    if (enrollmentForm.value) {
+      enrollmentForm.value.focusInput()
+    }
+  }, 300)
+}
 
 // Match editing state
 const editingMatch = ref(null)
@@ -192,7 +201,7 @@ const handleGenerateMatches = async (event) => {
         await tournamentService.generateMatches(uuid)
         // Automatically switch to active phase
         await tournamentService.updateTournament(uuid, { status: 'active' })
-        const msg = tournament.value?.type === 'eliminatory' ? 'Sorteo realizado con éxito. ¡Torneo en marcha!' : t('dashboard.matches_success')
+        const msg = tournament.value?.type === 'eliminatory' ? t('tournament_admin.preparation.draw_success') : t('dashboard.matches_success')
         toast.add({ severity: 'success', summary: t('common.success'), detail: msg, life: 3000 })
         await fetchTournamentData(true)
       } catch (e) {
@@ -475,7 +484,7 @@ const normalizeStageKey = (stage) => {
                     <Checkbox :modelValue="tt.isConfirmed" :binary="true" @change="handleToggleConfirm(tt.id)" v-tooltip.top="t('tournament_admin.enrollment.confirmed_tooltip')" />
                     <div class="team-info">
                       <span class="name" :class="{ 'opacity-50': !tt.isConfirmed }">{{ tt.team?.name }}</span>
-                      <span class="group-tag" v-if="tt.groupName">{{ tt.groupName }}</span>
+                      <span class="group-tag" v-if="tt.mesa">{{ tt.mesa }}</span>
                     </div>
                   </div>
                   <button v-if="['draft', 'pending'].includes(tournament.status)" @click="handleRemoveTeam($event, tt.id)" class="remove-btn" v-tooltip.left="t('tournament_admin.enrollment.delete_btn') || 'Eliminar'">
@@ -759,9 +768,9 @@ const normalizeStageKey = (stage) => {
     </Dialog>
 
     <!-- Enrollment Dialog -->
-    <Dialog v-model:visible="showEnrollmentDialog" modal :header="t('tournament_admin.enrollment.dialog_title')" :style="{ width: '450px' }" class="mus-dialog-premium">
+    <Dialog v-model:visible="showEnrollmentDialog" modal :header="t('tournament_admin.enrollment.dialog_title')" :style="{ width: '450px' }" class="mus-dialog-premium" @show="onEnrollmentDialogShow">
       <div class="p-4">
-        <TournamentEnrollmentForm :tournamentUuid="uuid" @success="onEnrollmentSuccess" @cancel="showEnrollmentDialog = false" />
+        <TournamentEnrollmentForm ref="enrollmentForm" :tournamentUuid="uuid" @success="onEnrollmentSuccess" @cancel="showEnrollmentDialog = false" />
       </div>
     </Dialog>
   </div>

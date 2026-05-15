@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { tournamentService } from '../services/api'
 import { useI18n } from 'vue-i18n'
 
@@ -13,6 +13,7 @@ const props = defineProps({
 const emit = defineEmits(['success', 'cancel'])
 const { t } = useI18n()
 
+const nameInput = ref(null)
 const form = ref({
   name: '',
   isConfirmed: false
@@ -21,9 +22,23 @@ const form = ref({
 const saving = ref(false)
 const error = ref(null)
 
+const focusInput = () => {
+  if (nameInput.value) {
+    nameInput.value.focus()
+  }
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    focusInput()
+  }, 400) // Un poco más de tiempo para que PrimeVue termine su lógica
+})
+
+defineExpose({ focusInput })
+
 const handleSubmit = async () => {
   if (!form.value.name.trim()) {
-    error.value = 'El nombre de la pareja es obligatorio'
+    error.value = t('tournament_admin.enrollment.error_name_required')
     return
   }
 
@@ -51,12 +66,14 @@ const handleSubmit = async () => {
       <div v-if="error" class="error-msg mb-4">{{ error }}</div>
 
       <div class="form-group">
-        <label class="mus-label">Nombre de la Pareja <span class="required">*</span></label>
-        <input v-model="form.name" 
+        <label class="mus-label">{{ t('tournament_admin.enrollment.team_name_label') }} <span class="required">*</span></label>
+        <input ref="nameInput"
+               v-model="form.name" 
                type="text" 
                maxlength="255"
                required 
-               placeholder="Ej: Los Reyes del Mus" 
+               autofocus
+               :placeholder="t('tournament_admin.enrollment.team_name_placeholder')" 
                class="mus-input">
       </div>
 
@@ -67,10 +84,10 @@ const handleSubmit = async () => {
           <Checkbox v-model="form.isConfirmed" :binary="true" />
           <div class="flex flex-column">
             <span class="text-xs font-black uppercase tracking-wider" :class="form.isConfirmed ? 'text-secondary' : 'text-white'">
-              Confirmado / Pagado
+              {{ t('tournament_admin.enrollment.is_confirmed_label') }}
             </span>
             <span class="text-[9px] font-bold uppercase mt-1" :class="form.isConfirmed ? 'text-secondary/70' : 'text-slate-500'">
-              {{ form.isConfirmed ? 'Inscripción confirmada' : 'Marca esta opción si ya han confirmado o pagado' }}
+              {{ form.isConfirmed ? t('tournament_admin.enrollment.is_confirmed_active') : t('tournament_admin.enrollment.is_confirmed_help') }}
             </span>
           </div>
           <i v-if="form.isConfirmed" class="pi pi-check-circle ml-auto text-secondary text-xl"></i>
@@ -79,12 +96,12 @@ const handleSubmit = async () => {
 
       <div class="flex gap-4 mt-8">
         <button type="button" @click="emit('cancel')" class="mus-btn-secondary flex-1">
-          CANCELAR
+          {{ t('tournament_form.actions.cancel') }}
         </button>
         <button type="submit" :disabled="saving" class="mus-btn-primary flex-1">
           <i v-if="saving" class="pi pi-spin pi-spinner mr-2"></i>
           <i v-else class="pi pi-plus mr-2"></i>
-          {{ saving ? 'GUARDANDO...' : 'INSCRIBIR' }}
+          {{ saving ? t('tournament_admin.enrollment.submitting_btn') : t('tournament_admin.enrollment.submit_btn') }}
         </button>
       </div>
     </form>

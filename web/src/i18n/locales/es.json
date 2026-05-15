@@ -1,5 +1,17 @@
 {
+  "stages": {
+    "t64": "Treintadosavos",
+    "t32": "Dieciseisavos",
+    "t16": "Octavos de Final",
+    "t8": "Cuartos de Final",
+    "t4": "Semifinales",
+    "final": "Final",
+    "third_place": "3º y 4º Puesto",
+    "general": "General"
+  },
   "common": {
+    "table": "Mesa",
+    "matches": "Partidas",
     "loading": "Cargando...",
     "user": "Usuario",
     "save": "Guardar",
@@ -226,8 +238,8 @@
     "delete_confirm_title": "Eliminar Torneo",
     "delete_confirm_msg": "¿Estás seguro de que deseas eliminar este torneo? Todos los datos asociados (parejas, partidas) se perderán permanentemente. Esta acción no se puede deshacer.",
     "delete_success": "Torneo eliminado correctamente",
-    "invalid_groups": "Número de grupos inválido",
-    "groups_success": "Grupos generados con éxito",
+    "invalid_groups": "Número de mesas inválido",
+    "groups_success": "Mesas generadas con éxito",
     "matches_success": "Calendario generado con éxito",
     "enroll_success": "Pareja inscrita correctamente",
     "master_advice": "CONSEJO MAESTRO",
@@ -631,9 +643,9 @@
     "enrolled_count": "{count} Equipos Inscritos",
     "select_team": "Seleccionar equipo para inscribir...",
     "enroll": "Inscribir",
-    "no_group": "Sin Grupo",
-    "groups_count_label": "Número de Grupos",
-    "draw_groups": "Sorteo de Grupos",
+    "no_group": "Sin Mesa",
+    "groups_count_label": "Número de Mesas",
+    "draw_groups": "Sorteo de Mesas",
     "generate_matches": "Generar Calendario de Partidas"
   },
   "how_it_works_page": {
@@ -675,12 +687,20 @@
       "delete_confirm_title": "Confirmar Eliminación",
       "delete_confirm_msg": "¿Estás seguro de que quieres desapuntar a esta pareja? Esta acción no se puede deshacer.",
       "dialog_title": "Inscribir Pareja",
-      "delete_btn": "Eliminar"
+      "delete_btn": "Eliminar",
+      "team_name_label": "Nombre de la Pareja",
+      "team_name_placeholder": "Ej: Los Reyes del Mus",
+      "is_confirmed_label": "Confirmado / Pagado",
+      "is_confirmed_help": "Marca esta opción si ya han confirmado o pagado",
+      "is_confirmed_active": "Inscripción confirmada",
+      "error_name_required": "El nombre de la pareja es obligatorio",
+      "submit_btn": "INSCRIBIR",
+      "submitting_btn": "GUARDANDO..."
     },
     "groups": {
-      "config_title": "Configuración de Grupos",
-      "count_label": "Número de Grupos",
-      "generate_btn": "REPARTIR EN GRUPOS"
+      "config_title": "Configuración de Mesas",
+      "count_label": "Número de Mesas",
+      "generate_btn": "REPARTIR EN MESAS"
     },
     "status": {
       "title": "Fase del Torneo",
@@ -696,7 +716,8 @@
       "system_label": "Sistema",
       "draw_confirm_title": "Confirmar Sorteo",
       "draw_confirm_msg": "¿Estás seguro de que quieres realizar el sorteo? Esto generará los emparejamientos definitivos, no se podrá deshacer y el torneo pasará a estar activo inmediatamente.",
-      "draw_confirm_btn": "Realizar Sorteo"
+      "draw_confirm_btn": "Realizar Sorteo",
+      "draw_success": "Sorteo realizado con éxito. ¡Torneo en marcha!"
     },
     "matches": {
       "title": "Partidos del Torneo",

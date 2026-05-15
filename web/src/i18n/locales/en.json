@@ -1,5 +1,7 @@
 {
   "common": {
+    "table": "Table",
+    "matches": "Matches",
     "loading": "Loading...",
     "user": "User",
     "save": "Save",
@@ -7,6 +9,16 @@
     "error": "Error",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "stages": {
+    "t64": "Round of 64",
+    "t32": "Round of 32",
+    "t16": "Round of 16",
+    "t8": "Quarter-finals",
+    "t4": "Semi-finals",
+    "final": "Final",
+    "third_place": "3rd & 4th Place",
+    "general": "General"
   },
   "nav": {
     "features": "Features",
@@ -215,8 +227,8 @@
     "delete_confirm_title": "Delete Tournament",
     "delete_confirm_msg": "Are you sure you want to delete this tournament? All associated data (teams, matches) will be permanently lost. This action cannot be undone.",
     "delete_success": "Tournament successfully deleted",
-    "invalid_groups": "Invalid number of groups",
-    "groups_success": "Groups generated successfully",
+    "invalid_groups": "Invalid number of tables",
+    "groups_success": "Tables generated successfully",
     "matches_success": "Matches generated successfully",
     "enroll_success": "Team enrolled successfully",
     "master_advice": "MASTER ADVICE",
@@ -620,9 +632,9 @@
     "enrolled_count": "{count} Enrolled Teams",
     "select_team": "Select team to enroll...",
     "enroll": "Enroll",
-    "no_group": "No Group",
-    "groups_count_label": "Number of Groups",
-    "draw_groups": "Draw Groups",
+    "no_group": "No Table",
+    "groups_count_label": "Number of Tables",
+    "draw_groups": "Draw Tables",
     "generate_matches": "Generate Match Schedule"
   },
   "how_it_works_page": {
@@ -663,13 +675,21 @@
       "add_success": "Pair registered successfully",
       "delete_confirm_title": "Confirm Removal",
       "delete_confirm_msg": "Are you sure you want to unregister this pair? This action cannot be undone.",
-      "dialog_title": "Enroll Pair",
-      "delete_btn": "Remove"
+      "dialog_title": "Register Pair",
+      "delete_btn": "Remove",
+      "team_name_label": "Pair Name",
+      "team_name_placeholder": "E.g.: The Mus Kings",
+      "is_confirmed_label": "Confirmed / Paid",
+      "is_confirmed_help": "Check this option if they have already confirmed or paid",
+      "is_confirmed_active": "Registration confirmed",
+      "error_name_required": "Pair name is required",
+      "submit_btn": "REGISTER",
+      "submitting_btn": "SAVING..."
     },
     "groups": {
-      "config_title": "Group Configuration",
-      "count_label": "Number of Groups",
-      "generate_btn": "DISTRIBUTE INTO GROUPS"
+      "config_title": "Tables Configuration",
+      "count_label": "Number of Tables",
+      "generate_btn": "DISTRIBUTE INTO TABLES"
     },
     "status": {
       "title": "Tournament Phase",
@@ -685,7 +705,8 @@
       "system_label": "System",
       "draw_confirm_title": "Confirm Draw",
       "draw_confirm_msg": "Are you sure you want to perform the draw? This will generate the final matchups, it cannot be undone, and the tournament will become ACTIVE immediately.",
-      "draw_confirm_btn": "Perform Draw"
+      "draw_confirm_btn": "Perform Draw",
+      "draw_success": "Draw completed successfully. Tournament is live!"
     },
     "matches": {
       "title": "Tournament Matches",

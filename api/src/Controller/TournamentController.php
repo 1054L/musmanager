@@ -358,7 +358,7 @@ class TournamentController extends AbstractController
             'tournamentTeams' => array_map(function($tt) {
                 return [
                     'id' => $tt->getId(),
-                    'groupName' => $tt->getGroupName(),
+                    'mesa' => $tt->getMesa(),
                     'isConfirmed' => $tt->isConfirmed(),
                     'team' => [
                         'id' => $tt->getTeam()->getId(),
@@ -376,6 +376,7 @@ class TournamentController extends AbstractController
                     'score2' => $match->getScoreTeam2(),
                     'bracketRound' => $match->getBracketRound(),
                     'bracketPosition' => $match->getBracketPosition(),
+                    'mesa' => $match->getMesa(),
                     'games' => array_map(function($game) {
                         return [
                             'points1' => $game->getPointsTeam1(),
@@ -419,7 +420,7 @@ class TournamentController extends AbstractController
             'success' => true,
             'team' => [
                 'id' => $tournamentTeam->getId(),
-                'groupName' => $tournamentTeam->getGroupName(),
+                'mesa' => $tournamentTeam->getMesa(),
                 'isConfirmed' => $tournamentTeam->isConfirmed(),
                 'team' => [
                     'id' => $team->getId(),
@@ -478,7 +479,7 @@ class TournamentController extends AbstractController
         $groupLetters = range('A', 'Z');
         foreach ($teams as $index => $tt) {
             $groupIndex = $index % $groupsCount;
-            $tt->setGroupName('Grupo ' . $groupLetters[$groupIndex]);
+            $tt->setMesa('Mesa ' . $groupLetters[$groupIndex]);
         }
 
         $entityManager->flush();
@@ -526,12 +527,16 @@ class TournamentController extends AbstractController
                 $matchesInRound = pow(2, $r - 1);
                 $stageLabel = $stageNames[$matchesInRound] ?? 'Ronda ' . ($roundsNeeded - $r + 1);
                 
+                // Tables should be reused. In each round, we start numbering from 1.
+                $mesaCounter = 1;
+                
                 for ($p = 0; $p < $matchesInRound; $p++) {
                     $match = new MusMatch();
                     $match->setTournament($tournament);
                     $match->setStage($stageLabel);
                     $match->setBracketRound($r);
                     $match->setBracketPosition($p);
+                    $match->setMesa('Mesa ' . $mesaCounter++);
                     
                     // Assign teams only for the first round ($r === $roundsNeeded)
                     if ($r === $roundsNeeded) {
@@ -553,11 +558,13 @@ class TournamentController extends AbstractController
                             
                             // Advance Bye winner if round > 1
                             if ($r > 1) {
-                                $this->advanceWinnerInBracket($match, $entityManager);
+                                // We don't have a hub here, but advanceWinnerInBracket handles it
+                                $this->advanceWinnerInBracket($match, $entityManager, null);
                             }
                         }
                     }
 
+                    $tournament->addMatch($match);
                     $entityManager->persist($match);
                 }
             }
@@ -576,11 +583,11 @@ class TournamentController extends AbstractController
             // ROUND ROBIN / GROUPS LOGIC
             $groups = [];
             foreach ($teams as $tt) {
-                $gn = $tt->getGroupName() ?: 'Sin Grupo';
+                $gn = $tt->getMesa() ?: 'Sin Mesa';
                 $groups[$gn][] = $tt;
             }
 
-            foreach ($groups as $groupName => $groupTeams) {
+            foreach ($groups as $mesaLabel => $groupTeams) {
                 $count = count($groupTeams);
                 for ($i = 0; $i < $count; $i++) {
                     for ($j = $i + 1; $j < $count; $j++) {
@@ -588,7 +595,7 @@ class TournamentController extends AbstractController
                         $match->setTournament($tournament);
                         $match->setTeam1($groupTeams[$i]);
                         $match->setTeam2($groupTeams[$j]);
-                        $match->setStage($groupName);
+                        $match->setStage($mesaLabel);
                         $entityManager->persist($match);
                     }
                 }
@@ -771,7 +778,7 @@ class TournamentController extends AbstractController
 
         $classification = [];
         foreach ($tournament->getTournamentTeams() as $tt) {
-            $gn = $tt->getGroupName() ?: 'General';
+            $gn = $tt->getMesa() ?: 'General';
             $classification[$gn][] = [
                 'teamName' => $tt->getTeam()->getName(),
                 'points' => $tt->getPoints(),
@@ -837,7 +844,7 @@ class TournamentController extends AbstractController
         }, $tournaments));
     }
 
-    private function advanceWinnerInBracket(MusMatch $match, EntityManagerInterface $entityManager, HubInterface $hub): void
+    private function advanceWinnerInBracket(MusMatch $match, EntityManagerInterface $entityManager, ?HubInterface $hub = null): void
     {
         $tournament = $match->getTournament();
         if ($tournament->getType() !== 'eliminatory' || !$match->getWinner() || $match->getBracketRound() <= 1) {
@@ -848,11 +855,23 @@ class TournamentController extends AbstractController
         $nextPos = (int)floor($match->getBracketPosition() / 2);
         $isTeam2 = $match->getBracketPosition() % 2 === 1;
 
-        $nextMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
-            'tournament' => $tournament,
-            'bracketRound' => $nextRound,
-            'bracketPosition' => $nextPos
-        ]);
+        // Find next match. If generating initial draw, matches are in memory (tournament->getMatches())
+        $nextMatch = null;
+        foreach ($tournament->getMatches() as $m) {
+            if ($m->getBracketRound() === $nextRound && $m->getBracketPosition() === $nextPos) {
+                $nextMatch = $m;
+                break;
+            }
+        }
+
+        // Fallback to repository if not found in collection (should not happen with addMatch)
+        if (!$nextMatch) {
+            $nextMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
+                'tournament' => $tournament,
+                'bracketRound' => $nextRound,
+                'bracketPosition' => $nextPos
+            ]);
+        }
 
         if ($nextMatch) {
             if ($isTeam2) {
@@ -865,11 +884,21 @@ class TournamentController extends AbstractController
 
         // Logic for 3rd and 4th place (losers of semifinals)
         if ($match->getBracketRound() === 2 && $tournament->isHasThirdPlace()) {
-            $thirdPlaceMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
-                'tournament' => $tournament,
-                'bracketRound' => 1,
-                'bracketPosition' => 1
-            ]);
+            $thirdPlaceMatch = null;
+            foreach ($tournament->getMatches() as $m) {
+                if ($m->getBracketRound() === 1 && $m->getBracketPosition() === 1) {
+                    $thirdPlaceMatch = $m;
+                    break;
+                }
+            }
+            
+            if (!$thirdPlaceMatch) {
+                $thirdPlaceMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
+                    'tournament' => $tournament,
+                    'bracketRound' => 1,
+                    'bracketPosition' => 1
+                ]);
+            }
 
             if ($thirdPlaceMatch) {
                 $loser = ($match->getWinner() === $match->getTeam1()) ? $match->getTeam2() : $match->getTeam1();

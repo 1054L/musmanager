@@ -1,5 +1,7 @@
 {
   "common": {
+    "table": "Mahaia",
+    "matches": "Partidak",
     "loading": "Kargatzen...",
     "user": "Erabiltzailea",
     "save": "Gorde",
@@ -7,6 +9,16 @@
     "error": "Errorea",
     "delete": "Ezabatu",
     "edit": "Editatu"
+  },
+  "stages": {
+    "t64": "Hirurogeita laurdenak",
+    "t32": "Hamaseiren Finalak",
+    "t16": "Final zortzirenak",
+    "t8": "Final laurdenak",
+    "t4": "Finalerdiak",
+    "final": "Finala",
+    "third_place": "3. eta 4. postua",
+    "general": "Orokorra"
   },
   "nav": {
     "features": "Ezaugarriak",
@@ -210,8 +222,8 @@
     "delete_confirm_title": "Txapelketa Ezabatu",
     "delete_confirm_msg": "Ziur al zaude txapelketa hau ezabatu nahi duzula? Lotutako datu guztiak (bikoteak, partidak) betiko galduko dira. Ekintza hau ezin da desegin.",
     "delete_success": "Txapelketa ongi ezabatu da",
-    "invalid_groups": "Talde kopuru baliogabea",
-    "groups_success": "Taldeak ongi sortu dira",
+    "invalid_groups": "Mahai kopuru baliogabea",
+    "groups_success": "Mahaiak ongi sortu dira",
     "matches_success": "Partiden egutegia ongi sortu da",
     "enroll_success": "Bikotea ongi izena eman du",
     "master_advice": "AHOLKU NAGUSIA",
@@ -537,7 +549,7 @@
     "view_full_bracket": "Ikusi Koadro Osoa",
     "tv_mode": "TV MODUA",
     "exit": "IRTEN",
-    "grand_final": "FINALA HANDIA",
+    "grand_final": "FINAL HANDIA",
     "match_status": {
       "finished": "Amaitua",
       "pending": "Zain"
@@ -614,9 +626,9 @@
     "enrolled_count": "{count} Talde Inskribatuta",
     "select_team": "Hautatu inskribatzeko taldea...",
     "enroll": "Inskribatu",
-    "no_group": "Talderik Gabe",
-    "groups_count_label": "Talde Kopurua",
-    "draw_groups": "Taldeen Zozketa",
+    "no_group": "Mahairik Gabe",
+    "groups_count_label": "Mahai Kopurua",
+    "draw_groups": "Mahaien Zozketa",
     "generate_matches": "Sortu Partiden Egutegia"
   },
   "how_it_works_page": {
@@ -657,13 +669,21 @@
       "add_success": "Bikotea ongi inskribatu da",
       "delete_confirm_title": "Ezabatzea Baieztatu",
       "delete_confirm_msg": "Ziur al zaude bikote hau desapuntatu nahi duzula? Ekintza hau ezin da desegin.",
-      "dialog_title": "Inskribatu Bikotea",
-      "delete_btn": "Ezabatu"
+      "dialog_title": "Bikotea Inskribatu",
+      "delete_btn": "Ezabatu",
+      "team_name_label": "Bikotearen Izena",
+      "team_name_placeholder": "Adib: Mus Erregeak",
+      "is_confirmed_label": "Konfirmatuta / Ordainduta",
+      "is_confirmed_help": "Markatu aukera hau ordaindu badute",
+      "is_confirmed_active": "Inskripzioa konfirmatuta",
+      "error_name_required": "Bikotearen izena derrigorrezkoa da",
+      "submit_btn": "INSKRIBATU",
+      "submitting_btn": "GORDETZEN..."
     },
     "groups": {
-      "config_title": "Taldeen Konfigurazioa",
-      "count_label": "Talde Kopurua",
-      "generate_btn": "TALDETAN BANATU"
+      "config_title": "Mahaien Konfigurazioa",
+      "count_label": "Mahai Kopurua",
+      "generate_btn": "MAHAIETAN BANATU"
     },
     "status": {
       "title": "Txapelketaren Fasea",
@@ -679,7 +699,8 @@
       "system_label": "Sistema",
       "draw_confirm_title": "Zozketa Berretsi",
       "draw_confirm_msg": "Ziur zaude zozketa egin nahi duzula? Honek behin betiko parekatzeak sortuko ditu, ezin da atzera egin eta txapelketa berehala AKTIBO egongo da.",
-      "draw_confirm_btn": "Zozketa Egin"
+      "draw_confirm_btn": "Zozketa Egin",
+      "draw_success": "Zozketa ongi egin da. Txapelketa martxan dago!"
     },
     "matches": {
       "title": "Txapelketako Partidak",

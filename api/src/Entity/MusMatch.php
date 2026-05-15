@@ -46,6 +46,9 @@ class MusMatch
     #[ORM\Column(nullable: true)]
     private ?int $bracketPosition = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $mesa = null;
+
     /**
      * @var Collection<int, MusMatchGame>
      */
@@ -186,6 +189,17 @@ class MusMatch
     public function setBracketPosition(?int $bracketPosition): static
     {
         $this->bracketPosition = $bracketPosition;
+        return $this;
+    }
+
+    public function getMesa(): ?string
+    {
+        return $this->mesa;
+    }
+
+    public function setMesa(?string $mesa): static
+    {
+        $this->mesa = $mesa;
         return $this;
     }
 }

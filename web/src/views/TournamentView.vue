@@ -14,6 +14,56 @@ import GoogleAd from '../components/GoogleAd.vue'
 import MusLoader from '../components/MusLoader.vue'
 import { useToast } from 'primevue/usetoast'
 
+const normalizeStageKey = (stage) => {
+  if (!stage) return 'general'
+  const s = stage.toLowerCase().trim()
+  
+  // Check for 64 (Round of 64 / Treintadosavos)
+  if (s.includes('treintadosavos') || s.includes('treintaidosavos') || s.includes('trintadosavos') || s.includes('64') || s.includes('hirurogei')) return 't64'
+  
+  // Check for 32 (Round of 32 / Dieciseisavos)
+  if (s.includes('dieciseisavos') || s.includes('32') || s.includes('hamasei')) return 't32'
+  
+  // Check for 16 (Round of 16 / Octavos)
+  if (s.includes('octavos') || s.includes('16') || s.includes('zortzi')) return 't16'
+  
+  // Check for 8 (Quarter-finals / Cuartos)
+  if (s.includes('cuartos') || s.includes('quarter') || s.includes('8') || s.includes('laurden')) return 't8'
+  
+  // Check for 3rd place (Check this before t4/semi because it might contain '4')
+  if (s.includes('3º') || s.includes('3er') || s.includes('tercer') || s.includes('3/') || s.includes('hirugarren')) return 'third_place'
+  
+  // Check for 4 (Semi-finals)
+  if (s.includes('semi') || s.includes('4') || s.includes('erdi')) return 't4'
+  
+  // Final only if it's exactly "final" or common standalone terms
+  if (s === 'final' || s === 'finala' || s === 'la final' || s === 'gran final') return 'final'
+  
+  // Fallback for slugs or unknown stages
+  return stage.toLowerCase().replace(/\s+/g, '_')
+}
+
+const formatMesa = (mesa) => {
+  if (!mesa) return ''
+  if (mesa.toLowerCase().startsWith('mesa')) {
+    const number = mesa.match(/\d+/)
+    return number ? `${t('common.table')} ${number[0]}` : t('common.table')
+  }
+  // Basque fallback "Mahaia X"
+  if (mesa.toLowerCase().startsWith('mahaia')) {
+    const number = mesa.match(/\d+/)
+    return number ? `${t('common.table')} ${number[0]}` : t('common.table')
+  }
+  return mesa
+}
+
+const translateStage = (stageName) => {
+  const key = normalizeStageKey(stageName)
+  const translation = t('stages.' + key)
+  // If key not found in i18n, return original
+  return translation.includes('stages.') ? stageName : translation
+}
+
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
@@ -154,6 +204,7 @@ const fetchTournament = async () => {
         stage: m.stage,
         bracketRound: m.bracketRound,
         bracketPosition: m.bracketPosition,
+        mesa: m.mesa,
         games: m.games || []
       }))
     }
@@ -520,9 +571,9 @@ const saveMatchResult = async () => {
            </div>
 
            <div v-else-if="activeTab === 'standings'" class="classification-container">
-             <div v-for="(teams, groupName) in classification" :key="groupName" class="mb-10">
+             <div v-for="(teams, mesaName) in classification" :key="mesaName" class="mb-10">
                <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest mb-4 flex items-center gap-2">
-                 <i class="pi pi-table"></i> {{ groupName }}
+                 <i class="pi pi-table"></i> {{ mesaName }}
                </h4>
                <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5">
                  <table class="w-full text-left border-collapse">
@@ -608,22 +659,26 @@ const saveMatchResult = async () => {
                           <div v-for="(col, colIdx) in splitBracketMatches.left" :key="'left-'+col.round" 
                                class="bracket-round flex flex-column min-w-[300px] w-[320px]" style="min-height: 100%">
                              <div class="round-title mb-8 px-4 text-right">
-                                <h4 class="m-0 font-black uppercase italic tracking-widest text-[11px] text-secondary">{{ col.stageName }}</h4>
-                                <div class="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-1">{{ col.matches.length }} Matches</div>
+                                <h4 class="m-0 font-black uppercase italic tracking-widest text-[11px] text-secondary">{{ translateStage(col.stageName) }}</h4>
+                                <div class="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-1">{{ col.matches.length }} {{ t('common.matches') }}</div>
                              </div>
                              <div class="flex-grow-1 flex flex-column justify-content-around relative pb-4" style="min-height: 500px">
-                                <div v-for="(m, i) in col.matches" :key="m.id" class="bracket-match-container relative">
-                                   <!-- Standard Card -->
-                                   <div class="bracket-match-card mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
-                                      <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
-                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA || 'TBD' }}</span>
-                                         <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
-                                      </div>
-                                      <div class="team-row-bracket flex justify-content-between align-items-center p-3">
-                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamB || 'TBD' }}</span>
-                                         <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
-                                      </div>
+                                <div v-for="(m, i) in col.matches" :key="m.id" class="bracket-match-container relative flex flex-row">
+                                   <div v-if="m.mesa" class="w-[24px] flex-shrink-0 bg-slate-900 border-y border-l border-white/10 rounded-l-xl flex align-items-center justify-center relative">
+                                      <span class="text-[15px] font-black text-secondary uppercase tracking-tighter whitespace-nowrap absolute" style="width: 120px; text-align: center; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-90deg);">
+                                         {{ formatMesa(m.mesa) }}
+                                      </span>
                                    </div>
+                                    <div class="bracket-match-card flex-grow-1 mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
+                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
+                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA || 'TBD' }}</span>
+                                          <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
+                                       </div>
+                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3">
+                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamB || 'TBD' }}</span>
+                                          <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
+                                       </div>
+                                    </div>
                                    <div v-if="colIdx < splitBracketMatches.left.length - 1" class="bracket-connector"></div>
                                 </div>
                              </div>
@@ -689,12 +744,17 @@ const saveMatchResult = async () => {
                           <div v-for="(col, colIdx) in splitBracketMatches.right" :key="'right-'+col.round" 
                                class="bracket-round flex flex-column min-w-[300px] w-[320px]" style="min-height: 100%">
                              <div class="round-title mb-8 px-4">
-                                <h4 class="m-0 font-black uppercase italic tracking-widest text-[11px] text-secondary">{{ col.stageName }}</h4>
-                                <div class="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-1">{{ col.matches.length }} Matches</div>
+                                <h4 class="m-0 font-black uppercase italic tracking-widest text-[11px] text-secondary">{{ translateStage(col.stageName) }}</h4>
+                                <div class="text-[9px] font-bold text-slate-600 uppercase tracking-widest mt-1">{{ col.matches.length }} {{ t('common.matches') }}</div>
                              </div>
                              <div class="flex-grow-1 flex flex-column justify-content-around relative pb-4" style="min-height: 500px">
-                                <div v-for="(m, i) in col.matches" :key="m.id" class="bracket-match-container relative right-wing">
-                                   <div class="bracket-match-card mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
+                                <div v-for="(m, i) in col.matches" :key="m.id" class="bracket-match-container relative right-wing flex flex-row">
+                                   <div v-if="m.mesa" class="w-[24px] flex-shrink-0 bg-slate-900 border-y border-l border-white/10 rounded-l-xl flex align-items-center justify-center relative">
+                                      <span class="text-[15px] font-black text-secondary uppercase tracking-tighter whitespace-nowrap absolute" style="width: 120px; text-align: center; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-90deg);">
+                                         {{ formatMesa(m.mesa) }}
+                                      </span>
+                                   </div>
+                                   <div class="bracket-match-card flex-grow-1 mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA || 'TBD' }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
@@ -728,7 +788,7 @@ const saveMatchResult = async () => {
                               {{ tt.team?.name }}
                            </td>
                            <td class="p-4 text-right w-1/3 border-l border-white/5">
-                              <span class="text-slate-400 text-xs font-black uppercase tracking-widest">{{ tt.groupName || '-' }}</span>
+                              <span class="text-slate-400 text-xs font-black uppercase tracking-widest">{{ tt.mesa || '-' }}</span>
                            </td>
                         </tr>
                      </tbody>

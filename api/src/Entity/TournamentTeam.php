@@ -25,7 +25,7 @@ class TournamentTeam
     private ?Team $team = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $groupName = null;
+    private ?string $mesa = null;
 
     #[ORM\Column(options: ['default' => 0])]
     private int $points = 0;
@@ -98,14 +98,14 @@ class TournamentTeam
         return $this;
     }
 
-    public function getGroupName(): ?string
+    public function getMesa(): ?string
     {
-        return $this->groupName;
+        return $this->mesa;
     }
 
-    public function setGroupName(?string $groupName): static
+    public function setMesa(?string $mesa): static
     {
-        $this->groupName = $groupName;
+        $this->mesa = $mesa;
         return $this;
     }
 
