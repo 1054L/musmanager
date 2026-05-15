@@ -98,6 +98,36 @@ export const authService = {
     }
 
     return response.json();
+  },
+
+  async forgotPassword(email) {
+    const response = await fetch(`${API_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ message: 'Error en el servidor' }));
+      throw new Error(data.message || 'Error al procesar la solicitud');
+    }
+
+    return response.json();
+  },
+
+  async resetPassword(token, password) {
+    const response = await fetch(`${API_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, password })
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ message: 'Error en el servidor' }));
+      throw new Error(data.message || 'Error al restablecer la contraseña');
+    }
+
+    return response.json();
   }
 };
 

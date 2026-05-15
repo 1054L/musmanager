@@ -125,7 +125,29 @@
     "age_verification": "18 urte edo gehiago ditudala eta erabilera baldintzak onartzen ditudala baieztatzen dut",
     "role": "Erabiltzaile Mota",
     "roleUser": "Jokalaria",
-    "roleAdmin": "Antolatzailea"
+    "roleAdmin": "Antolatzailea",
+    "forgot_password_link": "Pasahitza ahaztu duzu?",
+    "forgot_password": {
+      "title": "Pasahitza Berreskuratu",
+      "subtitle": "Sartu zure emaila eta zure kontua berrezartzeko esteka bat bidaliko dizugu.",
+      "email_label": "Zure kontuaren emaila",
+      "submit": "Bidali esteka",
+      "success": "Emaila bidalita! Begiratu zure sarrera-ontzia.",
+      "error": "Ezin izan dugu zure eskaera prozesatu. Saiatu berriro.",
+      "back_to_home": "Hasierara itzuli",
+      "back_to_login": "Itzuli saio-hasierara"
+    },
+    "reset_password": {
+      "title": "Pasahitz Berria",
+      "subtitle": "Sortu pasahitz seguru bat zure Mus Manager konturako.",
+      "new_password": "Pasahitz Berria",
+      "confirm_password": "Berretsi Pasahitza",
+      "submit": "Eguneratu Pasahitza",
+      "success": "Pasahitza ondo eguneratu da. Birbideratzen...",
+      "error_invalid": "Esteka ez da baliozkoa edo iraungi egin da.",
+      "request_new": "Eskatu beste esteka bat",
+      "mismatch": "Pasahitzak ez datoz bat"
+    }
   },
   "profile": {
     "title": "Nire Profila",
@@ -382,7 +404,11 @@
     "about_title": "Guri Buruz | Mus Managerren Misioa",
     "about_desc": "Ezagutu Mus Managerren historia, misioa eta ikuspegia. Mus jokoa profesionalizatzeko lan egiten dugu, bere esentzia tradizionala mantenduz.",
     "privacy_title": "Pribatutasun Politika | Datuen Segurtasuna Mus Manager-en",
-    "terms_title": "Erabilera Baldintzak eta Baldintzak"
+    "terms_title": "Erabilera Baldintzak eta Baldintzak",
+    "forgot_password_title": "Pasahitza Berreskuratu | Mus Manager",
+    "forgot_password_desc": "Berreskuratu zure Mus Manager konturako sarbidea.",
+    "reset_password_title": "Pasahitza Berrezarri | Mus Manager",
+    "reset_password_desc": "Aukeratu pasahitz seguru berri bat zure konturako."
   },
   "tournaments_page": {
     "title": "Txapelketak",

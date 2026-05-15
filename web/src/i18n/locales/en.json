@@ -125,7 +125,29 @@
     "age_verification": "I confirm I am 18 years or older and accept the terms of use",
     "role": "User Type",
     "roleUser": "Player",
-    "roleAdmin": "Organizer"
+    "roleAdmin": "Organizer",
+    "forgot_password_link": "Forgot your password?",
+    "forgot_password": {
+      "title": "Recover Password",
+      "subtitle": "Enter your email and we'll send you a link to reset your account.",
+      "email_label": "Account Email",
+      "submit": "Send link",
+      "success": "Email sent! Please check your inbox.",
+      "error": "We couldn't process your request. Please try again.",
+      "back_to_home": "Back to home",
+      "back_to_login": "Back to login"
+    },
+    "reset_password": {
+      "title": "New Password",
+      "subtitle": "Create a secure password for your Mus Manager account.",
+      "new_password": "New Password",
+      "confirm_password": "Confirm Password",
+      "submit": "Update Password",
+      "success": "Password updated successfully. Redirecting...",
+      "error_invalid": "The link is invalid or has expired.",
+      "request_new": "Request another link",
+      "mismatch": "Passwords do not match"
+    }
   },
   "profile": {
     "title": "My Profile",
@@ -387,7 +409,11 @@
     "about_title": "About Us | The Mission of Mus Manager",
     "about_desc": "Discover the history, mission, and vision of Mus Manager. We work to professionalize the game of Mus while maintaining its traditional essence.",
     "privacy_title": "Privacy Policy | Data Security at Mus Manager",
-    "terms_title": "Terms and Conditions of Use"
+    "terms_title": "Terms and Conditions of Use",
+    "forgot_password_title": "Recover Password | Mus Manager",
+    "forgot_password_desc": "Recover access to your Mus Manager account.",
+    "reset_password_title": "Reset Password | Mus Manager",
+    "reset_password_desc": "Choose a new secure password for your account."
   },
   "tournaments_page": {
     "title": "Tournaments",

@@ -134,7 +134,29 @@
     "age_verification": "Confirmo que soy mayor de 18 años y acepto las condiciones de uso",
     "role": "Tipo de Usuario",
     "roleUser": "Jugador",
-    "roleAdmin": "Organizador"
+    "roleAdmin": "Organizador",
+    "forgot_password_link": "¿Olvidaste tu contraseña?",
+    "forgot_password": {
+      "title": "Recuperar Contraseña",
+      "subtitle": "Introduce tu email y te enviaremos un enlace para restablecer tu cuenta.",
+      "email_label": "Email de tu cuenta",
+      "submit": "Enviar enlace",
+      "success": "¡Correo enviado! Revisa tu bandeja de entrada.",
+      "error": "No hemos podido procesar tu solicitud. Inténtalo de nuevo.",
+      "back_to_home": "Volver a inicio",
+      "back_to_login": "Volver al inicio de sesión"
+    },
+    "reset_password": {
+      "title": "Nueva Contraseña",
+      "subtitle": "Crea una contraseña segura para tu cuenta de Mus Manager.",
+      "new_password": "Nueva Contraseña",
+      "confirm_password": "Confirmar Contraseña",
+      "submit": "Actualizar Contraseña",
+      "success": "Contraseña actualizada con éxito. Redirigiendo...",
+      "error_invalid": "El enlace no es válido o ha caducado.",
+      "request_new": "Solicitar otro enlace",
+      "mismatch": "Las contraseñas no coinciden"
+    }
   },
   "profile": {
     "title": "Mi Perfil",
@@ -399,7 +421,11 @@
     "about_title": "Sobre Nosotros | La Misión de Mus Manager",
     "about_desc": "Conoce la historia, misión y visión de Mus Manager. Trabajamos para profesionalizar el juego del Mus manteniendo su esencia tradicional.",
     "privacy_title": "Política de Privacidad | Seguridad de Datos en Mus Manager",
-    "terms_title": "Términos y Condiciones de Uso"
+    "terms_title": "Términos y Condiciones de Uso",
+    "forgot_password_title": "Recuperar Contraseña | Mus Manager",
+    "forgot_password_desc": "Recupera el acceso a tu cuenta de Mus Manager.",
+    "reset_password_title": "Restablecer Contraseña | Mus Manager",
+    "reset_password_desc": "Elige una nueva contraseña segura para tu cuenta."
   },
   "tournaments_page": {
     "title": "Torneos",

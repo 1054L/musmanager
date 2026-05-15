@@ -113,6 +113,12 @@ const handleSubmit = async () => {
         </div>
       </div>
 
+      <div v-if="isLogin" class="flex justify-end -mt-4">
+        <router-link to="/forgot-password" class="text-[10px] font-bold uppercase tracking-widest text-[#0fb361] hover:text-[#f4d125] transition-colors border-b border-[#0fb361]/20">
+          {{ t('auth.forgot_password_link') }}
+        </router-link>
+      </div>
+
       <Transition name="expand">
         <div v-if="!isLogin" class="input-group">
           <label class="input-label">{{ t('auth.confirm') }}</label>
@@ -162,24 +168,13 @@ const handleSubmit = async () => {
         </div>
       </Transition>
 
-      <button type="submit" :disabled="loading || (!isLogin && !ageVerified)" class="mus-button-primary w-full py-5 mt-4 group">
+      <button type="submit" :disabled="loading || (!isLogin && !ageVerified)" class="mus-button-primary w-full py-3 mt-2 group">
         <span class="font-black uppercase tracking-widest text-sm">
           {{ isLogin ? t('auth.submitLogin') : t('auth.submitRegister') }}
         </span>
         <i v-if="!loading" class="pi pi-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
       </button>
     </form>
-
-    <footer class="mt-8 text-center pt-8 border-t border-[var(--border)]">
-      <p v-if="isLogin" class="footer-switch">
-        {{ t('auth.noAccount') }} 
-        <button @click="switchMode('register')" class="switch-btn">{{ t('auth.createAccount') }}</button>
-      </p>
-      <p v-else class="footer-switch">
-        {{ t('auth.haveAccount') }} 
-        <button @click="switchMode('login')" class="switch-btn">{{ t('auth.loginHere') }}</button>
-      </p>
-    </footer>
   </div>
 </template>
 
@@ -208,11 +203,11 @@ const handleSubmit = async () => {
 .mus-input-field:focus + .input-icon { color: var(--primary); }
 
 .mus-input-field {
-  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px; padding: 18px 24px 18px 56px; color: var(--text-main); font-size: 14px; font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.mus-input-field:focus { outline: none; border-color: var(--secondary); background: var(--surface-hover); box-shadow: 0 0 10px rgba(233, 195, 73, 0.2); }
+.mus-input-field:focus { outline: none; border-color: var(--secondary); background: rgba(233, 195, 73, 0.05); box-shadow: 0 0 10px rgba(233, 195, 73, 0.2); }
 
 
 

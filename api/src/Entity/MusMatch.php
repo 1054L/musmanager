@@ -20,11 +20,11 @@ class MusMatch
     #[ORM\JoinColumn(nullable: false)]
     private ?Tournament $tournament = null;
 
-    #[ORM\ManyToOne(targetEntity: TournamentTeam::class)]
+    #[ORM\ManyToOne(targetEntity: TournamentTeam::class, inversedBy: 'matchesAsTeam1')]
     #[ORM\JoinColumn(nullable: true)]
     private ?TournamentTeam $team1 = null;
 
-    #[ORM\ManyToOne(targetEntity: TournamentTeam::class)]
+    #[ORM\ManyToOne(targetEntity: TournamentTeam::class, inversedBy: 'matchesAsTeam2')]
     #[ORM\JoinColumn(nullable: true)]
     private ?TournamentTeam $team2 = null;
 

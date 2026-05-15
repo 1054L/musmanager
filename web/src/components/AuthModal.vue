@@ -27,7 +27,16 @@ const handleKeydown = (e) => {
   }
 }
 
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// Close modal on route change
+watch(() => route.path, () => {
+  emit('close')
+})
+
 onMounted(() => window.addEventListener('keydown', handleKeydown))
 onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 </script>

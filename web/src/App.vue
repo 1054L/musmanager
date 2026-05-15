@@ -6,10 +6,12 @@ import MusMasterLayout from './layout/MusMasterLayout.vue'
 import { useLocationStore } from './stores/locationStore'
 import { useThemeStore } from './stores/themeStore'
 
-const locationStore = useLocationStore()
-const themeStore = useThemeStore()
+
 
 onMounted(() => {
+  const locationStore = useLocationStore()
+  const themeStore = useThemeStore()
+  
   locationStore.fetchLocations()
   themeStore.initTheme()
 })
