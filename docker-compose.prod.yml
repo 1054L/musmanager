@@ -53,7 +53,7 @@ services:
     command: php bin/console messenger:consume async --limit=10 --memory-limit=128M
     restart: always
     env_file:
-      - api/.env
+      - ./api/.env
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - MAILER_DSN=${MAILER_DSN}
