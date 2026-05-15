@@ -49,15 +49,16 @@ services:
       - proxy
 
   messenger-worker:
-    build: 
-      context: .
-      dockerfile: ./docker/php/Dockerfile # Usa el mismo que tu API
-    command: php bin/console messenger:consume async --memory-limit=128M --time-limit=3600
+    image: mus-api
+    command: php bin/console messenger:consume async --limit=10 --memory-limit=128M
     restart: always
     env_file:
       - .env
     depends_on:
-      - db
+      api:
+        condition: service_started
+      db:
+        condition: service_healthy
 
   web:
     build:
