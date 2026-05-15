@@ -38,11 +38,11 @@ jobs:
             set -e
             cd /var/www/mus
             echo "Cleaning working directory..."
-            git reset HEAD .
-            git checkout -- .
-            git clean -fd
-            echo "Pulling latest changes from main..."
-            git pull origin main
+            git fetch origin main
+            echo "Forcing local branch to match origin/main..."
+            git reset --hard origin/main
+            echo "Cleaning untracked files..."
+            git clean -fd -e .env*
 
       # 4. Copiar los archivos compilados de Vue (dist) al servidor
       - name: Upload compiled frontend
