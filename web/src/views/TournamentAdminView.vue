@@ -410,7 +410,7 @@ const normalizeStageKey = (stage) => {
             <div>
               <div class="flex align-items-center gap-2 mb-1">
                 <span class="text-slate-500 text-[9px] font-black uppercase tracking-[0.4em]">{{ t('tournament_admin.panel_title') }}</span>
-                <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                <span class="h-1 w-1 rounded-full bg-slate-700"> </span>
                 <span class="text-secondary text-[9px] font-black uppercase tracking-[0.2em] italic">{{ t('tournament_form.types.' + tournament.type) }}</span>
               </div>
               <h1 class="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter m-0 leading-none">
