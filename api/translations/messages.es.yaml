@@ -1,0 +1,9 @@
+emails:
+    reset_password:
+        subject: "Recuperación de contraseña - Mus Manager"
+        greeting: "Hola,"
+        intro: "Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en Mus Manager."
+        button: "Restablecer Contraseña"
+        ignore: "Si no has solicitado este cambio, puedes ignorar este correo con seguridad."
+        note: "Nota: Este enlace caducará en 1 hora por razones de seguridad."
+        footer: "Todos los derechos reservados."

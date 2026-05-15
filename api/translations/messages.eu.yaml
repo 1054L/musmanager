@@ -1,0 +1,9 @@
+emails:
+    reset_password:
+        subject: "Pasahitza berreskuratzea - Mus Manager"
+        greeting: "Kaixo,"
+        intro: "Zure Mus Manager kontuko pasahitza berrezartzeko eskaera jaso dugu."
+        button: "Pasahitza Berrezarri"
+        ignore: "Aldaketa hau eskatu ez baduzu, mezu hau baztertu dezakezu segurtasunez."
+        note: "Oharra: Esteka hau ordubete barru iraungiko da segurtasun arrazoiengatik."
+        footer: "Eskubide guztiak erreserbatuta."

@@ -20,10 +20,12 @@ class AuthController extends AbstractController
     public function forgotPassword(
         Request $request,
         EntityManagerInterface $entityManager,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        \Symfony\Contracts\Translation\TranslatorInterface $translator
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? null;
+        $locale = $data['locale'] ?? 'es'; // Default to Spanish if not provided
 
         if (!$email) {
             return new JsonResponse(['message' => 'Email is required'], Response::HTTP_BAD_REQUEST);
@@ -40,13 +42,16 @@ class AuthController extends AbstractController
             $frontendUrl = $_ENV['FRONTEND_URL'] ?? 'https://musmanager.com';
             $resetLink = $frontendUrl . '/reset-password?token=' . $token;
 
+            $subject = $translator->trans('emails.reset_password.subject', [], 'messages', $locale);
+
             $emailMessage = (new Email())
                 ->from($_ENV['MAILER_FROM'] ?? 'info@musmanager.com')
                 ->to($user->getEmail())
-                ->subject('Recuperación de contraseña - Mus Manager')
+                ->subject($subject)
                 ->html($this->renderView('emails/reset_password.html.twig', [
                     'resetLink' => $resetLink,
-                    'user' => $user
+                    'user' => $user,
+                    'locale' => $locale
                 ]));
 
             try {
@@ -61,8 +66,10 @@ class AuthController extends AbstractController
             }
         }
 
+        $successMsg = $translator->trans('Si ese correo existe, recibirás un enlace para restablecer tu contraseña', [], 'messages', $locale);
+
         return new JsonResponse([
-            'message' => 'Si ese correo existe, recibirás un enlace para restablecer tu contraseña'
+            'message' => $successMsg
         ], Response::HTTP_OK);
     }
 

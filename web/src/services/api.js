@@ -100,11 +100,11 @@ export const authService = {
     return response.json();
   },
 
-  async forgotPassword(email) {
+  async forgotPassword(email, locale = 'es') {
     const response = await fetch(`${API_URL}/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email, locale })
     });
 
     if (!response.ok) {

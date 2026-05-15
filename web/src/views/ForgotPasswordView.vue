@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from 'primevue/usetoast'
 import MusLoader from '../components/MusLoader.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 
 const email = ref('')
@@ -14,7 +14,7 @@ const loading = ref(false)
 const handleSubmit = async () => {
   loading.value = true
   try {
-    const response = await authService.forgotPassword(email.value)
+    const response = await authService.forgotPassword(email.value, locale.value)
     toast.add({
       severity: 'success',
       summary: t('common.success'),
