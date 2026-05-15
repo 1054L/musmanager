@@ -7,3 +7,5 @@ emails:
         ignore: "Si no has solicitado este cambio, puedes ignorar este correo con seguridad."
         note: "Nota: Este enlace caducará en 1 hora por razones de seguridad."
         footer: "Todos los derechos reservados."
+auth:
+    forgot_password_success: "Si ese correo existe, recibirás un enlace para restablecer tu contraseña."

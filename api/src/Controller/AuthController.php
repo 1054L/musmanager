@@ -66,7 +66,7 @@ class AuthController extends AbstractController
             }
         }
 
-        $successMsg = $translator->trans('Si ese correo existe, recibirás un enlace para restablecer tu contraseña', [], 'messages', $locale);
+        $successMsg = $translator->trans('auth.forgot_password_success', [], 'messages', $locale);
 
         return new JsonResponse([
             'message' => $successMsg

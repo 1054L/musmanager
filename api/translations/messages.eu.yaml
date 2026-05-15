@@ -7,3 +7,5 @@ emails:
         ignore: "Aldaketa hau eskatu ez baduzu, mezu hau baztertu dezakezu segurtasunez."
         note: "Oharra: Esteka hau ordubete barru iraungiko da segurtasun arrazoiengatik."
         footer: "Eskubide guztiak erreserbatuta."
+auth:
+    forgot_password_success: "Posta hori existitzen bada, pasahitza berrezartzeko esteka bat jasoko duzu."
