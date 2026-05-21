@@ -9,5 +9,5 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 return function (array $context) {
-    return new Kernel('dev', true);
+    return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
 };
