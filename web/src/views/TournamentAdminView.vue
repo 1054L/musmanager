@@ -7,6 +7,7 @@ import Card from 'primevue/card'
 import Tag from 'primevue/tag'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
+import Calendar from 'primevue/calendar'
 import Checkbox from 'primevue/checkbox'
 import MusLoader from '../components/MusLoader.vue'
 import TournamentEnrollmentForm from '../components/TournamentEnrollmentForm.vue'
@@ -14,13 +15,37 @@ import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import { useMercure } from '../composables/useMercure'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const { subscribe } = useMercure()
 const toast = useToast()
 const confirm = useConfirm()
 const uuid = route.params.uuid
+
+const getStageLabel = (stage) => {
+  if (!stage) return t('tournament_view.rounds.general')
+  if (stage.startsWith('matchDay_')) {
+    const day = stage.split('_')[1]
+    const matchDayLabel = t('tournament_view.rounds.matchDay')
+    if (!day) return matchDayLabel
+    return locale.value === 'eu'
+      ? `${day}. ${matchDayLabel}`
+      : `${matchDayLabel} ${day}`
+  }
+
+  const normalizedStage = normalizeStageKey(stage)
+  const knockoutKey = `tournament_view.knockout.${normalizedStage}`
+  const knockoutLabel = t(knockoutKey)
+  if (knockoutLabel !== knockoutKey) return knockoutLabel
+
+  const roundKey = `tournament_view.rounds.${normalizedStage}`
+  const roundLabel = t(roundKey)
+  if (roundLabel !== roundKey) return roundLabel
+
+  return stage
+}
+
 
 const tournament = ref(null)
 const loading = ref(true)
@@ -35,6 +60,17 @@ const showEnrollmentDialog = ref(false)
 const enrollmentForm = ref(null)
 const matchesOrder = ref('asc')
 const collapsedStages = ref({})
+const leagueMatchDays = ref([])
+
+const toggleMatchDay = (day) => {
+  const index = leagueMatchDays.value.indexOf(day);
+  if (index === -1) {
+    leagueMatchDays.value.push(day);
+  } else {
+    leagueMatchDays.value.splice(index, 1);
+  }
+  leagueMatchDays.value.sort();
+};
 
 const onEnrollmentDialogShow = () => {
   setTimeout(() => {
@@ -56,19 +92,22 @@ const fetchTournamentData = async (silent = false) => {
   try {
     const data = await tournamentService.getTournament(uuid)
     tournament.value = data
-    enrolledTeams.value = data.tournamentTeams || []
+    enrolledTeams.value = data.teams || []
+    leagueMatchDays.value = data.leagueMatchDays || []
     
     if (data.matches) {
       matches.value = data.matches.map(m => ({
         id: m.id,
-        status: m.score1 > 0 || m.score2 > 0 ? 'finished' : 'pending',
-        teamA: m.team1,
-        scoreA: m.score1,
-        teamB: m.team2,
-        scoreB: m.score2,
+        status: m.status || (m.scoreA > 0 || m.scoreB > 0 ? 'finished' : 'pending'),
+        teamA: m.teamA,
+        scoreA: m.scoreA,
+        teamB: m.teamB,
+        scoreB: m.scoreB,
         stage: m.stage,
         bracketRound: m.bracketRound,
         bracketPosition: m.bracketPosition,
+        matchDay: m.matchDay,
+        deadlineDate: m.deadlineDate,
         games: m.games || []
       }))
     }
@@ -133,6 +172,13 @@ const handleToggleConfirm = async (registrationId) => {
     const team = enrolledTeams.value.find(tt => tt.id === registrationId)
     if (team) {
       team.isConfirmed = response.isConfirmed
+      const detailKey = response.isConfirmed ? 'tournament_admin.enrollment.confirmed_success' : 'tournament_admin.enrollment.unconfirmed_success'
+      toast.add({ 
+        severity: 'success', 
+        summary: t('common.success'), 
+        detail: t(detailKey) || (response.isConfirmed ? 'Pareja confirmada' : 'Confirmación anulada'), 
+        life: 3000 
+      })
     }
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
@@ -196,8 +242,15 @@ const handleGenerateMatches = async (event) => {
         severity: 'primary'
     },
     accept: async () => {
+      if (tournament.value.type === 'league' && (!leagueMatchDays.value || leagueMatchDays.value.length === 0)) {
+        toast.add({ severity: 'error', summary: 'Error', detail: t('tournament_admin.teams.league.match_days_required'), life: 5000 })
+        return
+      }
       processing.value = true
       try {
+        if (tournament.value.type === 'league') {
+          await tournamentService.updateTournament(uuid, { leagueMatchDays: leagueMatchDays.value })
+        }
         await tournamentService.generateMatches(uuid)
         // Automatically switch to active phase
         await tournamentService.updateTournament(uuid, { status: 'active' })
@@ -214,6 +267,49 @@ const handleGenerateMatches = async (event) => {
 }
 
 const editGames = ref([])
+const editDeadlineDate = ref(null)
+
+const editingDateStageMatches = ref([])
+const editingDateStageName = ref('')
+const editMatchDateValue = ref(null)
+const isSavingDate = ref(false)
+
+const openStageDateModal = (stageName, stageMatches) => {
+  editingDateStageName.value = stageName
+  editingDateStageMatches.value = stageMatches
+  editMatchDateValue.value = stageMatches[0]?.deadlineDate ? new Date(stageMatches[0].deadlineDate) : null
+}
+
+const saveStageDate = async () => {
+  isSavingDate.value = true
+  try {
+    let dateIso = null
+    if (editMatchDateValue.value) {
+      // Adjust for local timezone offset to avoid the date going backwards by 1 day when converting to UTC
+      const d = editMatchDateValue.value
+      dateIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString()
+    }
+    
+    const matchIds = editingDateStageMatches.value.map(m => m.id)
+    
+    await tournamentService.updateStageDate(matchIds, dateIso)
+    
+    // Update local state reactively
+    matches.value.forEach((m, idx) => {
+      if (matchIds.includes(m.id)) {
+        matches.value[idx] = { ...m, deadlineDate: dateIso }
+      }
+    })
+
+    toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_admin.match_edit.date_save_success'), life: 3000 })
+    editingDateStageMatches.value = []
+    await fetchTournamentData(true)
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+  } finally {
+    isSavingDate.value = false
+  }
+}
 
 const calculatedScore1 = computed(() => {
   return editGames.value.filter(g => g.points1 >= (tournament.value?.rulePoints || 40)).length
@@ -225,6 +321,7 @@ const calculatedScore2 = computed(() => {
 
 const openEditModal = (match) => {
   editingMatch.value = match
+  editDeadlineDate.value = match.deadlineDate ? new Date(match.deadlineDate) : null
   
   const toWin = tournament.value?.ruleGames || 3
   const maxPossibleGames = (toWin * 2) - 1
@@ -274,16 +371,22 @@ const saveMatchResult = async () => {
   isSavingResult.value = true
   try {
     await tournamentService.updateMatchScore(editingMatch.value.id, {
-      games: editGames.value
+      games: editGames.value,
+      deadlineDate: editDeadlineDate.value ? editDeadlineDate.value.toISOString() : null
     })
     
     // Update local match state reactively
-    const match = matches.value.find(m => m.id === editingMatch.value.id)
-    if (match) {
-      match.scoreA = calculatedScore1.value
-      match.scoreB = calculatedScore2.value
-      match.status = (calculatedScore1.value > 0 || calculatedScore2.value > 0) ? 'finished' : 'pending'
-      match.games = [...editGames.value]
+    const matchIdx = matches.value.findIndex(m => m.id === editingMatch.value.id)
+    if (matchIdx !== -1) {
+      // Re-create the match object to trigger Vue reactivity properly
+      matches.value[matchIdx] = {
+        ...matches.value[matchIdx],
+        scoreA: calculatedScore1.value,
+        scoreB: calculatedScore2.value,
+        status: (calculatedScore1.value > 0 || calculatedScore2.value > 0) ? 'finished' : 'pending',
+        games: JSON.parse(JSON.stringify(editGames.value)),
+        deadlineDate: editDeadlineDate.value ? editDeadlineDate.value.toISOString() : null
+      }
     }
 
     editingMatch.value = null
@@ -308,7 +411,7 @@ const stats = computed(() => {
   if (!tournament.value) return []
   const confirmedCount = enrolledTeams.value.filter(tt => tt.isConfirmed).length
   return [
-    { label: t('tournament_view.tabs.teams'), value: tournament.value?.teamsCount || 0, icon: 'pi-users', color: '#e9c349' },
+    { label: t('tournament_view.tabs.teams'), value: enrolledTeams.value.length, icon: 'pi-users', color: '#e9c349' },
     { label: t('tournament_admin.stats.confirmed'), value: confirmedCount, icon: 'pi-verified', color: '#10b981' },
     { label: t('tournament_view.tabs.matches'), value: matches.value.length, icon: 'pi-calendar', color: '#f4d125' },
     { label: t('tournament_admin.stats.finished'), value: matches.value.filter(m => m.status === 'finished').length, icon: 'pi-check-circle', color: '#3b82f6' }
@@ -317,16 +420,34 @@ const stats = computed(() => {
 
 const groupedMatches = computed(() => {
   const groups = {}
+  
   matches.value.forEach(match => {
-    let stage = normalizeStageKey(match.stage)
-    // If it's 3rd place, group it with final to show them together
-    if (stage === 'third_place') stage = 'final'
-    
-    if (!groups[stage]) groups[stage] = []
-    groups[stage].push(match)
+    let groupKey = ''
+    if (tournament.value?.type === 'league') {
+      const day = match.matchDay || (match.stage?.toLowerCase().includes('jornada') || match.stage?.toLowerCase().includes('jardunaldia') ? match.stage.match(/\d+/)?.[0] : null)
+      groupKey = day ? `matchDay_${day}` : 'general'
+    } else {
+      groupKey = normalizeStageKey(match.stage)
+      if (groupKey === 'third_place') groupKey = 'final'
+    }
+
+    if (!groups[groupKey]) groups[groupKey] = []
+    groups[groupKey].push(match)
   })
   
   let entries = Object.entries(groups)
+  
+  // Sort entries
+  entries.sort((a, b) => {
+    if (tournament.value?.type === 'league') {
+      const dayA = parseInt(a[0].split('_')[1] || 0)
+      const dayB = parseInt(b[0].split('_')[1] || 0)
+      return dayA - dayB
+    }
+    // For knockout, we could add custom sorting if needed
+    return 0
+  })
+
   if (matchesOrder.value === 'desc') {
     entries.reverse()
   }
@@ -356,7 +477,15 @@ const normalizeStageKey = (stage) => {
   if (!stage) return 'general'
   const s = stage.toLowerCase().trim()
   
+  const rondaMatch = s.match(/(?:ronda|round)\s*(\d+)/i)
+  if (rondaMatch) {
+    const roundNumber = Number(rondaMatch[1])
+    const roundMap = ['final', 't4', 't8', 't16', 't32', 't64']
+    return roundMap[roundNumber - 1] || stage.toLowerCase().replace(/\s+/g, '_')
+  }
+  
   // Check for 64 (Round of 64 / Treintadosavos)
+  if (s.includes('jornada') || s.includes('jardunaldia')) return 'matchDay'
   if (s.includes('treintadosavos') || s.includes('treintaidosavos') || s.includes('trintadosavos') || s.includes('64') || s.includes('hirurogei')) return 't64'
   
   // Check for 32 (Round of 32 / Dieciseisavos)
@@ -483,7 +612,7 @@ const normalizeStageKey = (stage) => {
                   <div class="flex align-items-center gap-3">
                     <Checkbox :modelValue="tt.isConfirmed" :binary="true" @change="handleToggleConfirm(tt.id)" v-tooltip.top="t('tournament_admin.enrollment.confirmed_tooltip')" />
                     <div class="team-info">
-                      <span class="name" :class="{ 'opacity-50': !tt.isConfirmed }">{{ tt.team?.name }}</span>
+                      <span class="name" :class="{ 'opacity-50': !tt.isConfirmed }">{{ tt.name }}</span>
                       <span class="group-tag" v-if="tt.mesa">{{ tt.mesa }}</span>
                     </div>
                   </div>
@@ -522,6 +651,30 @@ const normalizeStageKey = (stage) => {
           <section v-if="['draft', 'pending'].includes(tournament.status)" class="side-panel-premium">
             <h3 class="panel-title"><i class="pi pi-step-forward"></i> {{ t('tournament_admin.status.title') }}</h3>
             <div class="p-6">
+              <!-- League Match Days Selector (Moved here) -->
+              <div v-if="tournament.type === 'league' && ['draft', 'pending'].includes(tournament.status)" class="w-full mb-10 pb-10 border-b border-white/5">
+                <div class="flex align-items-center justify-center gap-2 mb-6">
+                  <span class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                    {{ t('tournament_admin.teams.league.match_days_label') }}
+                  </span>
+                  <i class="pi pi-info-circle text-slate-600 text-xs cursor-help" v-tooltip.top="t('tournament_admin.teams.league.match_days_tooltip')"></i>
+                </div>
+                <div class="flex justify-center gap-3">
+                  <button v-for="day in [1,2,3,4,5,6,7]" :key="day"
+                          @click="toggleMatchDay(day)"
+                          type="button"
+                          class="w-12 h-12 rounded-xl font-black text-sm transition-all flex items-center justify-center border"
+                          :class="leagueMatchDays.includes(day) 
+                            ? 'bg-[#e9c349] text-slate-900 border-[#e9c349] shadow-lg shadow-[#e9c349]/20' 
+                            : 'bg-white/5 text-slate-500 border-white/5 hover:bg-white/10'">
+                    {{ ['L', 'M', 'X', 'J', 'V', 'S', 'D'][day-1] }}
+                  </button>
+                </div>
+                <p class="text-[10px] text-slate-600 font-bold uppercase mt-6 opacity-60 italic text-center">
+                  {{ t('tournament_admin.teams.league.match_days_hint') }}
+                </p>
+              </div>
+
               <div class="grid">
                 <div v-for="option in statusOptions" :key="option.value" class="col-3">
                   <button @click="handleStatusChange(option.value)"
@@ -549,7 +702,6 @@ const normalizeStageKey = (stage) => {
                 <p class="text-slate-500 font-bold text-xs uppercase tracking-widest max-w-md mx-auto mb-10 leading-relaxed">
                   {{ enrolledTeams.length < 2 ? t('tournament_admin.preparation.not_ready_desc') : t('tournament_admin.preparation.ready_desc') }}
                 </p>
-                
                 <div class="flex flex-column items-center gap-6">
                   <div class="flex align-items-center gap-10 bg-black/40 p-6 rounded-2xl border border-white/5">
                     <div class="text-center">
@@ -562,6 +714,7 @@ const normalizeStageKey = (stage) => {
                       <span class="text-2xl font-black italic text-secondary">{{ t('tournament_form.types.' + tournament.type) }}</span>
                     </div>
                   </div>
+                  
 
                   <button @click="handleGenerateMatches($event)" 
                           :disabled="processing || enrolledTeams.length < 2" 
@@ -599,9 +752,21 @@ const normalizeStageKey = (stage) => {
                   <div class="stage-header flex align-items-center gap-4 mb-6 cursor-pointer hover:opacity-80 transition-all" @click="toggleStage(stage)">
                     <span class="stage-dot" :class="{ 'is-collapsed': collapsedStages[stage] }"></span>
                     <h4 class="m-0 text-secondary font-black italic uppercase tracking-[0.25em] text-sm">
-                      {{ stage === 'final' && stageMatches.some(m => normalizeStageKey(m.stage) === 'third_place') ? t('tournament_view.knockout.final') + ' & ' + t('tournament_view.knockout.third_place') : (t('tournament_view.knockout.' + stage) || t('tournament_view.rounds.' + stage) || stage) }}
+                      <template v-if="stage.startsWith('matchDay_')">
+                        {{ getStageLabel(stage) }}
+                        <span v-if="stageMatches[0]?.deadlineDate" class="ml-2 text-slate-500 font-bold tracking-normal lowercase opacity-60">
+                          - [{{ new Date(stageMatches[0].deadlineDate).toLocaleDateString() }}]
+                        </span>
+                      </template>
+                      <template v-else-if="stage === 'general'">
+                        {{ t('tournament_view.rounds.general') }}
+                      </template>
+                      <template v-else>
+                        {{ stage === 'final' && stageMatches.some(m => normalizeStageKey(m.stage) === 'third_place') ? t('tournament_view.knockout.final') + ' & ' + t('tournament_view.knockout.third_place') : getStageLabel(stage) }}
+                      </template>
                     </h4>
-                    <div class="h-px flex-1 bg-gradient-to-r from-secondary/20 to-transparent"></div>
+                    <button v-if="tournament?.type === 'league'" @click.stop="openStageDateModal(stage, stageMatches)" class="mus-btn-secondary px-2 py-1 ml-auto text-[10px]" v-tooltip.top="t('tournament_admin.match_edit.date_tooltip')"><i class="pi pi-calendar"></i></button>
+                    <div class="h-px flex-1 bg-gradient-to-r from-secondary/20 to-transparent ml-4"></div>
                     <i class="pi text-xs text-slate-500" :class="collapsedStages[stage] ? 'pi-chevron-down' : 'pi-chevron-up'"></i>
                   </div>
                   
@@ -614,21 +779,23 @@ const normalizeStageKey = (stage) => {
                       <div class="relative z-10">
                         <div class="flex justify-content-between align-items-center mb-4">
                           <div class="flex flex-column gap-1">
-                            <span class="text-[8px] font-black text-secondary uppercase tracking-[0.2em]">
-                               {{ t('tournament_view.knockout.' + normalizeStageKey(match.stage)) || t('tournament_view.rounds.' + normalizeStageKey(match.stage)) || match.stage }}
-                             </span>
+                             <span class="text-[8px] font-black text-secondary uppercase tracking-[0.2em]">
+                                {{ match.matchDay ? getStageLabel(`matchDay_${match.matchDay}`) : getStageLabel(normalizeStageKey(match.stage)) }}
+                              </span>
                              <span class="match-status-tag" :class="{ 'is-finished': match.status === 'finished' }">
                                {{ t('tournament_view.match_status.' + match.status) }}
                              </span>
                           </div>
-                          <div class="match-edit-icon"><i class="pi pi-pencil"></i></div>
+                          <div class="flex gap-2 relative z-20">
+                             <div class="match-edit-icon"><i class="pi pi-pencil"></i></div>
+                          </div>
                         </div>
                         <div class="team-row">
-                          <span class="team-name" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.teamA || t('tournament_admin.matches.tbd') }}</span>
+                          <span class="team-name" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.teamA?.name || match.teamA || t('tournament_admin.matches.tbd') }}</span>
                           <span class="team-score" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.scoreA }}</span>
                         </div>
                         <div class="team-row mt-2">
-                          <span class="team-name" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.teamB || t('tournament_admin.matches.tbd') }}</span>
+                          <span class="team-name" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.teamB?.name || match.teamB || t('tournament_admin.matches.tbd') }}</span>
                           <span class="text-slate-700 font-black italic text-xl" v-if="match.scoreA === 0 && match.scoreB === 0 && !match.teamA && !match.teamB">VS</span>
                           <span v-else class="team-score" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.scoreB }}</span>
                         </div>
@@ -645,8 +812,32 @@ const normalizeStageKey = (stage) => {
 </template>
 
     <!-- Score Edit Dialog (Redesigned for Games - Side by Side - Ultra Wide - Fixed) -->
-    <Dialog v-model:visible="editingMatch" modal :header="t('tournament_admin.match_edit.title')" :style="{ width: '1000px' }" :dismissableMask="true" class="mus-dialog-premium no-scroll">
+    <Dialog :visible="!!editingMatch" @update:visible="(val) => !val ? editingMatch = null : null" modal :closable="false" :style="{ width: '1000px' }" :dismissableMask="true" class="mus-dialog-premium no-scroll">
       <div v-if="editingMatch" class="p-0 overflow-hidden">
+        <!-- Header visual premium -->
+        <div class="form-header-premium pt-2 px-5 pb-0">
+          <div class="flex align-items-center justify-content-between">
+            <div class="flex align-items-center gap-4">
+              <div class="header-icon scale-90">
+                <i class="pi pi-pencil text-secondary text-lg"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-black text-white italic uppercase tracking-tighter m-0 leading-none">
+                  {{ t('tournament_admin.match_edit.title').split(' ').slice(0, -1).join(' ') }} 
+                  <span class="text-secondary">{{ t('tournament_admin.match_edit.title').split(' ').slice(-1)[0] }}</span>
+                </h2>
+                <p class="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] mt-1">{{ t('tournament_admin.match_edit.subtitle') }}</p>
+              </div>
+            </div>
+            
+            <!-- Botón de cierre X -->
+            <button @click="editingMatch = null" class="close-modal-btn" type="button">
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+          <div class="header-line mt-3"></div>
+        </div>
+
         <div class="grid grid-nogutter">
           <!-- LEFT COLUMN: INFO & SUMMARY (Horizontal alignment - Optimized) -->
           <div class="col-12 md:col-6 p-5 bg-white/2 border-right border-white/5">
@@ -661,14 +852,14 @@ const normalizeStageKey = (stage) => {
                   <div class="flex justify-content-between align-items-center gap-4 mb-6">
                     <div class="flex-1 min-w-0">
                       <span class="text-[9px] font-black text-secondary/60 uppercase tracking-[0.3em] block mb-1">{{ t('tournament_view.match_edit.local') }}</span>
-                      <div class="text-xl font-black text-white italic truncate" v-tooltip.bottom="editingMatch.teamA">{{ editingMatch.teamA }}</div>
+                      <div class="text-xl font-black text-white italic truncate" v-tooltip.bottom="editingMatch.teamA?.name || editingMatch.teamA">{{ editingMatch.teamA?.name || editingMatch.teamA }}</div>
                     </div>
                     <div class="flex-shrink-0 px-2">
                       <span class="text-xl font-black italic text-white/10">VS</span>
                     </div>
                     <div class="flex-1 min-w-0 text-right">
                       <span class="text-[9px] font-black text-secondary/60 uppercase tracking-[0.3em] block mb-1">{{ t('tournament_view.match_edit.visitor') }}</span>
-                      <div class="text-xl font-black text-white italic truncate" v-tooltip.bottom="editingMatch.teamB">{{ editingMatch.teamB }}</div>
+                      <div class="text-xl font-black text-white italic truncate" v-tooltip.bottom="editingMatch.teamB?.name || editingMatch.teamB">{{ editingMatch.teamB?.name || editingMatch.teamB }}</div>
                     </div>
                  </div>
                  <div class="match-summary-panel p-6 bg-secondary/10 border border-secondary/20 rounded-[32px] text-center shadow-2xl relative overflow-hidden">
@@ -685,6 +876,8 @@ const normalizeStageKey = (stage) => {
                     </div>
                  </div>
               </div>
+
+
 
               <div class="rules-hint mt-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex align-items-center gap-4">
                 <i class="pi pi-info-circle text-emerald-500 text-lg"></i>
@@ -767,8 +960,36 @@ const normalizeStageKey = (stage) => {
       </div>
     </Dialog>
 
+    <!-- Date Edit Dialog -->
+    <Dialog :visible="editingDateStageMatches.length > 0" @update:visible="(val) => !val ? editingDateStageMatches = [] : null" modal :closable="false" :style="{ width: '600px' }" :contentStyle="{ overflow: 'visible' }" class="mus-dialog-premium">
+      <div v-if="editingDateStageMatches.length > 0" class="p-5">
+        <div class="flex align-items-center justify-content-between mb-6">
+          <h3 class="m-0 text-xl font-black text-white italic uppercase tracking-widest"><i class="pi pi-calendar text-secondary mr-2"></i> {{ t('tournament_admin.match_edit.date_title') }}</h3>
+          <button @click="editingDateStageMatches = []" class="close-modal-btn" type="button"><i class="pi pi-times"></i></button>
+        </div>
+        
+        <div class="mb-6">
+          <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">{{ t('common.deadline') || 'Fecha Límite' }}</label>
+          <Calendar v-model="editMatchDateValue" 
+                    dateFormat="dd/mm/yy" 
+                    showIcon 
+                    appendTo="body"
+                    class="mus-calendar-premium w-full" 
+                    :placeholder="t('tournament_admin.teams.league.match_days_label')" />
+        </div>
+        
+        <div class="flex gap-3 justify-content-end">
+          <button @click="editingDateStageMatches = []" class="mus-btn-secondary px-4 py-2 text-[10px]">{{ t('tournament_admin.match_edit.cancel_btn') }}</button>
+          <button @click="saveStageDate" :disabled="isSavingDate" class="mus-btn-primary px-4 py-2 text-[10px]">
+            <i v-if="isSavingDate" class="pi pi-spin pi-spinner mr-2"></i>
+            {{ isSavingDate ? t('tournament_admin.match_edit.saving_btn') : t('tournament_admin.match_edit.save_btn') }}
+          </button>
+        </div>
+      </div>
+    </Dialog>
+
     <!-- Enrollment Dialog -->
-    <Dialog v-model:visible="showEnrollmentDialog" modal :header="t('tournament_admin.enrollment.dialog_title')" :style="{ width: '450px' }" class="mus-dialog-premium" @show="onEnrollmentDialogShow">
+    <Dialog v-model:visible="showEnrollmentDialog" modal :closable="false" :style="{ width: '450px' }" class="mus-dialog-premium" @show="onEnrollmentDialogShow">
       <div class="p-4">
         <TournamentEnrollmentForm ref="enrollmentForm" :tournamentUuid="uuid" @success="onEnrollmentSuccess" @cancel="showEnrollmentDialog = false" />
       </div>
@@ -926,7 +1147,7 @@ const normalizeStageKey = (stage) => {
 .status-toggle-btn.active .active-indicator { opacity: 1; }
 
 /* Team List */
-.teams-list-scroll { max-height: 400px; overflow-y: auto; padding-right: 8px; }
+.teams-list-scroll { max-height: 650px; overflow-y: auto; padding-right: 8px; }
 .team-list-item { 
   padding: 14px 18px; 
   background: rgba(255,255,255,0.02); 
@@ -1075,5 +1296,52 @@ const normalizeStageKey = (stage) => {
 /* Dialog overrides */
 :deep(.no-scroll .p-dialog-content) {
   overflow: hidden !important;
+}
+/* Premium Modal Headers */
+.form-header-premium {
+  position: relative;
+}
+
+.header-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(191, 149, 63, 0.1);
+  border: 1px solid rgba(191, 149, 63, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  aspect-ratio: 1/1;
+}
+
+.header-line {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--secondary) 0%, rgba(191, 149, 63, 0.2) 50%, transparent 100%);
+  opacity: 0.5;
+}
+
+.close-modal-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #64748b;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-modal-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #f43f5e;
+  transform: rotate(90deg);
 }
 </style>

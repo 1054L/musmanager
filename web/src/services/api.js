@@ -216,12 +216,12 @@ export const tournamentService = {
     const isFormData = data instanceof FormData;
     // Using POST for update to better support file uploads in various environments
     const response = await fetch(`${API_URL}/admin/tournament/${uuid}`, {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         ...authService.getAuthHeader(),
-        ...(isFormData ? {} : { 'Content-Type': 'application/json' })
+        'Content-Type': 'application/json'
       },
-      body: isFormData ? data : JSON.stringify(data)
+      body: JSON.stringify(data)
     });
 
     if (!response.ok) {
@@ -349,7 +349,7 @@ export const tournamentService = {
   },
 
   async updateMatchScore(matchId, data) {
-    const response = await fetch(`${API_URL}/admin/match/${matchId}`, {
+    const response = await fetch(`${API_URL}/admin/match/${matchId}/update`, {
       method: 'POST',
       headers: {
         ...authService.getAuthHeader(),
@@ -360,6 +360,22 @@ export const tournamentService = {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || 'Error al actualizar resultado');
+    }
+    return response.json();
+  },
+
+  async updateStageDate(matchIds, dateIso) {
+    const response = await fetch(`${API_URL}/admin/match/bulk-date`, {
+      method: 'PATCH',
+      headers: {
+        ...authService.getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ matchIds, deadlineDate: dateIso })
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Error al actualizar la fecha');
     }
     return response.json();
   },

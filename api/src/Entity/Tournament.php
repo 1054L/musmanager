@@ -76,6 +76,9 @@ class Tournament
     #[ORM\Column(options: ['default' => false])]
     private bool $hasThirdPlace = false;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $leagueMatchDays = null;
+
     /**
      * @var Collection<int, User>
      */
@@ -392,6 +395,17 @@ class Tournament
     public function setHasThirdPlace(bool $hasThirdPlace): static
     {
         $this->hasThirdPlace = $hasThirdPlace;
+        return $this;
+    }
+
+    public function getLeagueMatchDays(): ?array
+    {
+        return $this->leagueMatchDays;
+    }
+
+    public function setLeagueMatchDays(?array $leagueMatchDays): static
+    {
+        $this->leagueMatchDays = $leagueMatchDays;
         return $this;
     }
 }

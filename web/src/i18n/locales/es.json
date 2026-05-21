@@ -21,7 +21,8 @@
     "edit": "Editar",
     "accept": "Aceptar",
     "decline": "Rechazar",
-    "more_info": "Más información"
+    "more_info": "Más información",
+    "deadline": "Límite"
   },
   "cookie_banner": {
     "title": "Configuración de Cookies",
@@ -550,7 +551,8 @@
       "draft": "Borrador",
       "pending": "Pendiente",
       "active": "Activo",
-      "finished": "Finalizado"
+      "finished": "Finalizado",
+      "resting": "Descansa"
     }
   },
   "tournament_view": {
@@ -569,7 +571,8 @@
     "grand_final": "GRAN FINAL",
     "match_status": {
       "finished": "Finalizado",
-      "pending": "Pendiente"
+      "pending": "Pendiente",
+      "resting": "Descansa"
     },
     "tabs": {
       "matches": "Partidas",
@@ -581,14 +584,22 @@
     "rounds": {
       "title": "Jornada",
       "stage": "Fase",
-      "general": "General"
+      "general": "General",
+      "matchDay": "Jornada"
     },
     "classification": {
-      "team": "Equipo",
+      "team": "Pareja",
       "played": "PJ",
-      "won": "G",
-      "lost": "P",
-      "points": "PTS",
+      "won": "PG",
+      "mw": "PG",
+      "ml": "PP",
+      "vw": "VG",
+      "vl": "VP",
+      "vdiff": "+/- V",
+      "tf": "TF",
+      "tc": "TC",
+      "tdiff": "+/- T",
+      "pts": "Pts",
       "empty": "No hay clasificación disponible todavía"
     },
     "bracket": {
@@ -606,7 +617,10 @@
       "save_success": "Resultado guardado correctamente",
       "local": "Local",
       "visitor": "Visitante",
-      "rule_summary": "Partida a {games} chicos de {points} tantos"
+      "rule_summary": "Partida a {games} chicos de {points} tantos",
+      "date_title": "Fecha Límite",
+      "date_tooltip": "Editar fecha de la jornada",
+      "date_save_success": "Fecha de la jornada actualizada"
     },
     "activity": {
       "title": "Actividad Reciente",
@@ -678,10 +692,13 @@
     "back_tooltip": "Volver a Mis Torneos",
     "enrollment": {
       "title": "Inscripción de Parejas",
+      "subtitle": "AÑADIR NUEVOS PARTICIPANTES AL TORNEO",
       "add_btn": "INSCRIBIR NUEVA PAREJA",
       "list_title": "Parejas Inscritas",
-      "empty": "No hay parejas todavía",
+      "empty": "No hay inscripciones todavía",
       "confirmed_tooltip": "Confirmado / Pagado",
+      "confirmed_success": "Pareja confirmada correctamente",
+      "unconfirmed_success": "Confirmación anulada correctamente",
       "delete_success": "Pareja eliminada correctamente",
       "add_success": "Pareja inscrita correctamente",
       "delete_confirm_title": "Confirmar Eliminación",
@@ -719,6 +736,14 @@
       "draw_confirm_btn": "Realizar Sorteo",
       "draw_success": "Sorteo realizado con éxito. ¡Torneo en marcha!"
     },
+    "teams": {
+      "league": {
+        "match_days_label": "Días de jornada",
+        "match_days_hint": "Selecciona los días de la semana en que se juegan las partidas",
+        "match_days_tooltip": "Seleccionar los días es necesario para calcular automáticamente las fechas límite de cada jornada basándose en la fecha de inicio del torneo.",
+        "match_days_required": "Debes seleccionar al menos un día de la semana para generar el calendario."
+      }
+    },
     "matches": {
       "title": "Partidos del Torneo",
       "empty": "No hay partidos generados",
@@ -730,6 +755,7 @@
     },
     "match_edit": {
       "title": "Gestión de Resultado",
+      "subtitle": "GESTIÓN DE RESULTADOS Y PUNTUACIONES",
       "panel_title": "Panel de Control",
       "score_games": "PUNTUACIÓN CHICOS",
       "regulation": "REGLAMENTO",

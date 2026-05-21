@@ -18,6 +18,13 @@ const normalizeStageKey = (stage) => {
   if (!stage) return 'general'
   const s = stage.toLowerCase().trim()
   
+  const rondaMatch = s.match(/(?:ronda|round)\s*(\d+)/i)
+  if (rondaMatch) {
+    const roundNumber = Number(rondaMatch[1])
+    const roundMap = ['final', 't4', 't8', 't16', 't32', 't64']
+    return roundMap[roundNumber - 1] || stage.toLowerCase().replace(/\s+/g, '_')
+  }
+
   // Check for 64 (Round of 64 / Treintadosavos)
   if (s.includes('treintadosavos') || s.includes('treintaidosavos') || s.includes('trintadosavos') || s.includes('64') || s.includes('hirurogei')) return 't64'
   
@@ -64,13 +71,46 @@ const translateStage = (stageName) => {
   return translation.includes('stages.') ? stageName : translation
 }
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const getStageLabel = (stage) => {
+  if (stage.startsWith('matchDay_')) {
+    const day = stage.split('_')[1]
+    const matchDayLabel = t('tournament_view.rounds.matchDay')
+    if (!day) return matchDayLabel
+
+    return locale.value === 'eu'
+      ? `${day}. ${matchDayLabel}`
+      : `${matchDayLabel} ${day}`
+  }
+
+  const normalizedStage = normalizeStageKey(stage)
+  const knockoutKey = `tournament_view.knockout.${normalizedStage}`
+  const knockoutLabel = t(knockoutKey)
+  if (knockoutLabel !== knockoutKey) return knockoutLabel
+
+  const roundKey = `tournament_view.rounds.${normalizedStage}`
+  const roundLabel = t(roundKey)
+  if (roundLabel !== roundKey) return roundLabel
+
+  return stage
+}
+
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const { subscribe } = useMercure()
 const activeTab = ref('matches')
 const classification = ref({})
+const normalizedClassification = computed(() => {
+  if (!classification.value) return {};
+  // If it's already an object with keys (grouped by groups/tables)
+  if (!Array.isArray(classification.value)) {
+    return classification.value;
+  }
+  // If it's a flat array (League mode), wrap it in a 'General' group
+  return { [t('stages.general')]: classification.value };
+});
 const tournament = ref(null)
 const loading = ref(true)
 const error = ref(null)
@@ -78,7 +118,30 @@ const matches = ref([])
 const showActivity = ref(false)
 const isSavingResult = ref(false)
 const showPosterDialog = ref(false)
-const canManage = computed(() => tournament.value?.isManager)
+const isManager = computed(() => tournament.value?.isManager || false)
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  
+  // Special handling for Basque (manual mapping to ensure correctness)
+  if (locale.value === 'eu') {
+    const monthsEU = ['URT', 'OTS', 'MAR', 'API', 'MAI', 'EKA', 'UZT', 'ABU', 'IRA', 'URR', 'AZA', 'ABE']
+    return `${date.getDate().toString().padStart(2, '0')} ${monthsEU[date.getMonth()]}`
+  }
+
+  const localeMap = { 'es': 'es-ES', 'en': 'en-GB' }
+  const currentLocale = localeMap[locale.value] || 'es-ES'
+  return date.toLocaleDateString(currentLocale, { day: '2-digit', month: 'short' }).toUpperCase()
+}
+
+const formatFullDate = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const localeMap = { 'eu': 'eu-ES', 'es': 'es-ES', 'en': 'en-GB' }
+  const currentLocale = localeMap[locale.value] || 'es-ES'
+  return date.toLocaleDateString(currentLocale)
+}
 const uuid = route.params.uuid
 
 const bracketContainer = ref(null);
@@ -109,17 +172,64 @@ const knockoutStages = [
   '3º y 4º puesto'
 ];
 const groupedMatches = computed(() => {
-  if (!matches.value.length) return []
-  const acc = {}
+  const groups = {}
+  if (!matches.value || matches.value.length === 0) return []
+  
   matches.value.forEach(match => {
-    const stage = match.stage || t('tournament_view.rounds.general')
-    if (knockoutStages.includes(stage)) return; // Exclude from normal list
-    if (!acc[stage]) acc[stage] = []
-    acc[stage].push(match)
+    let groupKey = ''
+    if (tournament.value?.type === 'league') {
+      const stageName = match.stage || ''
+      const day = match.matchDay || (stageName.toLowerCase().includes('jornada') || stageName.toLowerCase().includes('jardunaldia') ? stageName.match(/\d+/)?.[0] : null)
+      groupKey = day ? `matchDay_${day}` : 'general'
+    } else {
+      groupKey = normalizeStageKey(match.stage || 'general')
+    }
+
+    if (!groups[groupKey]) groups[groupKey] = []
+    groups[groupKey].push(match)
   })
   
-  const entries = Object.entries(acc).reverse();
-  return entries;
+  let entries = Object.entries(groups)
+  
+  // Sort entries numerically for league match days
+  entries.sort((a, b) => {
+    if (tournament.value?.type === 'league') {
+      const dayA = parseInt(a[0].split('_')[1] || 0)
+      const dayB = parseInt(b[0].split('_')[1] || 0)
+      return dayA - dayB
+    }
+    return 0
+  })
+
+  return entries
+});
+
+// Calculate resting teams for each match day (for odd number of teams)
+const restingTeamsByDay = computed(() => {
+  if (!tournament.value?.teams || !matches.value) return {};
+  
+  const allTeams = tournament.value.teams;
+  const resting = {};
+  
+  groupedMatches.value.forEach(([stage, stageMatches]) => {
+    // Only for match days/league rounds
+    if (stage.startsWith('matchDay_')) {
+      const day = stage.split('_')[1];
+      const teamsInMatches = new Set();
+      
+      stageMatches.forEach(m => {
+        if (m.teamA?.id) teamsInMatches.add(m.teamA.id);
+        if (m.teamB?.id) teamsInMatches.add(m.teamB.id);
+      });
+      
+      const restingThisDay = allTeams.filter(t => !teamsInMatches.has(t.id));
+      if (restingThisDay.length > 0) {
+        resting[stage] = restingThisDay;
+      }
+    }
+  });
+  
+  return resting;
 });
 
 // Auto-select first stage tab when matches load
@@ -186,6 +296,11 @@ const qrCodeUrl = computed(() => `https://api.qrserver.com/v1/create-qr-code/?si
 
 const thirdPlaceMatch = computed(() => matches.value.find(x => x.stage === t('tournament_view.knockout.third_place') || x.stage === '3º y 4º puesto'))
 
+const handleTabChange = (tab) => {
+  console.log('Changing tab to:', tab)
+  activeTab.value = tab
+}
+
 
 const fetchTournament = async () => {
   loading.value = true
@@ -196,14 +311,16 @@ const fetchTournament = async () => {
     if (data.matches) {
       matches.value = data.matches.map(m => ({
         id: m.id,
-        status: m.score1 > 0 || m.score2 > 0 ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending'),
-        teamA: m.team1,
-        scoreA: m.score1,
-        teamB: m.team2,
-        scoreB: m.score2,
+        status: m.status || (m.scoreA > 0 || m.scoreB > 0 ? 'finished' : 'pending'),
+        teamA: m.teamA,
+        scoreA: m.scoreA,
+        teamB: m.teamB,
+        scoreB: m.scoreB,
         stage: m.stage,
         bracketRound: m.bracketRound,
         bracketPosition: m.bracketPosition,
+        matchDay: m.matchDay,
+        deadlineDate: m.deadlineDate,
         mesa: m.mesa,
         games: m.games || []
       }))
@@ -237,9 +354,10 @@ onMounted(() => {
       if (match) {
         match.scoreA = data.score1;
         match.scoreB = data.score2;
-        match.status = data.status === 'finished' ? t('tournament_view.match_status.finished') : t('tournament_view.match_status.pending');
+        match.status = data.finished ? 'finished' : 'pending';
+        match.games = data.games || [];
         
-        // Update team names for advancements
+        // Update team names for advancements (knockout rounds)
         if (data.team1) match.teamA = data.team1;
         if (data.team2) match.teamB = data.team2;
       } else {
@@ -357,7 +475,7 @@ const saveMatchResult = async () => {
                   <i class="pi pi-eye text-[#e9c349]"></i>
                   {{ t('dashboard.poster') }}
                 </span>
-                <router-link v-if="canManage" :to="`/admin/tournament/${uuid}/edit`" class="cursor-pointer hover:text-main transition-colors flex align-items-center gap-2 no-underline text-slate-500">
+                <router-link v-if="isManager" :to="`/admin/tournament/${uuid}/edit`" class="cursor-pointer hover:text-main transition-colors flex align-items-center gap-2 no-underline text-slate-500">
                   <i class="pi pi-pencil text-[#e9c349]"></i>
                   {{ t('common.edit') }}
                 </router-link>
@@ -382,7 +500,7 @@ const saveMatchResult = async () => {
                     <span class="text-xs font-black ml-2">{{ tournament?.ruleGames || 3 }}</span>
                   </div>
               
-              <button v-if="canManage" @click="router.push(`/tournament/${uuid}/manage`)" 
+              <button v-if="isManager" @click="router.push(`/tournament/${uuid}/manage`)" 
                       class="mus-btn-gold px-4 py-2 flex align-items-center gap-2">
                 <i class="pi pi-cog"></i>
                 <span class="text-[10px] font-black uppercase tracking-widest">{{ t('dashboard.manage') }}</span>
@@ -403,15 +521,15 @@ const saveMatchResult = async () => {
         <div class="card p-3 md:p-6 mus-glass border-white/5">
            <div class="flex justify-content-between align-items-center mb-2 border-b border-white/5 pb-4">
               <div class="flex gap-4">
-                <button v-if="tournament.type !== 'eliminatory'" @click="activeTab = 'matches'" 
-                        class="mus-tab-btn" :class="{ active: activeTab === 'matches' }">
-                  {{ t('tournament_view.tabs.matches') }}
-                </button>
-                <button v-if="tournament.type === 'groups' || tournament.type === 'league'" @click="activeTab = 'standings'" 
+                <button v-if="tournament.type === 'league' || tournament.type === 'groups'" @click="activeTab = 'standings'" 
                         class="mus-tab-btn" :class="{ active: activeTab === 'standings' }">
                   {{ t('tournament_view.tabs.standings') }}
                 </button>
-                <button v-if="tournament.type !== 'league'" @click="activeTab = 'bracket'" 
+                <button @click="activeTab = 'matches'" 
+                        class="mus-tab-btn" :class="{ active: activeTab === 'matches' }">
+                  {{ t('tournament_view.tabs.matches') }}
+                </button>
+                <button v-if="tournament.type === 'eliminatory' || tournament.type === 'groups'" @click="activeTab = 'bracket'" 
                         class="mus-tab-btn" :class="{ active: activeTab === 'bracket' }">
                   {{ t('tournament_view.tabs.bracket') }}
                 </button>
@@ -454,11 +572,11 @@ const saveMatchResult = async () => {
                                          <div class="flex flex-column gap-3">
                                             <div class="flex align-items-center gap-3">
                                                <div class="w-7 h-7 flex-shrink-0 rounded-full bg-secondary border border-white/20 flex align-items-center justify-center text-[10px] font-black text-black">1</div>
-                                               <span class="text-main font-black italic text-xl truncate tracking-tight uppercase">{{ match.teamA }}</span>
+                                               <span class="text-main font-black italic text-xl truncate tracking-tight uppercase">{{ match.teamA?.name || match.teamA || t('tournament_admin.matches.tbd') }}</span>
                                             </div>
                                             <div class="flex align-items-center gap-3">
                                                <div class="w-7 h-7 flex-shrink-0 rounded-full bg-secondary border border-white/20 flex align-items-center justify-center text-[10px] font-black text-black">2</div>
-                                               <span class="text-main font-black italic text-xl truncate tracking-tight uppercase">{{ match.teamB }}</span>
+                                               <span class="text-main font-black italic text-xl truncate tracking-tight uppercase">{{ match.teamB?.name || match.teamB || t('tournament_admin.matches.tbd') }}</span>
                                             </div>
                                          </div>
                                       </td>
@@ -492,12 +610,12 @@ const saveMatchResult = async () => {
                                       <td class="p-4 w-7/12">
                                          <div class="flex flex-column gap-3">
                                             <div class="flex align-items-center gap-3">
-                                               <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
-                                               <span class="text-main font-black italic text-lg truncate uppercase">{{ match.teamA }}</span>
+                                               <div class="w-5 h-5 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[8px] font-black">A</div>
+                                               <span class="text-main font-black italic text-lg truncate uppercase">{{ match.teamA?.name || match.teamA || t('tournament_admin.matches.tbd') }}</span>
                                             </div>
                                             <div class="flex align-items-center gap-3">
-                                               <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
-                                               <span class="text-main font-black italic text-lg truncate uppercase">{{ match.teamB }}</span>
+                                               <div class="w-5 h-5 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[8px] font-black">B</div>
+                                               <span class="text-main font-black italic text-lg truncate uppercase">{{ match.teamB?.name || match.teamB || t('tournament_admin.matches.tbd') }}</span>
                                             </div>
                                          </div>
                                       </td>
@@ -524,82 +642,120 @@ const saveMatchResult = async () => {
                 </div>
 
                 <!-- Regular Stage Matches -->
-                <div v-for="([stage, stageMatches]) in groupedMatches" :key="stage" class="col-12 mb-8">
-                   <h4 class="text-[#e9c349] font-black italic uppercase tracking-[0.2em] mb-4 flex align-items-center gap-2 text-xs">
-                      <i class="pi pi-calendar"></i> {{ stage }}
-                   </h4>
-                   <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5">
-                      <table class="w-full text-left border-collapse">
-                         <tbody>
-                            <tr v-for="(match, i) in stageMatches" :key="i" class="border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors group">
-                               <td class="p-4 w-7/12">
-                                  <div class="flex flex-column gap-3">
-                                     <div class="flex align-items-center gap-3">
-                                        <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">A</div>
-                                        <span class="text-main font-black italic text-base truncate uppercase" :title="match.teamA">{{ match.teamA }}</span>
-                                     </div>
-                                     <div class="flex align-items-center gap-3">
-                                        <div class="w-6 h-6 flex-shrink-0 rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[9px] font-black">B</div>
-                                        <span class="text-main font-black italic text-base truncate uppercase" :title="match.teamB">{{ match.teamB }}</span>
-                                     </div>
-                                  </div>
-                               </td>
-                               <td class="p-4 w-2/12 border-l border-white/5 align-middle">
-                                  <div class="flex flex-column gap-3 text-center">
-                                     <span class="text-xl font-black italic" :class="match.scoreA > match.scoreB ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreA }}</span>
-                                     <span class="text-xl font-black italic" :class="match.scoreB > match.scoreA ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreB }}</span>
-                                  </div>
-                               </td>
-                               <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
-                                  <div class="flex flex-column align-items-center justify-center gap-2">
-                                     <Tag :value="match.status" :severity="match.status === t('tournament_view.match_status.finished') ? 'success' : 'secondary'" class="text-[8px] whitespace-nowrap" />
-                                     <button v-if="tournament.isManager" 
-                                             @click="openEditModal(match)"
-                                             class="mt-2 text-[9px] font-black text-[#e9c349] uppercase border border-[#e9c349]/30 px-2 py-1 rounded bg-[#e9c349]/5 hover:bg-[#e9c349]/20 transition-all whitespace-nowrap">
-                                       {{ t('dashboard.manage') }}
-                                     </button>
-                                  </div>
-                               </td>
-                            </tr>
-                         </tbody>
-                      </table>
-                   </div>
-                </div>
-              </div>
+                 <div v-for="([stage, stageMatches]) in groupedMatches" :key="stage" class="col-12 mb-8">
+                     <div class="flex align-items-center justify-content-between mb-2">
+                        <h4 class="text-[#e9c349] font-black italic uppercase tracking-[0.2em] m-0 flex align-items-center gap-2 text-xs">
+                           <i class="pi pi-calendar"></i>
+                           <template v-if="stage.startsWith('matchDay_')">
+                             <span>
+                               {{ getStageLabel(stage) }}
+                             </span>
+                             <span v-if="stageMatches[0]?.deadlineDate" class="ml-2 text-slate-500 font-bold tracking-normal lowercase opacity-70">
+                               - [{{ formatFullDate(stageMatches[0].deadlineDate) }}]
+                             </span>
+                           </template>
+                           <template v-else>
+                             {{ getStageLabel(stage) }}
+                           </template>
+                        </h4>
+                        <div v-if="stageMatches[0]?.deadlineDate" class="flex align-items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-full">
+                           <span class="text-[9px] font-black text-rose-400 uppercase tracking-widest">{{ t('common.deadline') }}</span>
+                           <span class="text-[10px] font-black text-white italic">{{ formatDate(stageMatches[0].deadlineDate) }}</span>
+                        </div>
+                     </div>
+
+                    <!-- Resting Teams Info -->
+                    <div v-if="restingTeamsByDay[stage]" class="flex flex-wrap gap-2 mb-4">
+                       <div v-for="team in restingTeamsByDay[stage]" :key="'rest-'+team.id" 
+                            class="bg-[#e9c349]/10 border border-[#e9c349]/20 rounded-xl px-3 py-2 flex align-items-center gap-2">
+                          <i class="pi pi-info-circle text-[#e9c349] text-xs"></i>
+                          <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">{{ t('tournament_view.match_status.resting') || 'Descansa' }}:</span>
+                          <span class="text-[10px] font-black text-white uppercase italic">{{ team.name }}</span>
+                       </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;" class="mt-4">
+                       <div v-for="(match, i) in stageMatches" :key="i">
+                         <div class="bg-white/5 border border-white/10 rounded-2xl p-3 hover:bg-white/10 transition-all h-full">
+                            <!-- Mini Header for Status -->
+                            <div class="flex justify-content-end mb-2 border-bottom border-white/5 pb-1">
+                               <Tag :value="t('tournament_view.match_status.' + (match.status || 'pending'))" 
+                                    :severity="match.status === 'finished' ? 'success' : 'secondary'" 
+                                    class="text-[7px] font-black uppercase whitespace-nowrap px-2 py-0.5" />
+                            </div>
+
+                            <div class="flex flex-column gap-2">
+                               <!-- Team A -->
+                               <div class="flex align-items-center gap-2">
+                                  <div style="width: 18px; height: 18px; flex-shrink: 0;" class="rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[7px] font-black opacity-30">A</div>
+                                  <span class="text-main font-black italic text-sm truncate uppercase flex-1" :class="{'opacity-50': match.status === 'finished' && match.scoreB > match.scoreA}">
+                                     {{ match.teamA?.name || match.teamA || t('tournament_admin.matches.tbd') }}
+                                  </span>
+                                  <span class="text-lg font-black italic ml-2" :class="match.scoreA > match.scoreB ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreA }}</span>
+                               </div>
+                               <!-- Team B -->
+                               <div class="flex align-items-center gap-2">
+                                  <div style="width: 18px; height: 18px; flex-shrink: 0;" class="rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[7px] font-black opacity-30">B</div>
+                                  <span class="text-main font-black italic text-sm truncate uppercase flex-1" :class="{'opacity-50': match.status === 'finished' && match.scoreA > match.scoreB}">
+                                     {{ match.teamB?.name || match.teamB || t('tournament_admin.matches.tbd') }}
+                                  </span>
+                                  <span class="text-lg font-black italic ml-2" :class="match.scoreB > match.scoreA ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreB }}</span>
+                               </div>
+                            </div>
+                         </div>
+                       </div>
+                    </div>
+                 </div>
+               </div>
               <!-- Inner Ad -->
               <GoogleAd :key="'inner-' + activeTab" />
            </div>
 
            <div v-else-if="activeTab === 'standings'" class="classification-container">
-             <div v-for="(teams, mesaName) in classification" :key="mesaName" class="mb-10">
-               <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest mb-4 flex items-center gap-2">
-                 <i class="pi pi-table"></i> {{ mesaName }}
-               </h4>
-               <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5">
-                 <table class="w-full text-left border-collapse">
-                   <thead>
-                     <tr class="bg-white/5 text-[10px] uppercase font-black tracking-widest text-slate-500">
-                       <th class="p-4 w-5/12 min-w-[150px]">{{ t('tournament_view.classification.team') }}</th>
-                       <th class="p-4 text-center">{{ t('tournament_view.classification.played') }}</th>
-                       <th class="p-4 text-center">{{ t('tournament_view.classification.won') }}</th>
-                       <th class="p-4 text-center">{{ t('tournament_view.classification.lost') }}</th>
-                       <th class="p-4 text-center text-main">{{ t('tournament_view.classification.points') }}</th>
-                     </tr>
-                   </thead>
-                   <tbody>
-                     <tr v-for="team in teams" :key="team.teamName" class="border-t border-white/5 hover:bg-white/5 transition-colors">
-                       <td class="p-4 font-bold text-main">{{ team.teamName }}</td>
-                       <td class="p-4 text-center text-slate-400">{{ team.played }}</td>
-                       <td class="p-4 text-center text-emerald-500">{{ team.won }}</td>
-                       <td class="p-4 text-center text-rose-500">{{ team.lost }}</td>
-                       <td class="p-4 text-center font-black text-[#e9c349]">{{ team.points }}</td>
-                     </tr>
-                   </tbody>
-                 </table>
-               </div>
-             </div>
-             <div v-if="Object.keys(classification).length === 0" class="text-center py-10 opacity-30">
-                <i class="pi pi-info-circle text-4xl mb-4"></i>
+              <div v-for="(teams, mesaName) in (tournament.type === 'league' ? { 'General': Object.values(classification).flat() } : classification)" :key="mesaName" class="mb-10">
+                <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <i class="pi pi-table"></i> {{ mesaName }}
+                </h4>
+                <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5 overflow-x-auto">
+                  <table class="w-full text-left border-collapse min-w-[800px]">
+                    <thead>
+                      <tr class="bg-white/5 text-[10px] uppercase font-black tracking-widest text-slate-500">
+                        <th class="p-4 w-[60px] text-center border-r border-white/5">#</th>
+                        <th class="p-4 min-w-[200px]">{{ t('tournament_view.classification.team') }}</th>
+                        <th class="p-4 w-[60px] text-center border-l border-white/5" title="Partidas Jugadas">{{ t('tournament_view.classification.played') }}</th>
+                        <th class="p-4 w-[60px] text-center" title="Partidas Ganadas">{{ t('tournament_view.classification.mw') }}</th>
+                        <th class="p-4 w-[60px] text-center" title="Partidas Perdidas">{{ t('tournament_view.classification.ml') }}</th>
+                        <th class="p-4 w-[60px] text-center bg-white/[0.03]" title="Vacas Ganadas">{{ t('tournament_view.classification.vw') }}</th>
+                        <th class="p-4 w-[60px] text-center bg-white/[0.03]" title="Vacas Perdidas">{{ t('tournament_view.classification.vl') }}</th>
+                        <th class="p-4 w-[80px] text-center italic" title="Diferencia de Vacas">{{ t('tournament_view.classification.vdiff') }}</th>
+                        <th class="p-4 w-[80px] text-center" title="Tantos a Favor">{{ t('tournament_view.classification.tf') }}</th>
+                        <th class="p-4 w-[80px] text-center" title="Tantos en Contra">{{ t('tournament_view.classification.tc') }}</th>
+                        <th class="p-4 w-[80px] text-center italic" title="Diferencia de Tantos">{{ t('tournament_view.classification.tdiff') }}</th>
+                        <th class="p-4 w-[80px] text-center text-main bg-white/[0.05]" title="Puntos Totales">{{ t('tournament_view.classification.pts') }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(team, index) in teams" :key="team.teamName" class="border-t border-white/5 hover:bg-white/[0.03] transition-colors">
+                        <td class="p-4 w-[60px] text-center border-r border-white/5">
+                           <span class="text-xs font-black" :class="index < 3 ? 'text-[#e9c349]' : 'text-slate-500'">{{ index + 1 }}</span>
+                        </td>
+                        <td class="p-4 min-w-[200px] font-black text-main uppercase italic text-sm">{{ team.teamName }}</td>
+                        <td class="p-4 w-[60px] text-center text-slate-500 font-bold border-l border-white/5">{{ team.matchesPlayed }}</td>
+                        <td class="p-4 w-[60px] text-center font-black text-emerald-400">{{ team.matchesWon }}</td>
+                        <td class="p-4 w-[60px] text-center font-bold text-rose-400/50">{{ team.matchesLost }}</td>
+                        <td class="p-4 w-[60px] text-center font-bold text-emerald-400/70 bg-white/[0.01]">{{ team.vacasWon }}</td>
+                        <td class="p-4 w-[60px] text-center font-bold text-rose-400/70 bg-white/[0.01]">{{ team.vacasLost }}</td>
+                        <td class="p-4 w-[80px] text-center font-black italic" :class="team.vacasDiff >= 0 ? 'text-emerald-500' : 'text-rose-500'">{{ team.vacasDiff > 0 ? '+' : '' }}{{ team.vacasDiff }}</td>
+                        <td class="p-4 w-[80px] text-center font-bold text-slate-400">{{ team.tantosFavor }}</td>
+                        <td class="p-4 w-[80px] text-center font-bold text-slate-600">{{ team.tantosContra }}</td>
+                        <td class="p-4 w-[80px] text-center font-black italic" :class="team.tantosDiff >= 0 ? 'text-emerald-400' : 'text-rose-400'">{{ team.tantosDiff > 0 ? '+' : '' }}{{ team.tantosDiff }}</td>
+                        <td class="p-4 w-[80px] text-center font-black text-[#e9c349] bg-white/[0.02]">{{ team.matchesWon }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div v-if="Object.keys(normalizedClassification).length === 0" class="text-center py-10 opacity-30">
                 <p class="font-bold">{{ t('tournament_view.classification.empty') }}</p>
              </div>
            </div>
@@ -775,17 +931,17 @@ const saveMatchResult = async () => {
             </div>
 
             <div v-else-if="activeTab === 'teams'">
-               <div v-if="tournament.tournamentTeams?.length" class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5">
+               <div v-if="tournament.teams?.length" class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5">
                   <table class="w-full text-left border-collapse">
                      <tbody>
-                        <tr v-for="tt in tournament.tournamentTeams" :key="tt.id" class="border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors group">
+                        <tr v-for="tt in tournament.teams" :key="tt.id" class="border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors group">
                            <td class="p-4 w-16 text-center border-r border-white/5">
-                              <div class="w-10 h-10 mx-auto rounded-full bg-[#e9c349]/10 border border-[#e9c349]/20 flex align-items-center justify-center">
+                              <div style="width: 40px; height: 40px; border-radius: 50%;" class="mx-auto bg-[#e9c349]/10 border border-[#e9c349]/20 flex align-items-center justify-center">
                                  <i class="pi pi-users text-[#e9c349]"></i>
                               </div>
                            </td>
                            <td class="p-4 font-bold text-main text-lg uppercase italic">
-                              {{ tt.team?.name }}
+                              {{ tt.name }}
                            </td>
                            <td class="p-4 text-right w-1/3 border-l border-white/5">
                               <span class="text-slate-400 text-xs font-black uppercase tracking-widest">{{ tt.mesa || '-' }}</span>
@@ -795,7 +951,7 @@ const saveMatchResult = async () => {
                   </table>
                </div>
                
-               <div v-if="!tournament.tournamentTeams?.length" class="text-center py-10 opacity-30">
+               <div v-if="!tournament.teams?.length" class="text-center py-10 opacity-30">
                   <i class="pi pi-users text-4xl mb-4"></i>
                   <p class="font-bold">{{ t('tournament_view.teams.empty') }}</p>
                </div>

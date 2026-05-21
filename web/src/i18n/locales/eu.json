@@ -8,7 +8,8 @@
     "success": "Arrakasta",
     "error": "Errorea",
     "delete": "Ezabatu",
-    "edit": "Editatu"
+    "edit": "Editatu",
+    "deadline": "Muga-eguna"
   },
   "stages": {
     "t64": "Hirurogeita laurdenak",
@@ -533,7 +534,8 @@
       "draft": "Zirriborroa",
       "pending": "Zain",
       "active": "Abian",
-      "finished": "Amaitua"
+      "finished": "Amaitua",
+      "resting": "Atseden"
     }
   },
   "tournament_view": {
@@ -552,7 +554,8 @@
     "grand_final": "FINAL HANDIA",
     "match_status": {
       "finished": "Amaitua",
-      "pending": "Zain"
+      "pending": "Zain",
+      "resting": "Atseden"
     },
     "tabs": {
       "matches": "Partidak",
@@ -564,14 +567,23 @@
     "rounds": {
       "title": "Jardunaldia",
       "stage": "Fasea",
-      "general": "Orokorra"
+      "general": "Orokorra",
+      "matchDay": "Jardunaldia"
     },
     "classification": {
-      "team": "Taldea",
-      "played": "J",
-      "won": "I",
-      "lost": "G",
-      "points": "PTS",
+      "team": "Bikotea",
+      "played": "PJ",
+      "won": "PG",
+      "lost": "PP",
+      "mw": "PG",
+      "ml": "PP",
+      "vw": "VG",
+      "vl": "VP",
+      "vdiff": "+/- V",
+      "tf": "TF",
+      "tc": "TC",
+      "tdiff": "+/- T",
+      "pts": "Pts",
       "empty": "Ez dago sailkapenik eskuragarri oraindik"
     },
     "bracket": {
@@ -661,10 +673,13 @@
     "back_tooltip": "Itzuli nire txapelketetara",
     "enrollment": {
       "title": "Bikoteen Inskripzioa",
+      "subtitle": "TXAPELKETAN PARTE HARTZAILE BERRIAK GEHITU",
       "add_btn": "INSKRIBATU BIKOTE BERRIA",
       "list_title": "Inskribatutako Bikoteak",
-      "empty": "Ez dago bikoterik oraindik",
+      "empty": "Ez dago inskripziorik oraindik",
       "confirmed_tooltip": "Konfirmatuta / Ordainduta",
+      "confirmed_success": "Bikotea ongi konfirmatu da",
+      "unconfirmed_success": "Konfirmazioa ongi kendu da",
       "delete_success": "Bikotea ongi ezabatu da",
       "add_success": "Bikotea ongi inskribatu da",
       "delete_confirm_title": "Ezabatzea Baieztatu",
@@ -702,6 +717,14 @@
       "draw_confirm_btn": "Zozketa Egin",
       "draw_success": "Zozketa ongi egin da. Txapelketa martxan dago!"
     },
+    "teams": {
+      "league": {
+        "match_days_label": "Jardunaldi egunak",
+        "match_days_hint": "Hautatu partida egunak",
+        "match_days_tooltip": "Egunak hautatzea beharrezkoa da jardunaldi bakoitzeko muga-egunak automatikoki kalkulatzeko, txapelketaren hasiera-datan oinarrituta.",
+        "match_days_required": "Gutxienez asteko egun bat hautatu behar duzu egutegia sortzeko."
+      }
+    },
     "matches": {
       "title": "Txapelketako Partidak",
       "empty": "Ez dago partidarik sortuta oraindik",
@@ -713,6 +736,7 @@
     },
     "match_edit": {
       "title": "Emaitzen Kudeaketa",
+      "subtitle": "EMAITZEN ETA PUNTUAZIOEN KUDEAKETA",
       "panel_title": "Kontrol Panela",
       "score_games": "JOKUEN MARKAGAILUA",
       "regulation": "ERREGLAMENTUA",
@@ -723,7 +747,10 @@
       "games_breakdown": "Jokuen Xehetasunak",
       "points_per_game": "{points} tanto",
       "game_label": "Partida",
-      "win_tooltip": "Irabazi"
+      "win_tooltip": "Irabazi",
+      "date_title": "Jardunaldiaren Muga-eguna",
+      "date_tooltip": "Editatu jardunaldiaren muga-eguna",
+      "date_save_success": "Jardunaldiaren muga-eguna eguneratuta"
     },
     "stats": {
       "confirmed": "Konfirmatuta",

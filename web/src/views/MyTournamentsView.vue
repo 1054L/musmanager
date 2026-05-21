@@ -116,6 +116,15 @@ const handleGenerateMatches = async (tournament) => {
   }
 }
 
+const handleTournamentRowClick = (event) => {
+  const rowData = event?.data || event?.rowData
+  const target = event?.originalEvent?.target
+  if (!rowData || target?.closest('button, a, .row-action-btn')) {
+    return
+  }
+  router.push(`/tournament/${rowData.uuid}/manage`)
+}
+
 const fetchTournaments = async () => {
   loading.value = true
   error.value = null
@@ -269,11 +278,12 @@ onMounted(() => {
       </div>
 
       <DataTable v-else :value="tournaments" responsiveLayout="scroll" :paginator="true" :rows="8" 
-        class="custom-table">
+        class="custom-table"
+        @row-click="handleTournamentRowClick">
         
         <Column field="name" :header="t('dashboard.tournament')" sortable>
           <template #body="slotProps">
-            <span class="tournament-name" @click="router.push(`/tournament/${slotProps.data.uuid}`)">
+            <span class="tournament-name" @click="router.push(`/tournament/${slotProps.data.uuid}/manage`)">
               {{ slotProps.data.name }}
             </span>
           </template>

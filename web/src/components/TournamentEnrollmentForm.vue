@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { tournamentService } from '../services/api'
 import { useI18n } from 'vue-i18n'
+import Checkbox from 'primevue/checkbox'
 
 const props = defineProps({
   tournamentUuid: {
@@ -62,6 +63,30 @@ const handleSubmit = async () => {
 
 <template>
   <div class="tournament-enroll-form">
+    <!-- Header visual premium -->
+    <div class="form-header-premium mb-4">
+      <div class="flex align-items-center justify-content-between">
+        <div class="flex align-items-center gap-4">
+          <div class="header-icon">
+            <i class="pi pi-user-plus text-secondary text-lg"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl font-black text-white italic uppercase tracking-tighter m-0 leading-none">
+              {{ t('tournament_admin.enrollment.dialog_title').split(' ').slice(0, -1).join(' ') }} 
+              <span class="text-secondary">{{ t('tournament_admin.enrollment.dialog_title').split(' ').slice(-1)[0] }}</span>
+            </h2>
+            <p class="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em] mt-2">{{ t('tournament_admin.enrollment.subtitle') }}</p>
+          </div>
+        </div>
+        
+        <!-- Botón de cierre X -->
+        <button @click="$emit('cancel')" class="close-modal-btn" type="button">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <div class="header-line mt-4"></div>
+    </div>
+
     <form @submit.prevent="handleSubmit" class="mus-form">
       <div v-if="error" class="error-msg mb-4">{{ error }}</div>
 
@@ -109,6 +134,55 @@ const handleSubmit = async () => {
 </template>
 
 <style scoped>
+.form-header-premium {
+  position: relative;
+  margin-top: -10px;
+}
+
+.close-modal-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #64748b;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.close-modal-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #f43f5e;
+  transform: rotate(90deg);
+}
+
+.header-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  background: rgba(255, 193, 7, 0.05);
+  border: 1px solid rgba(255, 193, 7, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.header-line {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(to right, var(--secondary) 0%, rgba(255, 193, 7, 0.1) 50%, transparent 100%);
+  opacity: 0.4;
+}
+
 .mus-form { display: flex; flex-direction: column; gap: 20px; }
 .form-group { display: flex; flex-direction: column; gap: 10px; }
 .mus-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #64748b; margin-left: 4px; }

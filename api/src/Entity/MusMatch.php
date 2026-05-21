@@ -49,6 +49,12 @@ class MusMatch
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $mesa = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $matchDay = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $deadlineDate = null;
+
     /**
      * @var Collection<int, MusMatchGame>
      */
@@ -200,6 +206,28 @@ class MusMatch
     public function setMesa(?string $mesa): static
     {
         $this->mesa = $mesa;
+        return $this;
+    }
+
+    public function getMatchDay(): ?int
+    {
+        return $this->matchDay;
+    }
+
+    public function setMatchDay(?int $matchDay): static
+    {
+        $this->matchDay = $matchDay;
+        return $this;
+    }
+
+    public function getDeadlineDate(): ?\DateTimeImmutable
+    {
+        return $this->deadlineDate;
+    }
+
+    public function setDeadlineDate(?\DateTimeImmutable $deadlineDate): static
+    {
+        $this->deadlineDate = $deadlineDate;
         return $this;
     }
 }

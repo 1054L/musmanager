@@ -8,7 +8,8 @@
     "success": "Success",
     "error": "Error",
     "delete": "Delete",
-    "edit": "Edit"
+    "edit": "Edit",
+    "deadline": "Deadline"
   },
   "stages": {
     "t64": "Round of 64",
@@ -558,7 +559,8 @@
     "grand_final": "GRAND FINAL",
     "match_status": {
       "finished": "Finished",
-      "pending": "Pending"
+      "pending": "Pending",
+      "resting": "Resting"
     },
     "tabs": {
       "matches": "Matches",
@@ -568,16 +570,24 @@
       "admin": "Administration"
     },
     "rounds": {
-      "title": "Round",
+      "title": "Match Day",
       "stage": "Stage",
-      "general": "General"
+      "general": "General",
+      "matchDay": "Match Day"
     },
     "classification": {
-      "team": "Team",
-      "played": "P",
-      "won": "W",
-      "lost": "L",
-      "points": "PTS",
+      "team": "Pair",
+      "played": "MP",
+      "won": "MW",
+      "mw": "MW",
+      "ml": "ML",
+      "vw": "VW",
+      "vl": "VL",
+      "vdiff": "+/- V",
+      "tf": "TF",
+      "tc": "TC",
+      "tdiff": "+/- T",
+      "pts": "Pts",
       "empty": "No standings available yet"
     },
     "bracket": {
@@ -585,8 +595,10 @@
       "empty_desc": "The bracket will be generated automatically after the group stage"
     },
     "teams": {
-      "empty": "No teams enrolled yet",
-      "enrolled_count": "Enrolled Teams"
+      "empty": "No enrollments yet",
+      "groups": {
+        "enrolled_count": "Enrolled Teams"
+      }
     },
     "active_matches_desc": "Record match results to update the classification",
     "match_edit": {
@@ -595,7 +607,10 @@
       "save_success": "Result saved successfully",
       "local": "Local",
       "visitor": "Visitor",
-      "rule_summary": "Match to {games} sets of {points} points"
+      "rule_summary": "Match to {games} sets of {points} points",
+      "date_title": "Match Day Deadline",
+      "date_tooltip": "Edit match day deadline",
+      "date_save_success": "Match day deadline updated"
     },
     "activity": {
       "title": "Recent Activity",
@@ -707,6 +722,14 @@
       "draw_confirm_msg": "Are you sure you want to perform the draw? This will generate the final matchups, it cannot be undone, and the tournament will become ACTIVE immediately.",
       "draw_confirm_btn": "Perform Draw",
       "draw_success": "Draw completed successfully. Tournament is live!"
+    },
+    "teams": {
+      "league": {
+        "match_days_label": "Match Days",
+        "match_days_hint": "Select the weekdays matches are played",
+        "match_days_tooltip": "Selecting match days is required to automatically calculate round deadlines based on the tournament start date.",
+        "match_days_required": "You must select at least one weekday to generate the calendar."
+      }
     },
     "matches": {
       "title": "Tournament Matches",

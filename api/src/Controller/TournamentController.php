@@ -2,6 +2,13 @@
 
 namespace App\Controller;
 
+/**
+ * MANTENIMIENTO DOCKER:
+ * Si hay errores de permisos en la caché o el 500 persiste tras cambios:
+ * docker compose exec api php bin/console cache:clear
+ * docker compose exec api chmod -R 777 var/cache var/log
+ */
+
 use App\Entity\Tournament;
 use App\Entity\TournamentTeam;
 use App\Entity\Team;
@@ -9,25 +16,25 @@ use App\Entity\MusMatch;
 use App\Entity\MusMatchGame;
 use App\Entity\Province;
 use App\Entity\Town;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use App\Repository\TournamentRepository;
 use App\Repository\TeamRepository;
 use App\Repository\ProvinceRepository;
 use App\Repository\TownRepository;
+use App\Repository\TournamentTeamRepository;
+use App\Repository\MusMatchRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Uid\Uuid;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\LeagueGenerator;
+use App\Service\StandingCalculator;
 
 class TournamentController extends AbstractController
 {
-    #[Route('/user/tournaments', name: 'app_tournament_list_managed', methods: ['GET'])]
     #[Route('/api/user/tournaments', name: 'app_tournament_list_managed_api', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function listManaged(TournamentRepository $tournamentRepository): JsonResponse
@@ -65,6 +72,7 @@ class TournamentController extends AbstractController
                 'hasMatches' => count($t->getMatches()) > 0,
                 'private' => $t->isPrivate(),
                 'hasThirdPlace' => $t->isHasThirdPlace(),
+                'leagueMatchDays' => $t->getLeagueMatchDays(),
             ];
 
             if ($isSuperAdmin) {
@@ -83,7 +91,7 @@ class TournamentController extends AbstractController
 
     #[Route('/api/admin/tournament', name: 'app_tournament_create', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function create(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, ProvinceRepository $provinceRepository, TownRepository $townRepository): JsonResponse
+    public function create(Request $request, EntityManagerInterface $entityManager, ProvinceRepository $provinceRepository, TownRepository $townRepository): JsonResponse
     {
         $name = $request->request->get('name');
         if (!$name) {
@@ -97,400 +105,148 @@ class TournamentController extends AbstractController
         $tournament->setStatusDescription($request->request->get('statusDescription'));
         $tournament->setLocation($request->request->get('location'));
         
-        if ($provinceId = $request->request->get('provinceId')) {
-            $tournament->setProvince($provinceRepository->find($provinceId));
+        if ($request->request->get('provinceId')) {
+            $tournament->setProvince($provinceRepository->find($request->request->get('provinceId')));
         }
-        if ($townId = $request->request->get('townId')) {
-            $tournament->setTown($townRepository->find($townId));
+        if ($request->request->get('townId')) {
+            $tournament->setTown($townRepository->find($request->request->get('townId')));
         }
-        $tournament->setCreatedBy($this->getUser());
+
+        $tournament->setStartDate($request->request->get('startDate') ? new \DateTimeImmutable($request->request->get('startDate')) : null);
+        $tournament->setEndDate($request->request->get('endDate') ? new \DateTimeImmutable($request->request->get('endDate')) : null);
         
-        if ($startDate = $request->request->get('startDate')) {
-            $tournament->setStartDate(new \DateTimeImmutable($startDate));
-        }
-
-        if ($endDate = $request->request->get('endDate')) {
-            $tournament->setEndDate(new \DateTimeImmutable($endDate));
-        }
-
-        $tournament->setRuleKings((int) $request->request->get('ruleKings', 8));
-        $tournament->setRulePoints((int) $request->request->get('rulePoints', 40));
-        $tournament->setRuleGames((int) $request->request->get('ruleGames', 3));
-        
-        if ($request->request->has('tablesCount')) {
-            $tournament->setTablesCount($request->request->get('tablesCount') !== null ? (int) $request->request->get('tablesCount') : null);
-        }
-
+        $ruleKings = $request->request->get('ruleKings', 'with');
+        $tournament->setRuleKings($ruleKings === 'without' ? 0 : 8);
+        $tournament->setRulePoints((int)$request->request->get('rulePoints', 30));
+        $tournament->setRuleGames((int)$request->request->get('ruleGames', 3));
+        $tournament->setTablesCount((int)$request->request->get('tablesCount', 0));
         $tournament->setPrivate(filter_var($request->request->get('private'), FILTER_VALIDATE_BOOLEAN));
         $tournament->setHasThirdPlace(filter_var($request->request->get('hasThirdPlace'), FILTER_VALIDATE_BOOLEAN));
         
-        $posterFile = $request->files->get('poster');
-        if ($posterFile) {
-            $filename = $this->handleFileUpload($posterFile, $slugger, 'posters');
-            $tournament->setPosterPath('/uploads/posters/' . $filename);
+        $matchDaysRaw = $request->request->get('leagueMatchDays');
+        if ($matchDaysRaw) {
+            $matchDays = is_string($matchDaysRaw) ? json_decode($matchDaysRaw, true) : $matchDaysRaw;
+            $tournament->setLeagueMatchDays($matchDays);
         }
 
-        $rulesFile = $request->files->get('rulesFile');
-        if ($rulesFile) {
-            $filename = $this->handleFileUpload($rulesFile, $slugger, 'rules');
-            $tournament->setRulesPath('/uploads/rules/' . $filename);
-        }
+        $tournament->setCreatedBy($this->getUser());
 
         $entityManager->persist($tournament);
         $entityManager->flush();
 
-        return new JsonResponse([
-            'id' => $tournament->getId(),
-            'name' => $tournament->getName(),
-            'uuid' => $tournament->getUuidAccessToken(),
-            'status'     => $tournament->getStatus(),
-            'statusDescription' => $tournament->getStatusDescription(),
-            'type'       => $tournament->getType(),
-            'private'    => $tournament->isPrivate(),
-            'hasThirdPlace' => $tournament->isHasThirdPlace(),
-            'startDate'  => $tournament->getStartDate() ? $tournament->getStartDate()->format(\DateTimeInterface::ATOM) : null,
-            'endDate'    => $tournament->getEndDate() ? $tournament->getEndDate()->format(\DateTimeInterface::ATOM) : null,
-            'ruleKings'  => $tournament->getRuleKings(),
-            'rulePoints' => $tournament->getRulePoints(),
-            'ruleGames'  => $tournament->getRuleGames(),
-            'tablesCount'=> $tournament->getTablesCount(),
-            'location'   => $tournament->getLocation(),
-            'provinceId' => $tournament->getProvince() ? $tournament->getProvince()->getId() : null,
-            'provinceName' => $tournament->getProvince() ? $tournament->getProvince()->getName() : null,
-            'townId' => $tournament->getTown() ? $tournament->getTown()->getId() : null,
-            'townName' => $tournament->getTown() ? $tournament->getTown()->getName() : null,
-            'posterPath' => $tournament->getPosterPath(),
-            'rulesPath'  => $tournament->getRulesPath(),
-        ]);
+        return new JsonResponse(['id' => $tournament->getId(), 'uuid' => $tournament->getUuidAccessToken()]);
     }
 
-    #[Route('/api/admin/tournament/{uuid}', name: 'app_tournament_update', methods: ['POST'])]
+    #[Route('/api/admin/tournament/{uuid}', name: 'app_tournament_update', methods: ['PATCH'])]
     #[IsGranted('ROLE_USER')]
-    public function update(string $uuid, Request $request, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager, SluggerInterface $slugger, ProvinceRepository $provinceRepository, TownRepository $townRepository): JsonResponse
+    public function update(string $uuid, Request $request, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager, ProvinceRepository $provinceRepository, TownRepository $townRepository): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
+        if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
 
-        if (!$tournament) {
-            return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
-        }
+        $data = $request->getMethod() === 'PATCH' ? $request->toArray() : $request->request->all();
 
-        $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tournament);
+        if (isset($data['name'])) $tournament->setName($data['name']);
+        if (isset($data['type'])) $tournament->setType($data['type']);
+        if (isset($data['status'])) $tournament->setStatus($data['status']);
+        if (isset($data['statusDescription'])) $tournament->setStatusDescription($data['statusDescription']);
+        if (isset($data['location'])) $tournament->setLocation($data['location']);
 
-        $requestData = $request->request;
-
-        if ($requestData->has('name')) {
-            $tournament->setName($requestData->get('name'));
+        if (isset($data['provinceId'])) {
+            $tournament->setProvince($provinceRepository->find($data['provinceId']));
         }
-        if ($requestData->has('type')) {
-            $tournament->setType($requestData->get('type'));
-        }
-        if ($requestData->has('status')) {
-            $tournament->setStatus($requestData->get('status'));
-        }
-        if ($requestData->has('statusDescription')) {
-            $tournament->setStatusDescription($requestData->get('statusDescription'));
-        }
-        if ($requestData->has('location')) {
-            $tournament->setLocation($requestData->get('location'));
-        }
-        if ($requestData->has('provinceId')) {
-            $tournament->setProvince($requestData->get('provinceId') ? $provinceRepository->find($requestData->get('provinceId')) : null);
-        }
-        if ($requestData->has('townId')) {
-            $tournament->setTown($requestData->get('townId') ? $townRepository->find($requestData->get('townId')) : null);
-        }
-        if ($requestData->has('startDate')) {
-            $val = $requestData->get('startDate');
-            $tournament->setStartDate($val ? new \DateTimeImmutable($val) : null);
-        }
-        if ($requestData->has('endDate')) {
-            $val = $requestData->get('endDate');
-            $tournament->setEndDate($val ? new \DateTimeImmutable($val) : null);
+        if (isset($data['townId'])) {
+            $tournament->setTown($townRepository->find($data['townId']));
         }
 
-        if ($requestData->has('ruleKings')) {
-            $tournament->setRuleKings((int) $requestData->get('ruleKings'));
+        if (isset($data['startDate'])) {
+            $tournament->setStartDate(new \DateTimeImmutable($data['startDate']));
         }
-        if ($requestData->has('rulePoints')) {
-            $tournament->setRulePoints((int) $requestData->get('rulePoints'));
-        }
-        if ($requestData->has('ruleGames')) {
-            $tournament->setRuleGames((int) $requestData->get('ruleGames'));
-        }
-        if ($requestData->has('tablesCount')) {
-            $tournament->setTablesCount($requestData->get('tablesCount') !== "" ? (int) $requestData->get('tablesCount') : null);
-        }
-        if ($requestData->has('private')) {
-            $tournament->setPrivate(filter_var($requestData->get('private'), FILTER_VALIDATE_BOOLEAN));
-        }
-        if ($requestData->has('hasThirdPlace')) {
-            $tournament->setHasThirdPlace(filter_var($requestData->get('hasThirdPlace'), FILTER_VALIDATE_BOOLEAN));
+        if (isset($data['endDate'])) {
+            $tournament->setEndDate(new \DateTimeImmutable($data['endDate']));
         }
 
-        $posterFile = $request->files->get('poster');
-        if ($posterFile) {
-            $filename = $this->handleFileUpload($posterFile, $slugger, 'posters');
-            $tournament->setPosterPath('/uploads/posters/' . $filename);
+        if (isset($data['ruleKings'])) {
+            $tournament->setRuleKings($data['ruleKings'] === 'without' ? 0 : 8);
+        }
+        if (isset($data['rulePoints'])) $tournament->setRulePoints((int)$data['rulePoints']);
+        if (isset($data['ruleGames'])) $tournament->setRuleGames((int)$data['ruleGames']);
+        if (isset($data['tablesCount'])) $tournament->setTablesCount((int)$data['tablesCount']);
+        if (isset($data['private'])) $tournament->setPrivate(filter_var($data['private'], FILTER_VALIDATE_BOOLEAN));
+        if (isset($data['hasThirdPlace'])) $tournament->setHasThirdPlace(filter_var($data['hasThirdPlace'], FILTER_VALIDATE_BOOLEAN));
+        if (isset($data['leagueMatchDays'])) {
+            $matchDays = is_string($data['leagueMatchDays']) ? json_decode($data['leagueMatchDays'], true) : $data['leagueMatchDays'];
+            $tournament->setLeagueMatchDays($matchDays);
         }
 
-        $rulesFile = $request->files->get('rulesFile');
-        if ($rulesFile) {
-            $filename = $this->handleFileUpload($rulesFile, $slugger, 'rules');
-            $tournament->setRulesPath('/uploads/rules/' . $filename);
-        }
-
-        $entityManager->flush();
-
-        return new JsonResponse([
-            'id'         => $tournament->getId(),
-            'name'       => $tournament->getName(),
-            'uuid'       => $tournament->getUuidAccessToken(),
-            'status'     => $tournament->getStatus(),
-            'statusDescription' => $tournament->getStatusDescription(),
-            'type'       => $tournament->getType(),
-            'private'    => $tournament->isPrivate(),
-            'hasThirdPlace' => $tournament->isHasThirdPlace(),
-            'startDate'  => $tournament->getStartDate() ? $tournament->getStartDate()->format(\DateTimeInterface::ATOM) : null,
-            'endDate'    => $tournament->getEndDate() ? $tournament->getEndDate()->format(\DateTimeInterface::ATOM) : null,
-            'ruleKings'  => $tournament->getRuleKings(),
-            'rulePoints' => $tournament->getRulePoints(),
-            'ruleGames'  => $tournament->getRuleGames(),
-            'tablesCount'=> $tournament->getTablesCount(),
-            'location'   => $tournament->getLocation(),
-            'provinceId' => $tournament->getProvince() ? $tournament->getProvince()->getId() : null,
-            'provinceName' => $tournament->getProvince() ? $tournament->getProvince()->getName() : null,
-            'townId' => $tournament->getTown() ? $tournament->getTown()->getId() : null,
-            'townName' => $tournament->getTown() ? $tournament->getTown()->getName() : null,
-            'posterPath' => $tournament->getPosterPath(),
-            'rulesPath'  => $tournament->getRulesPath(),
-        ]);
-    }
-
-    #[Route('/api/admin/tournament/{uuid}', name: 'app_tournament_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_USER')]
-    public function delete(string $uuid, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
-
-        if (!$tournament) {
-            return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
-        }
-
-        $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tournament);
-
-        $entityManager->remove($tournament);
         $entityManager->flush();
 
         return new JsonResponse(['success' => true]);
     }
 
-    private function handleFileUpload($file, SluggerInterface $slugger, string $subdir): string
-    {
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $slugger->slug($originalFilename);
-        $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
-
-        $file->move(
-            $this->getParameter('kernel.project_dir').'/public/uploads/' . $subdir,
-            $newFilename
-        );
-
-        return $newFilename;
-    }
-
-    #[Route('/tournament/{uuid}', name: 'app_tournament_show', methods: ['GET'])]
-    #[Route('/api/tournament/{uuid}', name: 'app_tournament_show_api', methods: ['GET'])]
-    public function show(string $uuid, TournamentRepository $tournamentRepository): JsonResponse
-    {
-        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
-
-        if (!$tournament && is_numeric($uuid)) {
-            $tournament = $tournamentRepository->find($uuid);
-        }
-
-        if (!$tournament) {
-            return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
-        }
-
-        $this->denyAccessUnlessGranted('TOURNAMENT_VIEW', $tournament);
-
-        $user = $this->getUser();
-        $isManager = false;
-        if ($user) {
-            $isManager = ($tournament->getCreatedBy() && $tournament->getCreatedBy()->getId() === $user->getId()) 
-                         || $this->isGranted('ROLE_ADMIN') 
-                         || $this->isGranted('ROLE_SUPER_ADMIN');
-            if (!$isManager) {
-                foreach ($tournament->getManagers() as $manager) {
-                    if ($manager->getId() === $user->getId()) {
-                        $isManager = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Basic data return for example
-        return new JsonResponse([
-            'id' => $tournament->getId(),
-            'name' => $tournament->getName(),
-            'isManager' => $isManager,
-            'status' => $tournament->getStatus(),
-            'statusDescription' => $tournament->getStatusDescription(),
-            'type' => $tournament->getType(),
-            'startDate' => $tournament->getStartDate() ? $tournament->getStartDate()->format(\DateTimeInterface::ATOM) : null,
-            'endDate' => $tournament->getEndDate() ? $tournament->getEndDate()->format(\DateTimeInterface::ATOM) : null,
-            'ruleKings' => $tournament->getRuleKings(),
-            'rulePoints' => $tournament->getRulePoints(),
-            'ruleGames' => $tournament->getRuleGames(),
-            'tablesCount' => $tournament->getTablesCount(),
-            'location' => $tournament->getLocation(),
-            'provinceId' => $tournament->getProvince() ? $tournament->getProvince()->getId() : null,
-            'provinceName' => $tournament->getProvince() ? $tournament->getProvince()->getName() : null,
-            'townId' => $tournament->getTown() ? $tournament->getTown()->getId() : null,
-            'townName' => $tournament->getTown() ? $tournament->getTown()->getName() : null,
-            'posterPath' => $tournament->getPosterPath(),
-            'rulesPath' => $tournament->getRulesPath(),
-            'private' => $tournament->isPrivate(),
-            'hasThirdPlace' => $tournament->isHasThirdPlace(),
-            'uuid' => $tournament->getUuidAccessToken(),
-            'teamsCount' => count($tournament->getTournamentTeams()),
-            'tournamentTeams' => array_map(function($tt) {
-                return [
-                    'id' => $tt->getId(),
-                    'mesa' => $tt->getMesa(),
-                    'isConfirmed' => $tt->isConfirmed(),
-                    'team' => [
-                        'id' => $tt->getTeam()->getId(),
-                        'name' => $tt->getTeam()->getName(),
-                    ]
-                ];
-            }, $tournament->getTournamentTeams()->toArray()),
-            'matches' => array_map(function($match) {
-                return [
-                    'id' => $match->getId(),
-                    'stage' => $match->getStage(),
-                    'team1' => $match->getTeam1() ? $match->getTeam1()->getTeam()->getName() : 'TBD',
-                    'team2' => $match->getTeam2() ? $match->getTeam2()->getTeam()->getName() : 'TBD',
-                    'score1' => $match->getScoreTeam1(),
-                    'score2' => $match->getScoreTeam2(),
-                    'bracketRound' => $match->getBracketRound(),
-                    'bracketPosition' => $match->getBracketPosition(),
-                    'mesa' => $match->getMesa(),
-                    'games' => array_map(function($game) {
-                        return [
-                            'points1' => $game->getPointsTeam1(),
-                            'points2' => $game->getPointsTeam2(),
-                        ];
-                    }, $match->getGames()->toArray())
-                ];
-            }, $tournament->getMatches()->toArray())
-        ]);
-    }
-
     #[Route('/api/admin/tournament/{uuid}/enroll-team', name: 'app_tournament_enroll_team', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function enrollTeam(string $uuid, Request $request, TournamentRepository $tournamentRepository, TeamRepository $teamRepository, EntityManagerInterface $entityManager): JsonResponse
+    public function addTeam(string $uuid, Request $request, TournamentRepository $tournamentRepository, TeamRepository $teamRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
         if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
 
-        $data = json_decode($request->getContent(), true) ?: $request->request->all();
+        $data = $request->toArray();
+        $teamId = $data['teamId'] ?? null;
         $teamName = $data['name'] ?? null;
-        $isConfirmed = (bool) ($data['isConfirmed'] ?? false);
-
-        if (!$teamName) {
-            return new JsonResponse(['error' => 'El nombre de la pareja es obligatorio'], 400);
+        
+        $team = null;
+        if ($teamId) {
+            $team = $teamRepository->find($teamId);
+        } elseif ($teamName) {
+            // Buscar si ya existe una pareja con ese nombre o crearla
+            $team = $teamRepository->findOneBy(['name' => $teamName]);
+            if (!$team) {
+                $team = new Team();
+                $team->setName($teamName);
+                $entityManager->persist($team);
+            }
         }
 
-        // Create new Team
-        $team = new Team();
-        $team->setName(substr($teamName, 0, 255));
-        $entityManager->persist($team);
+        if (!$team) return new JsonResponse(['error' => 'Pareja no encontrada o nombre inválido'], 404);
 
-        $tournamentTeam = new TournamentTeam();
-        $tournamentTeam->setTournament($tournament);
-        $tournamentTeam->setTeam($team);
-        $tournamentTeam->setIsConfirmed($isConfirmed);
+        foreach ($tournament->getTournamentTeams() as $tt) {
+            if ($tt->getTeam()->getId() === $team->getId()) {
+                return new JsonResponse(['error' => 'Esta pareja ya está inscrita en el torneo'], 400);
+            }
+        }
 
-        $entityManager->persist($tournamentTeam);
+        $isConfirmed = filter_var($data['isConfirmed'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        $tt = new TournamentTeam();
+        $tt->setTournament($tournament);
+        $tt->setTeam($team);
+        $tt->setIsConfirmed($isConfirmed);
+
+        $tournament->addTournamentTeam($tt); // Asegurar que la colección se actualiza
+
+        $entityManager->persist($tt);
         $entityManager->flush();
 
         return new JsonResponse([
             'success' => true,
             'team' => [
-                'id' => $tournamentTeam->getId(),
-                'mesa' => $tournamentTeam->getMesa(),
-                'isConfirmed' => $tournamentTeam->isConfirmed(),
-                'team' => [
-                    'id' => $team->getId(),
-                    'name' => $team->getName(),
-                ]
+                'id' => $tt->getId(),
+                'name' => $team->getName(),
+                'mesa' => $tt->getMesa(),
+                'isConfirmed' => $tt->isConfirmed()
             ]
         ]);
     }
 
-    #[Route('/api/admin/tournament/team/{id}/toggle-confirm', name: 'app_tournament_team_toggle_confirm', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function toggleConfirmTeam(int $id, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $tt = $entityManager->getRepository(TournamentTeam::class)->find($id);
-        if (!$tt) return new JsonResponse(['error' => 'Registro no encontrado'], 404);
-        
-        $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tt->getTournament());
-        
-        $tt->setIsConfirmed(!$tt->isConfirmed());
-        $entityManager->flush();
-        
-        return new JsonResponse(['success' => true, 'isConfirmed' => $tt->isConfirmed()]);
-    }
-
-    #[Route('/api/admin/tournament/team/{id}', name: 'app_tournament_unenroll_team', methods: ['DELETE'])]
-    #[IsGranted('ROLE_USER')]
-    public function unenrollTeam(int $id, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $tt = $entityManager->getRepository(TournamentTeam::class)->find($id);
-        if (!$tt) return new JsonResponse(['error' => 'Registro no encontrado'], 404);
-        
-        $tournament = $tt->getTournament();
-        $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tournament);
-        
-        if ($tournament->getStatus() !== 'draft' && $tournament->getStatus() !== 'pending') {
-            return new JsonResponse(['error' => 'No se puede desapuntar una pareja si el torneo no está en borrador o pendiente'], 400);
-        }
-
-        $entityManager->remove($tt);
-        $entityManager->flush();
-        
-        return new JsonResponse(['success' => true]);
-    }
-
-    #[Route('/api/admin/tournament/{uuid}/generate-groups', name: 'app_tournament_generate_groups', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function generateGroups(string $uuid, Request $request, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
-        if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
-
-        $groupsCount = (int) $request->request->get('groupsCount', 2);
-        $teams = $tournament->getTournamentTeams()->toArray();
-        shuffle($teams);
-
-        $groupLetters = range('A', 'Z');
-        foreach ($teams as $index => $tt) {
-            $groupIndex = $index % $groupsCount;
-            $tt->setMesa('Mesa ' . $groupLetters[$groupIndex]);
-        }
-
-        $entityManager->flush();
-
-        return new JsonResponse(['success' => true]);
-    }
-
     #[Route('/api/admin/tournament/{uuid}/generate-matches', name: 'app_tournament_generate_matches', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function generateMatches(string $uuid, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager): JsonResponse
-    {
+    public function generateMatches(
+        string $uuid, 
+        TournamentRepository $tournamentRepository, 
+        EntityManagerInterface $entityManager,
+        LeagueGenerator $leagueGenerator
+    ): JsonResponse {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
         if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
 
@@ -504,102 +260,58 @@ class TournamentController extends AbstractController
         }
 
         if ($tournament->getType() === 'eliminatory') {
-            // SHUFFLE TEAMS FOR INITIAL DRAW
             shuffle($teams);
+            $numTeams = count($teams);
+            $rounds = ceil(log($numTeams, 2));
+            $bracketSize = pow(2, $rounds);
             
-            $teamsCount = count($teams);
-            $roundsNeeded = (int)ceil(log($teamsCount, 2));
-            $initialPower = pow(2, $roundsNeeded);
+            for ($i = 0; $i < $bracketSize / 2; $i++) {
+                $match = new MusMatch();
+                $match->setTournament($tournament);
+                $match->setBracketRound($rounds);
+                $match->setBracketPosition($i);
+                $match->setStage("Ronda $rounds");
+                
+                $t1Idx = $i * 2;
+                $t2Idx = $i * 2 + 1;
+                
+                if ($t1Idx < $numTeams) $match->setTeam1($teams[$t1Idx]);
+                if ($t2Idx < $numTeams) $match->setTeam2($teams[$t2Idx]);
+                
+                if ($match->getTeam1() && !$match->getTeam2()) {
+                    $match->setWinner($match->getTeam1());
+                    $match->setScoreTeam1(0);
+                    $match->setScoreTeam2(0);
+                }
+                
+                $entityManager->persist($match);
+            }
             
-            // Stage names mapping
-            $stageNames = [
-                1 => 'Final',
-                2 => 'Semifinales',
-                4 => 'Cuartos de Final',
-                8 => 'Octavos de Final',
-                16 => 'Dieciseisavos de Final',
-                32 => 'Treintaidosavos de Final'
-            ];
-
-            // Create ALL matches for the bracket structure
-            // We create them from Final (1) to Initial ($roundsNeeded) so Byes can advance
-            for ($r = 1; $r <= $roundsNeeded; $r++) {
+            for ($r = $rounds - 1; $r >= 1; $r--) {
                 $matchesInRound = pow(2, $r - 1);
-                $stageLabel = $stageNames[$matchesInRound] ?? 'Ronda ' . ($roundsNeeded - $r + 1);
-                
-                // Tables should be reused. In each round, we start numbering from 1.
-                $mesaCounter = 1;
-                
-                for ($p = 0; $p < $matchesInRound; $p++) {
+                for ($i = 0; $i < $matchesInRound; $i++) {
                     $match = new MusMatch();
                     $match->setTournament($tournament);
-                    $match->setStage($stageLabel);
                     $match->setBracketRound($r);
-                    $match->setBracketPosition($p);
-                    $match->setMesa('Mesa ' . $mesaCounter++);
-                    
-                    // Assign teams only for the first round ($r === $roundsNeeded)
-                    if ($r === $roundsNeeded) {
-                        $teamIndex1 = $p * 2;
-                        $teamIndex2 = $p * 2 + 1;
-                        
-                        if (isset($teams[$teamIndex1])) {
-                            $match->setTeam1($teams[$teamIndex1]);
-                        }
-                        if (isset($teams[$teamIndex2])) {
-                            $match->setTeam2($teams[$teamIndex2]);
-                        }
-
-                        // Handle Bye (if team2 is null, team1 wins immediately)
-                        if ($match->getTeam1() && !$match->getTeam2()) {
-                            $match->setWinner($match->getTeam1());
-                            $match->setScoreTeam1(1); 
-                            $match->setScoreTeam2(0);
-                            
-                            // Advance Bye winner if round > 1
-                            if ($r > 1) {
-                                // We don't have a hub here, but advanceWinnerInBracket handles it
-                                $this->advanceWinnerInBracket($match, $entityManager, null);
-                            }
-                        }
-                    }
-
-                    $tournament->addMatch($match);
+                    $match->setBracketPosition($i);
+                    $match->setStage($r === 1 ? "Final" : "Ronda $r");
                     $entityManager->persist($match);
                 }
             }
 
-            // Generate 3rd place match if enabled and there are enough rounds (at least semifinals)
-            if ($roundsNeeded >= 2 && $tournament->isHasThirdPlace()) {
-                $thirdPlaceMatch = new MusMatch();
-                $thirdPlaceMatch->setTournament($tournament);
-                $thirdPlaceMatch->setStage('3º y 4º puesto');
-                // We place it in Round 1 (same as Final) but position 1 (Final is 0)
-                $thirdPlaceMatch->setBracketRound(1);
-                $thirdPlaceMatch->setBracketPosition(1);
-                $entityManager->persist($thirdPlaceMatch);
+            if ($tournament->isHasThirdPlace()) {
+                $match = new MusMatch();
+                $match->setTournament($tournament);
+                $match->setBracketRound(1);
+                $match->setBracketPosition(1);
+                $match->setStage("3er y 4º Puesto");
+                $entityManager->persist($match);
             }
+        } elseif ($tournament->getType() === 'league') {
+            shuffle($teams);
+            $leagueGenerator->generate($tournament);
         } else {
-            // ROUND ROBIN / GROUPS LOGIC
-            $groups = [];
-            foreach ($teams as $tt) {
-                $gn = $tt->getMesa() ?: 'Sin Mesa';
-                $groups[$gn][] = $tt;
-            }
-
-            foreach ($groups as $mesaLabel => $groupTeams) {
-                $count = count($groupTeams);
-                for ($i = 0; $i < $count; $i++) {
-                    for ($j = $i + 1; $j < $count; $j++) {
-                        $match = new MusMatch();
-                        $match->setTournament($tournament);
-                        $match->setTeam1($groupTeams[$i]);
-                        $match->setTeam2($groupTeams[$j]);
-                        $match->setStage($mesaLabel);
-                        $entityManager->persist($match);
-                    }
-                }
-            }
+            return new JsonResponse(['error' => 'Tipo de torneo no soportado para generación automática'], 400);
         }
 
         $tournament->setStatus('active');
@@ -608,173 +320,190 @@ class TournamentController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    private array $affectedMatches = [];
-
-    #[Route('/api/admin/match/{id}', name: 'app_match_update', methods: ['POST'])]
+    #[Route('/api/admin/tournament/team/{teamId}', name: 'app_tournament_unenroll_team', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]
-    public function updateMatch(int $id, Request $request, EntityManagerInterface $entityManager, HubInterface $hub, LoggerInterface $logger): JsonResponse
+    public function removeTeam(int $teamId, EntityManagerInterface $entityManager): JsonResponse
     {
-        $logger->info(sprintf('TournamentController: Entering updateMatch for match %d', $id));
-        $match = $entityManager->getRepository(MusMatch::class)->find($id);
-        if (!$match) return new JsonResponse(['error' => 'Partido no encontrado'], 404);
+        $tt = $entityManager->getRepository(TournamentTeam::class)->find($teamId);
+        if (!$tt) return new JsonResponse(['error' => 'Registro no encontrado'], 404);
 
-        $tournament = $match->getTournament();
-        $this->denyAccessUnlessGranted('TOURNAMENT_EDIT', $tournament);
-
-        $data = json_decode($request->getContent(), true) ?: $request->request->all();
-        $gamesData = $data['games'] ?? [];
-
-        // Clear existing games
-        foreach ($match->getGames() as $game) {
-            $entityManager->remove($game);
-        }
-        $match->getGames()->clear();
-
-        $gamesWon1 = 0;
-        $gamesWon2 = 0;
-        $limit = $tournament->getRulePoints();
-
-        if (empty($gamesData) && (isset($data['score1']) || isset($data['score2']))) {
-            $gamesWon1 = (int)($data['score1'] ?? 0);
-            $gamesWon2 = (int)($data['score2'] ?? 0);
-        } else {
-            foreach ($gamesData as $index => $g) {
-                $points1 = (int) ($g['points1'] ?? 0);
-                $points2 = (int) ($g['points2'] ?? 0);
-                
-                if ($points1 === 0 && $points2 === 0) continue;
-
-                $game = new MusMatchGame();
-                $game->setMusMatch($match);
-                $game->setGameNumber($index + 1);
-                $game->setPointsTeam1($points1);
-                $game->setPointsTeam2($points2);
-                
-                if ($points1 >= $limit) $gamesWon1++;
-                elseif ($points2 >= $limit) $gamesWon2++;
-                
-                $entityManager->persist($game);
-                $match->addGame($game);
-            }
-        }
-
-        $match->setScoreTeam1($gamesWon1);
-        $match->setScoreTeam2($gamesWon2);
-
-        // Winner logic: First to reach ruleGames (e.g. 3) wins the match
-        $toWin = $tournament->getRuleGames();
-        if ($gamesWon1 >= $toWin) $match->setWinner($match->getTeam1());
-        elseif ($gamesWon2 >= $toWin) $match->setWinner($match->getTeam2());
-        else $match->setWinner(null);
-
-        $this->recalculateTournamentStats($tournament, $entityManager);
-        
-        // AUTOMATIC ADVANCEMENT FOR ELIMINATORY
-        $this->advanceWinnerInBracket($match, $entityManager, $hub);
-
+        $entityManager->remove($tt);
         $entityManager->flush();
-
-        // CHECK IF ALL MATCHES ARE FINISHED -> AUTO-FINISH TOURNAMENT
-        $allFinished = true;
-        foreach ($tournament->getMatches() as $m) {
-            if (!$m->getWinner()) {
-                $allFinished = false;
-                break;
-            }
-        }
-        if ($allFinished && count($tournament->getMatches()) > 0 && $tournament->getStatus() === 'active') {
-            $tournament->setStatus('finished');
-        }
-
-        $entityManager->flush();
-
-        $this->affectedMatches[] = $match;
-        foreach ($this->affectedMatches as $m) {
-            $this->publishMatchUpdate($m, $hub, $logger);
-        }
 
         return new JsonResponse(['success' => true]);
     }
 
-    private function publishMatchUpdate(MusMatch $match, HubInterface $hub, LoggerInterface $logger): void
-    {
-        $tournament = $match->getTournament();
-        $topic = sprintf('tournament/%s', $tournament->getUuidAccessToken());
-        $data = json_encode([
-            'matchId' => $match->getId(),
-            'score1' => $match->getScoreTeam1(),
-            'score2' => $match->getScoreTeam2(),
-            'stage' => $match->getStage(),
-            'bracketRound' => $match->getBracketRound(),
-            'bracketPosition' => $match->getBracketPosition(),
-            'team1' => $match->getTeam1() ? $match->getTeam1()->getTeam()->getName() : 'TBD',
-            'team2' => $match->getTeam2() ? $match->getTeam2()->getTeam()->getName() : 'TBD',
-            'winnerId' => $match->getWinner() ? $match->getWinner()->getId() : null,
-            'status' => $match->getWinner() ? 'finished' : 'pending'
-        ]);
-
-        $logger->info(sprintf('Mercure debug: Publishing to topic %s', $topic));
-        $logger->info(sprintf('Mercure debug: Data: %s', $data));
-
-        try {
-            $update = new Update($topic, $data);
-            $hub->publish($update);
-            $logger->info(sprintf('Mercure debug: Successfully published to %s', $topic));
-        } catch (\Exception $e) {
-            $logger->error(sprintf('Mercure debug: FAILED to publish to %s. Error: %s', $topic, $e->getMessage()));
-        }
-    }
-
-    private function recalculateTournamentStats(Tournament $tournament, EntityManagerInterface $entityManager): void
-    {
-        // Reset all stats for tournament teams
-        foreach ($tournament->getTournamentTeams() as $tt) {
-            $tt->setPoints(0);
-            $tt->setGamesWon(0);
-            $tt->setGamesLost(0);
-            $tt->setMatchesPlayed(0);
-        }
-
-        // Aggregate stats from all matches
-        foreach ($tournament->getMatches() as $match) {
-            $team1 = $match->getTeam1();
-            $team2 = $match->getTeam2();
-            $s1 = $match->getScoreTeam1();
-            $s2 = $match->getScoreTeam2();
-            $winner = $match->getWinner();
-
-            // Skip if no score yet (unless winner set manually, but we use scores)
-            if ($s1 === 0 && $s2 === 0 && !$winner) continue;
-
-            if (!$team1 || !$team2) continue;
-
-            $tt1 = $team1; 
-            $tt2 = $team2;
-
-            if ($tt1) {
-                $tt1->setMatchesPlayed($tt1->getMatchesPlayed() + 1);
-                $tt1->setGamesWon($tt1->getGamesWon() + $s1);
-                $tt1->setGamesLost($tt1->getGamesLost() + $s2);
-                if ($winner && $winner->getId() === $team1->getId()) {
-                    $tt1->setPoints($tt1->getPoints() + 3);
-                }
-            }
-            if ($tt2) {
-                $tt2->setMatchesPlayed($tt2->getMatchesPlayed() + 1);
-                $tt2->setGamesWon($tt2->getGamesWon() + $s2);
-                $tt2->setGamesLost($tt2->getGamesLost() + $s1);
-                if ($winner && $winner->getId() === $team2->getId()) {
-                    $tt2->setPoints($tt2->getPoints() + 3);
-                }
-            }
-        }
-    }
-
-    #[Route('/api/tournament/{uuid}/classification', name: 'app_tournament_classification', methods: ['GET'])]
-    public function getClassification(string $uuid, TournamentRepository $tournamentRepository): JsonResponse
+    #[Route('/api/tournament/{uuid}', name: 'app_tournament_show', methods: ['GET'])]
+    public function show(string $uuid, TournamentRepository $tournamentRepository): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
         if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+
+        $matches = [];
+        foreach ($tournament->getMatches() as $match) {
+            $games = [];
+            foreach ($match->getGames() as $game) {
+                $games[] = [
+                    'points1' => $game->getPointsTeam1(),
+                    'points2' => $game->getPointsTeam2()
+                ];
+            }
+
+            $matches[] = [
+                'id' => $match->getId(),
+                'teamA' => $match->getTeam1() ? ['id' => $match->getTeam1()->getId(), 'name' => $match->getTeam1()->getTeam()->getName()] : ($match->getTeam1() ?: null),
+                'teamB' => $match->getTeam2() ? ['id' => $match->getTeam2()->getId(), 'name' => $match->getTeam2()->getTeam()->getName()] : ($match->getTeam2() ?: null),
+                'scoreA' => $match->getScoreTeam1(),
+                'scoreB' => $match->getScoreTeam2(),
+                'games' => $games,
+                'status' => ($match->getScoreTeam1() > 0 || $match->getScoreTeam2() > 0) ? 'finished' : 'pending',
+                'winnerId' => $match->getWinner() ? $match->getWinner()->getId() : null,
+                'stage' => $match->getStage(),
+                'bracketRound' => $match->getBracketRound(),
+                'bracketPosition' => $match->getBracketPosition(),
+                'matchDay' => $match->getMatchDay(),
+                'mesa' => $match->getMesa(),
+                'deadlineDate' => $match->getDeadlineDate() ? $match->getDeadlineDate()->format('Y-m-d') : null
+            ];
+        }
+
+        return new JsonResponse([
+            'id' => $tournament->getId(),
+            'name' => $tournament->getName(),
+            'type' => $tournament->getType(),
+            'status' => $tournament->getStatus(),
+            'ruleKings' => $tournament->getRuleKings(),
+            'rulePoints' => $tournament->getRulePoints(),
+            'ruleGames' => $tournament->getRuleGames(),
+            'hasThirdPlace' => $tournament->isHasThirdPlace(),
+            'teamsCount' => count($tournament->getTournamentTeams()),
+            'matches' => $matches,
+            'teams' => array_map(function(TournamentTeam $tt) {
+                return [
+                    'id' => $tt->getId(),
+                    'name' => $tt->getTeam()->getName(),
+                    'mesa' => $tt->getMesa(),
+                    'isConfirmed' => $tt->isConfirmed()
+                ];
+            }, $tournament->getTournamentTeams()->toArray())
+        ]);
+    }
+
+    #[Route('/api/admin/tournament/team/{id}/toggle-confirm', name: 'app_tournament_team_toggle_confirm', methods: ['POST'])]
+    public function toggleConfirmTeam(
+        int $id,
+        TournamentTeamRepository $ttRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $tt = $ttRepository->find($id);
+        if (!$tt) return new JsonResponse(['error' => 'Inscripción no encontrada'], 404);
+
+        $tt->setIsConfirmed(!$tt->isConfirmed());
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'isConfirmed' => $tt->isConfirmed()
+        ]);
+    }
+
+    #[Route('/api/admin/match/{id}/update', name: 'app_match_update', methods: ['POST'])]
+    public function updateMatch(
+        int $id,
+        Request $request,
+        MusMatchRepository $matchRepository,
+        EntityManagerInterface $entityManager,
+        HubInterface $hub
+    ): JsonResponse {
+        $match = $matchRepository->find($id);
+        if (!$match) return new JsonResponse(['error' => 'Partido no encontrado'], 404);
+
+        $data = json_decode($request->getContent(), true);
+        $gamesData = $data['games'] ?? [];
+        $tournament = $match->getTournament();
+        $pointsToWinGame = $tournament->getRulePoints() ?: 40;
+
+        // Clear existing games using the collection to let orphanRemoval work
+        foreach ($match->getGames() as $game) {
+            $match->removeGame($game);
+        }
+        $entityManager->flush();
+
+        $score1 = 0;
+        $score2 = 0;
+
+        foreach ($gamesData as $index => $gData) {
+            $p1 = (int)($gData['points1'] ?? 0);
+            $p2 = (int)($gData['points2'] ?? 0);
+
+            if ($p1 > 0 || $p2 > 0) {
+                $game = new MusMatchGame();
+                $game->setMusMatch($match);
+                $game->setPointsTeam1($p1);
+                $game->setPointsTeam2($p2);
+                $game->setGameNumber($index + 1);
+                $entityManager->persist($game);
+
+                if ($p1 >= $pointsToWinGame) $score1++;
+                if ($p2 >= $pointsToWinGame) $score2++;
+            }
+        }
+
+        $match->setScoreTeam1($score1);
+        $match->setScoreTeam2($score2);
+
+        // Set winner for classification
+        if ($score1 > 0 || $score2 > 0) {
+            if ($score1 > $score2) {
+                $match->setWinner($match->getTeam1());
+            } elseif ($score2 > $score1) {
+                $match->setWinner($match->getTeam2());
+            } else {
+                $match->setWinner(null);
+            }
+        } else {
+            $match->setWinner(null);
+        }
+
+        if ($match->getBracketRound() !== null && $match->getWinner() !== null) {
+            $this->advanceWinnerInBracket($match, $entityManager);
+        }
+
+        $entityManager->flush();
+
+        // Notify via Mercure
+        $update = new Update(
+            "tournament/{$tournament->getUuidAccessToken()}",
+            json_encode([
+                'matchId' => $match->getId(),
+                'score1' => $match->getScoreTeam1(),
+                'score2' => $match->getScoreTeam2(),
+                'finished' => ($score1 > 0 || $score2 > 0),
+                'games' => $gamesData
+            ])
+        );
+        $hub->publish($update);
+
+        return new JsonResponse([
+            'success' => true,
+            'scoreA' => $match->getScoreTeam1(),
+            'scoreB' => $match->getScoreTeam2(),
+            'status' => ($score1 > 0 || $score2 > 0) ? 'finished' : 'pending'
+        ]);
+    }
+
+    #[Route('/api/tournament/{uuid}/classification', name: 'app_tournament_classification', methods: ['GET'])]
+    public function getClassification(
+        string $uuid, 
+        TournamentRepository $tournamentRepository,
+        StandingCalculator $standingCalculator
+    ): JsonResponse {
+        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
+        if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+
+        if ($tournament->getType() === 'league') {
+            return new JsonResponse($standingCalculator->calculate($tournament));
+        }
 
         $classification = [];
         foreach ($tournament->getTournamentTeams() as $tt) {
@@ -788,90 +517,34 @@ class TournamentController extends AbstractController
             ];
         }
 
-        // Sort each group by points
-        foreach ($classification as $gn => &$teams) {
-            usort($teams, fn($a, $b) => $b['points'] <=> $a['points']);
+        foreach ($classification as $key => $values) {
+            usort($classification[$key], function($a, $b) {
+                if ($b['points'] === $a['points']) {
+                    return ($b['won'] - $b['lost']) <=> ($a['won'] - $a['lost']);
+                }
+                return $b['points'] <=> $a['points'];
+            });
         }
 
         return new JsonResponse($classification);
     }
 
-    #[Route('/public/tournaments', name: 'app_tournament_list_public', methods: ['GET'])]
-    #[Route('/api/public/tournaments', name: 'app_tournament_list_public_api', methods: ['GET'])]
-    public function listPublic(TournamentRepository $tournamentRepository): JsonResponse
+    private function advanceWinnerInBracket(MusMatch $match, EntityManagerInterface $entityManager): void
     {
-        $tournaments = $tournamentRepository->findBy([
-            'status' => ['active', 'pending', 'finished'],
-            'private' => false
-        ], ['id' => 'DESC']);
-        $user = $this->getUser();
-        $isSuperAdmin = $user && in_array('ROLE_SUPER_ADMIN', $user->getRoles());
-
-        return new JsonResponse(array_map(function(Tournament $t) use ($isSuperAdmin) {
-            $data = [
-                'id' => $t->getId(),
-                'name' => $t->getName(),
-                'uuid' => $t->getUuidAccessToken(),
-                'status' => $t->getStatus(),
-                'type' => $t->getType(),
-                'startDate' => $t->getStartDate() ? $t->getStartDate()->format(\DateTimeInterface::ATOM) : null,
-                'endDate' => $t->getEndDate() ? $t->getEndDate()->format(\DateTimeInterface::ATOM) : null,
-                'ruleKings' => $t->getRuleKings(),
-                'rulePoints' => $t->getRulePoints(),
-                'ruleGames' => $t->getRuleGames(),
-                'posterPath' => $t->getPosterPath(),
-                'rulesPath' => $t->getRulesPath(),
-                'location' => $t->getLocation(),
-                'provinceId' => $t->getProvince() ? $t->getProvince()->getId() : null,
-                'provinceName' => $t->getProvince() ? $t->getProvince()->getName() : null,
-                'townId' => $t->getTown() ? $t->getTown()->getId() : null,
-                'townName' => $t->getTown() ? $t->getTown()->getName() : null,
-                'teamsCount' => count($t->getTournamentTeams()),
-                'playerCount' => 24,
-                'private' => $t->isPrivate(),
-                'hasThirdPlace' => $t->isHasThirdPlace(),
-            ];
-
-            if ($isSuperAdmin) {
-                $owner = $t->getCreatedBy();
-                $data['owner'] = [
-                    'id' => $owner ? $owner->getId() : null,
-                    'name' => $owner ? ($owner->getPlayer() ? $owner->getPlayer()->getName() : $owner->getEmail()) : 'System'
-                ];
-            }
-
-            return $data;
-        }, $tournaments));
-    }
-
-    private function advanceWinnerInBracket(MusMatch $match, EntityManagerInterface $entityManager, ?HubInterface $hub = null): void
-    {
-        $tournament = $match->getTournament();
-        if ($tournament->getType() !== 'eliminatory' || !$match->getWinner() || $match->getBracketRound() <= 1) {
+        if ($match->getBracketRound() <= 1) {
             return;
         }
 
+        $tournament = $match->getTournament();
         $nextRound = $match->getBracketRound() - 1;
-        $nextPos = (int)floor($match->getBracketPosition() / 2);
-        $isTeam2 = $match->getBracketPosition() % 2 === 1;
+        $nextPos = floor($match->getBracketPosition() / 2);
+        $isTeam2 = ($match->getBracketPosition() % 2 === 1);
 
-        // Find next match. If generating initial draw, matches are in memory (tournament->getMatches())
-        $nextMatch = null;
-        foreach ($tournament->getMatches() as $m) {
-            if ($m->getBracketRound() === $nextRound && $m->getBracketPosition() === $nextPos) {
-                $nextMatch = $m;
-                break;
-            }
-        }
-
-        // Fallback to repository if not found in collection (should not happen with addMatch)
-        if (!$nextMatch) {
-            $nextMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
-                'tournament' => $tournament,
-                'bracketRound' => $nextRound,
-                'bracketPosition' => $nextPos
-            ]);
-        }
+        $nextMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
+            'tournament' => $tournament,
+            'bracketRound' => $nextRound,
+            'bracketPosition' => $nextPos
+        ]);
 
         if ($nextMatch) {
             if ($isTeam2) {
@@ -879,26 +552,14 @@ class TournamentController extends AbstractController
             } else {
                 $nextMatch->setTeam1($match->getWinner());
             }
-            $this->affectedMatches[] = $nextMatch;
         }
 
-        // Logic for 3rd and 4th place (losers of semifinals)
         if ($match->getBracketRound() === 2 && $tournament->isHasThirdPlace()) {
-            $thirdPlaceMatch = null;
-            foreach ($tournament->getMatches() as $m) {
-                if ($m->getBracketRound() === 1 && $m->getBracketPosition() === 1) {
-                    $thirdPlaceMatch = $m;
-                    break;
-                }
-            }
-            
-            if (!$thirdPlaceMatch) {
-                $thirdPlaceMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
-                    'tournament' => $tournament,
-                    'bracketRound' => 1,
-                    'bracketPosition' => 1
-                ]);
-            }
+            $thirdPlaceMatch = $entityManager->getRepository(MusMatch::class)->findOneBy([
+                'tournament' => $tournament,
+                'bracketRound' => 1,
+                'bracketPosition' => 1
+            ]);
 
             if ($thirdPlaceMatch) {
                 $loser = ($match->getWinner() === $match->getTeam1()) ? $match->getTeam2() : $match->getTeam1();
@@ -908,7 +569,6 @@ class TournamentController extends AbstractController
                     } else {
                         $thirdPlaceMatch->setTeam2($loser);
                     }
-                    $this->affectedMatches[] = $thirdPlaceMatch;
                 }
             }
         }
