@@ -35,6 +35,47 @@ use App\Service\StandingCalculator;
 
 class TournamentController extends AbstractController
 {
+    #[Route('/api/public/tournaments', name: 'app_tournament_public_list', methods: ['GET'])]
+    public function listPublic(TournamentRepository $tournamentRepository): JsonResponse
+    {
+        $tournaments = $tournamentRepository->createQueryBuilder('t')
+            ->where('t.private = :private')
+            ->andWhere('t.status != :draft')
+            ->setParameter('private', false)
+            ->setParameter('draft', 'draft')
+            ->orderBy('t.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return new JsonResponse(array_map(function(Tournament $t) {
+            return [
+                'id' => $t->getId(),
+                'name' => $t->getName(),
+                'uuid' => $t->getUuidAccessToken(),
+                'status' => $t->getStatus(),
+                'type' => $t->getType(),
+                'startDate' => $t->getStartDate() ? $t->getStartDate()->format(\DateTimeInterface::ATOM) : null,
+                'endDate' => $t->getEndDate() ? $t->getEndDate()->format(\DateTimeInterface::ATOM) : null,
+                'ruleKings' => $t->getRuleKings(),
+                'rulePoints' => $t->getRulePoints(),
+                'ruleGames' => $t->getRuleGames(),
+                'tablesCount' => $t->getTablesCount(),
+                'location' => $t->getLocation(),
+                'provinceId' => $t->getProvince() ? $t->getProvince()->getId() : null,
+                'provinceName' => $t->getProvince() ? $t->getProvince()->getName() : null,
+                'townId' => $t->getTown() ? $t->getTown()->getId() : null,
+                'townName' => $t->getTown() ? $t->getTown()->getName() : null,
+                'posterPath' => $t->getPosterPath(),
+                'rulesPath' => $t->getRulesPath(),
+                'teamsCount' => count($t->getTournamentTeams()),
+                'hasMatches' => count($t->getMatches()) > 0,
+                'private' => $t->isPrivate(),
+                'hasThirdPlace' => $t->isHasThirdPlace(),
+                'leagueMatchDays' => $t->getLeagueMatchDays(),
+            ];
+        }, $tournaments));
+    }
+
     #[Route('/api/user/tournaments', name: 'app_tournament_list_managed_api', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function listManaged(TournamentRepository $tournamentRepository): JsonResponse
