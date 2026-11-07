@@ -1084,26 +1084,33 @@ const normalizeStageKey = (stage) => {
                      {{ t('tournament_view.tabs.matches') }}
                   </h3>
                   <div class="flex align-items-center gap-3">
-                    <button v-if="matches.length > 0"
-                            @click="handleResetMatches($event)"
+                    <button @click="handleResetMatches($event)"
                             :disabled="processing"
                             class="mus-btn-secondary px-4 py-2 text-[9px] gap-2 border-rose-500/30 text-rose-400 hover:bg-rose-500/10">
                       <i class="pi pi-refresh"></i>
                       {{ t('tournament_admin.matches.reset_btn') }}
                     </button>
-                    <button @click="toggleMatchesOrder" class="mus-btn-secondary px-4 py-2 text-[9px] gap-2">
+                    <button v-if="matches.length > 0" @click="toggleMatchesOrder" class="mus-btn-secondary px-4 py-2 text-[9px] gap-2">
                        <i :class="matchesOrder === 'asc' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'"></i>
                        {{ matchesOrder === 'asc' ? t('tournament_admin.matches.order_asc') : t('tournament_admin.matches.order_desc') }}
                     </button>
                   </div>
                </div>
 
-               <div v-if="matches.length === 0" class="text-center py-20 opacity-30">
-                 <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
+               <div v-if="matches.length === 0" class="text-center py-20">
+                 <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10 opacity-30">
                    <i class="pi pi-calendar-times text-4xl text-slate-700"></i>
                  </div>
-                 <h3 class="text-main font-black uppercase italic mb-2">{{ t('tournament_admin.matches.no_matchups') }}</h3>
-                 <p class="text-slate-500 font-bold text-xs uppercase tracking-widest mb-8">{{ t('tournament_admin.matches.error_desc') }}</p>
+                 <h3 class="text-main font-black uppercase italic mb-2 opacity-40">{{ t('tournament_admin.matches.no_matchups') }}</h3>
+                 <p class="text-slate-500 font-bold text-xs uppercase tracking-widest mb-8 opacity-40">{{ t('tournament_admin.matches.error_desc') }}</p>
+                 <div class="flex justify-center gap-4">
+                   <button @click="handleGenerateMatches($event)"
+                           :disabled="processing || enrolledTeams.length < 2"
+                           class="mus-btn-primary px-6 py-3 text-xs">
+                     <i class="pi pi-bolt mr-2"></i>
+                     {{ tournament.type === 'eliminatory' ? t('tournament_admin.preparation.initial_draw') : t('tournament_mgmt.generate_matches') }}
+                   </button>
+                 </div>
                </div>
 
                <div v-else class="space-y-12">
