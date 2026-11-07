@@ -60,10 +60,11 @@ const closeMobileMenu = () => {
         </div>
       </router-link>
 
-      <!-- Nav Links (Desktop - Only Guest) -->
       <nav v-if="!user" class="nav-links">
         <router-link :to="{ path: '/tournaments', query: { status: 'active' } }" class="nav-item">{{ t('nav.tournaments') }}</router-link>
         <router-link to="/como-funciona" class="nav-item">{{ t('nav.howItWorks') }}</router-link>
+        <router-link to="/reglas-del-mus" class="nav-item">{{ t('nav.rules') }}</router-link>
+        <router-link to="/faq" class="nav-item">{{ t('nav.faq') }}</router-link>
         <router-link to="/caracteristicas" class="nav-item">{{ t('nav.features') }}</router-link>
       </nav>
 
@@ -126,6 +127,14 @@ const closeMobileMenu = () => {
             <router-link to="/como-funciona" class="mobile-nav-item" @click="closeMobileMenu">
               <i class="pi pi-info-circle"></i>
               {{ t('nav.howItWorks') }}
+            </router-link>
+            <router-link to="/reglas-del-mus" class="mobile-nav-item" @click="closeMobileMenu">
+              <i class="pi pi-book"></i>
+              {{ t('nav.rules') }}
+            </router-link>
+            <router-link to="/faq" class="mobile-nav-item" @click="closeMobileMenu">
+              <i class="pi pi-question-circle"></i>
+              {{ t('nav.faq') }}
             </router-link>
             <router-link to="/caracteristicas" class="mobile-nav-item" @click="closeMobileMenu">
               <i class="pi pi-star"></i>

@@ -33,6 +33,8 @@
     "organizer": "Antolatzailea",
     "about": "Guri Buruz",
     "howItWorks": "Nola Funtzionatzen Du?",
+    "rules": "Erreglamentua",
+    "faq": "FAQ",
     "theme": "Aldatu Gaia",
     "lightMode": "Modu Argia",
     "darkMode": "Modu Iluna",
@@ -101,7 +103,13 @@
     "detailed_section": {
       "title": "Potentzia kapotaren azpian",
       "p1": "Mus Manager ez da aurpegi polit bat soilik; Musaren kasuistika konplexuetarako optimizatutako kalkulu-motorra da. Ehunka ordu inbertitu ditugu parekatze-algoritmoek arau tradizionalak errespeta ditzaten ziurtatzeko, klub bereko bikoteak goizegi aurrez aurre egon ez daitezen edo mahaien banaketa ekitatiboa bermatuz.",
-      "p2": "Gure hodeiko arkitekturak datuak seguru eta eskuragarri egotea bermatzen du 24/7. Bateria agortzen bazaizu edo konexioa galtzen baduzu, sistemak automatikoki gordetzen du txapelketaren azken egoera. Gainera, gure APIa joko-aretoetako pantaila erraldoiekin integratzeko prest dago, zure bazkideak aho zabalik utziko dituen 'Estadio' esperientzia ahalbidetuz."
+      "p2": "Gure hodeiko arkitekturak datuak seguru eta eskuragarri egotea bermatzen du 24/7. Bateria agortzen bazaizu edo konexioa galtzen baduzu, sistemak automatikoki gordetzen du txapelketaren azken egoera. Gainera, gure APIa joko-aretoetako pantaila erraldoiekin integratzeko prest dago, zure bazkideak aho zabalik utziko dituen 'Estadio' esperientzia ahalbidetuz.",
+      "infra_title": "Azpiegitura",
+      "infra_desc": "Hodeia 24/7 Autoeskalatzea",
+      "security_title": "Segurtasuna",
+      "security_desc": "AES-256 Enkriptatzea",
+      "performance_title": "Errendimendua",
+      "performance_desc": "Real-time Event Bus"
     }
   },
   "stats": {
@@ -283,6 +291,7 @@
     "company": "Enpresa",
     "about": "Guri buruz",
     "contact": "Kontaktua",
+    "faq": "FAQ",
     "legal": "Legala",
     "subscribe": "Harpidetu",
     "rights": "© 2026 Mus Manager. Eskubide guztiak erreserbatuta.",
@@ -421,7 +430,13 @@
     "forgot_password_title": "Pasahitza Berreskuratu | Mus Manager",
     "forgot_password_desc": "Berreskuratu zure Mus Manager konturako sarbidea.",
     "reset_password_title": "Pasahitza Berrezarri | Mus Manager",
-    "reset_password_desc": "Aukeratu pasahitz seguru berri bat zure konturako."
+    "reset_password_desc": "Aukeratu pasahitz seguru berri bat zure konturako.",
+    "contacto_title": "Kontaktua eta Laguntza | Mus Manager",
+    "contacto_desc": "Jarri harremanetan Mus Manager-ekin. Laguntza inprimakia eta info@musmanager.com posta elektroniko ofiziala.",
+    "reglas_title": "Mus Arauak | Erreglamentu eta Estrategia Gida Osoa",
+    "reglas_desc": "Ikasi Mus arau ofizialak (4 errege eta 8 errege), joko estrategia eta taktikak eta nola antolatu txapelketa profesionalak.",
+    "faq_title": "Galdera Arruntak (FAQ) | Mus Manager",
+    "faq_desc": "Argitu zure zalantzak Musari, txapelketei, kudeaketari, zure kontuari eta publizitateari buruz Mus Manager-en."
   },
   "tournaments_page": {
     "title": "Txapelketak",
@@ -644,6 +659,7 @@
     "generate_matches": "Sortu Partiden Egutegia"
   },
   "how_it_works_page": {
+    "step_label": "{step}. urratsa",
     "title": "Zure Txapelketa, Pausoz Pauso",
     "subtitle": "Ezagutu zein erraza den zure Mus peña profesionalizatzea.",
     "intro": "Mus txapelketa bat antolatzeak ez luke matematika azterketa bat izan behar. Mus Manager-en prozesua sinplifikatu dugu, edozein pertsonak, bere ezagutza teknologikoak kontuan hartu gabe, ekitaldi arrakastatsu bat abiarazi dezan minututan. Hemen azaltzen dizugu bidea erregistrotik podioraino.",
@@ -769,5 +785,160 @@
     "checkbox_label": "Mus Manager-en Erabilera Baldintzak eta Baldintzak eta Pribatutasun Politika irakurri eta onartzen ditut.",
     "accept_btn": "ONARTU ETA JARRAITU",
     "error_accepting": "Errorea baldintzak onartzean. Saiatu berriro."
+  },
+  "contacto": {
+    "title": "Kontaktua eta Laguntza",
+    "subtitle": "Hemen gaude laguntzeko. Jarri gurekin harremanetan edozein zalantza edo kontsulta izanez gero.",
+    "email_us": "Idatz iezaguzu zuzenean helbide honetara:",
+    "form_title": "Mezu bat bidali",
+    "name": "Izena",
+    "name_placeholder": "Zure izen-abizenak",
+    "email": "Harremanetarako Emaila",
+    "email_placeholder": "zure@email.com",
+    "subject": "Gaia",
+    "subject_placeholder": "Adib.: Txapelketei buruzko zalantzak, arazo teknikoak...",
+    "message": "Mezua",
+    "message_placeholder": "Idatzi hier zure mezu zehatza...",
+    "submit": "Mezua Bidali",
+    "sending": "Bidaltzen...",
+    "success": "Mezua ongi bidali da! Gurekin harremanetan jarriko gara ahalik eta lasterren.",
+    "error": "Errore bat gertatu da mezua bidaltzean. Saiatu berriro edo idatz iezaguzu zuzenean.",
+    "has_questions": "Mus Manager-i buruzko zalantzarik al duzu? Gure Galdera Arruntak (FAQ) zentro osotua kontsultatzea gomendatzen dizugu guri idatzi aurretik.",
+    "view_faq": "Ikusi Galdera Arruntak"
+  },
+  "faq": {
+    "title": "Galdera Arruntak",
+    "subtitle": "Mus Manager-i buruz jakin behar duzun guztia",
+    "search_placeholder": "Bilatu galdera...",
+    "no_results": "Ez da aurkitu zure bilaketarekin bat datorren galderarik.",
+    "cta_title": "Ez duzu erantzuna aurkitzen?",
+    "cta_desc": "Kontsulta bereziren bat baduzu edota laguntza tekniko pertsonalizatua behar baduzu, ez izan zalantzarik guri idazteko.",
+    "cta_button": "Jarri Harremanetan Laguntzarekin",
+    "categories": {
+      "mus": "Musa eta txapelketak",
+      "mgmt": "Kudeaketa eta Antolakuntza",
+      "account": "Kontua eta Datuak",
+      "ads": "Publizitatea eta Finantzaketa"
+    },
+    "questions": {
+      "mus": [
+        {
+          "q": "Zer txapelketa mota sor ditzaket?",
+          "a": "Hiru txapelketa formatu nagusi sor ditzakezu: Kanporaketa Zuzena (kontsolazio koadro lagungarriarekin), Liga (denak denon aurka) ohiko jardunaldiekin, eta formatu hibridoa: Multzoen Ligaxka + Fase Finala, txapelketa azkar eta bidezkoentzako aproposa dena. Laster Ceros formatu tradizionala ere gehituko dugu."
+        },
+        {
+          "q": "Zenbat bikote erregistratu ditzaket txapelketa batean?",
+          "a": "Aplikazioak ez du muga zorrotzik ezartzen. 4 bikoteko txapelketa txikietatik hasi eta 128 bikote baino gehiagoko makro-ekitaldietaraino kudeatu ditzakezu. Sistemak mahai kopurua eta beharrezkoak diren txandak automatikoki moldatuko ditu aukeratutako formatuaren arabera."
+        },
+        {
+          "q": "Zure txapelketa pribatu bat egiteko aukerarik al dago?",
+          "a": "Bai, erabat! Txapelketa bat sortu edo editatzean, \"Pribatutasuna\" aukera hauta dezakezu pribatu egiteko. Modu honetan, ez da bilatzaileetan edota webguneko zerrenda publikoetan agertuko. Zuk partekatzen duzun esteka zuzena dutenek bakarrik ikusi ahal izango dituzte emaitzak eta gurutzaketak."
+        },
+        {
+          "q": "Nola sortzen da kanporaketa koadroa automatikoki?",
+          "a": "Administrazio fitxan bikote parte-hartzaileak baieztatu ondoren, formatua Kanporaketakoa bada, sistemak zozketa aleatorio bidezko bat egingo du bikoteak lotzeko eta joko-mahaiak klik bakar batekin antolatzeko. Formatu hibridoa bada, azken koadroa automatikoki sortuko da multzoen fasea amaitzean, sailkapen ofizialetan oinarrituta."
+        },
+        {
+          "q": "Emaitzak aldatu ditzaket behin sartu ondoren?",
+          "a": "Bai, txapelketaren antolatzaile eta sortzaile gisa, emaitzak editatzeko askatasun osoa duzu edozein unetan partiden administrazio ataletik. Sailkapen orokorra eta hurrengo gurutzaketak automatikoki eta berehala birkalkulatuko dira markagailu berria gordetzerakoan."
+        },
+        {
+          "q": "Zer gertatzen da bikote kopuru bakoitia badago liga batean?",
+          "a": "Sistema prest dago bikote kopuru bakoitiak modu adimentsuan kudeatzeko. Jardunaldi bakoitzean, bikote bati \"Atseden\" egoera esleituko zaio automatikoki. Sailkapen orokorrean, jokaturiko partidak modu proportzional eta garbian konpentsatzen dira, arauzko ibilbidea aldatu gabe."
+        }
+      ],
+      "mgmt": [
+        {
+          "q": "Delegatu dezaket txapelketa baten kudeaketa beste pertsona batengan?",
+          "a": "Gaur egun, kudeaketa txapelketa sortu duen antolatzailearen kontuari lotuta dago. Hala ere, ko-administratzaile sistema batean ari gara lanean gogotsu, erregistratutako beste erabiltzaile batzuk gonbidatu ahal izateko emaitzak sartu eta mahaiak euren gailuetatik aldi berean konfiguratu ditzaten."
+        },
+        {
+          "q": "Nola partekatzen dut txapelketa parte-hartzaileekin?",
+          "a": "Zure txapelketaren aginte-panelean \"Esteka Kopiatu\" botoia aurkituko duzu. Lotura hau WhatsApp, Telegram, posta elektroniko edota sare sozialen bidez bidal dezakezu. Parte-hartzaileek esteka ireki eta sailkapen zein gurutzaketa guztiak denbora errealean ikusi ahal izango dituzte, konturik sortu edo aplikaziorik instalatu gabe."
+        },
+        {
+          "q": "Gehitu al diezaioket kartel edo irudi bat nire txapelketari?",
+          "a": "Bai! Txapelketa sortzean zein ondoren editatzean, JPG edo PNG formatuko irudi bat igo dezakezu kartel ofizial gisa erabili dadin. Irudi hau nabarmen agertuko da txapelketaren goiburuan, parte-hartzaileen ikuspegi publikoan eta plataformaren zerrenda orokorrean."
+        },
+        {
+          "q": "Parte-hartzaileek emaitzak denbora errealean ikus ditzakete?",
+          "a": "Bai, plataforma berehala eguneratzen da. Zure panelean mahai bateko emaitza gorde bezain laster, txapelketaren ikuspegi publikoa ikusten ari den edozein parte-hartzailek markagailu eguneratua, sailkapeneko aldaketak eta hurrengo gurutzaketa berehala ikusiko ditu."
+        },
+        {
+          "q": "Esportatu ditzaket txapelketako emaitzak?",
+          "a": "Gaur egun, emaitza eta sailkapenak modu digitalean gordetzen dira betirako, nahi duzunean kontsultatu ahal izateko. PDF eta kalkulu-orri (Excel) formatuetan deskargatzeko aukera garatzen ari gara, antolatzaileek sailkapen ofizialak fisikoki artxibatu edota inprimatu ditzaten."
+        }
+      ],
+      "account": [
+        {
+          "q": "Izanda ditzaket hainbat txapelketa aktibo aldi berean?",
+          "a": "Bai, ez dago mugarik aldi berean kudeatu ditzakezun txapelketa kopuruan. Antolatzaile gisa, hainbat txapelketa aldi berean administratu ditzakezu lokal berean edo kokapen ezberdinetan, inolako interferentziarik gabe."
+        },
+        {
+          "q": "Nola ezabatzen ditut nire kontua eta datuak?",
+          "a": "Zure pribatutasuna erabat errespetatzen dugu. Zure kontua bertan behera utzi eta hari lotutako informazio guztia (sortutako txapelketak barne) betiko ezabatu nahi baduzu, idatz iezaguzu eskaera ofiziala info@musmanager.com helbidera zure erregistratutako epostatik, eta berehala ezabatzeari ekingo diogu."
+        },
+        {
+          "q": "Nire datuak seguru al daude?",
+          "a": "Erabat. Zure informazio pertsonala eta txapelketen erregistroak HTTPS konexio seguru eta zifratuen bidez transmititzen dira eta segurtasun-protokolo industrialak dituzten hodeiko zerbitzarietan gordetzen dira. Inoiz ez ditugu zure datuak salduko edota baimenik gabeko hirugarrenekin partekatuko."
+        }
+      ],
+      "ads": [
+        {
+          "q": "Zergatik dago publizitatea aplikazioan?",
+          "a": "Mus Manager doako tresna, eskuragarria eta kalitate handikoa mantendu ahal izateko zaletu guztien komunitatearentzat, harpidetza-tasarik gabe. Publizitate-sarrerek zerbitzarien, datu-baseen eta garapen teknikoaren mantentze-gastuak ordaintzen laguntzen digute."
+        },
+        {
+          "q": "Publizitatea adingabeei zuzenduta dago?",
+          "a": "Ez. Mus Manager-ek zorrotz betetzen ditu adingabeak babesteko lege-araudiak. Publizitate-iragazki aurreratuak erabiltzen ditugu eduki desegokiak edo adingabeei zuzendutakoak saihesteko, uneoro nabigazio seguru eta errespetuzkoa bermatuz."
+        },
+        {
+          "q": "Erabili dezaket aplikazioa publizitaterik ikusi gabe?",
+          "a": "Gaur egun, kudeaketa eta ikuspen tresna guztien sarbide osoa iragarkien bidez mantentzen da doakotasuna bermatzeko. Hala ere, etorkizunean iragarkirik gabeko harpidetza premium bat eskaintzeko aukera aztertzen ari gara, saltoki komertzial edo federazioentzako."
+        }
+      ]
+    }
+  },
+  "reglas_page": {
+    "title": "Ikasi Musean Jolasten eta Txapelketak Antolatzen",
+    "subtitle": "Mus erreglamentu tradizionalari, estrategia aurreratuei eta txapelketen kudeaketa profesionalari buruzko behin betiko gida.",
+    "nav_rules": "Erreglamentu Ofiziala",
+    "nav_strategy": "Estrategia eta Taktikak",
+    "nav_org": "Txapelketen Antolakuntza",
+    "rules_title": "1. Mus Erreglamentu Ofiziala (4 Errege / 8 Errege)",
+    "rules_intro": "Musa ehunka urteko historia duen Espainiako karta-joko tradizionala da. Bikoteka jokatzen da (4 jokalari guztira) eta estrategia, psikologia, kartak baztertzea (deskartea) eta, batez ere, farol egitearen artea uztartzen ditu.",
+    "rules_deck_title": "Karta-jokoa eta Karten Balioa",
+    "rules_deck_text": "Espainiako 40 kartako multzoa erabiltzen da. Formatrik ohikoenean (8 Errege, Nafarroan eta Euskal Herrian ohikoa dena), Hirukoek Erregeen balioa dute (irudiak) eta Bikokoek Asen balioa (pitoak). Horrela, 8 Errege eta 8 As daude karta-jokoan. 4 Erregeko formatuan (gaztelako musean ohikoa dena), karta bakoitzak bere jatorrizko balio izendatua mantentzen du eta ez dira baliokidetza horiek egiten.",
+    "rules_rounds_title": "Musaren Lau Ustaldiak",
+    "rules_rounds_intro": "Esku bakoitzak ezinbestean lau ustaldi edo norgehiagoka ditu, orden zorrotz honetan jokatzen direnak:",
+    "rules_round1_title": "Handia:",
+    "rules_round1_desc": "Karta izendatu altuenak dituen bikoteak irabazten du (Erregeak, Zaldiak, Txanpak...). Ordena handienetik txikienera da.",
+    "rules_round2_title": "Txikia:",
+    "rules_round2_desc": "Karta izendatu baxuenak dituen bikoteak irabazten du. Ordena alderantzizkoa da (Asak, bikokoak/pitoak, hirukoak...).",
+    "rules_round3_title": "Pareak:",
+    "rules_round3_desc": "Gutxienez bi karta berdin izatea eskatzen da. Hiru pare mota daude: Pare sinplea (bi karta berdin), Erdikoak (hiru karta berdin) eta Dupleak (lau karta berdin edo bi pare berdin). Dupleak Erdikoak gainditzen ditu, eta Erdikoak Parea. Pare mota bera izatekotan, baliorik altuenak irabazten du.",
+    "rules_round4_title": "Jokoa edo Puntua:",
+    "rules_round4_desc": "Karten balioak batzen dira (Irudiek 10 balio dute, Asek 1, eta gainerakoek beren balio izendatua). Baturak 31 edo gehiago ematen badu, 'Jokoa' daukate jokalariek. Jokorik onena 31 da, eta ondoren 40, 36, 35, 34, 33 eta 32. Inork ez badu 31 lortzen, 'Puntura' jokatzen da, eta 30era gehien hurbiltzen denak irabazten du.",
+    "rules_betting_title": "Apustua eta Tantuak",
+    "rules_betting_text": "Ustaldi bakoitzean, lehen hitza duenak (eskuak) 'Paso' edo 'Enbido' (2 tantuko apustua) esan dezake. Aurkariak 'Nahi' (onartu), 'Paso' (apustua utzi, tantu 1 galduz) edo 'Berrenbido' (apustua igotzea) esan dezake. Apustu nagusia 'Hordagoa' da, joko edo chico osoa jokoan jartzen duena. Aurkariak hordagoa onartzen badu, kartak berehala erakusten dira chicoa nork irabazten duen erabakitzeko.",
+    "strategy_title": "2. Estrategia eta Taktika Aurreratuak",
+    "strategy_intro": "Musa informazio osatugabeko jokoa da, non bikotearen arteko koordinazioak eta aurkarien irakurketak txapeldun handiak definitzen dituen.",
+    "strategy_card1_title": "Kartak Baztertzeko Artea (Deskartea)",
+    "strategy_card1_desc": "Kartak noiz eskatu (musa eman) and noiz moztu (musrik ez eman) jakitea ezinbestekoa da. Esku izatea (hitz egiten lehena) abantaila taktiko handia da. Karta onak badituzu edo aurkarien deskartea moztu nahi baduzu, esan 'Ez dago musrik'. Deskarte selektiboak zure bikoteari zure asmoak asmatzen laguntzen dio.",
+    "strategy_card2_title": "Apustu Psikologikoa (Farola)",
+    "strategy_card2_desc": "Farola (karta onik gabe enbidatzea) jokoaren esentzia da. Farolari on batek aurkariaren gorputz-hizkuntza eta apustu historiala aztertzen ditu. Gakoa koherentzia da: zure apustuek istorio sinesgarri bat kontatu behar dute. Ez enbidatu beti karta onak izatean bakarrik, ezta farol egin atzera-biderik gabe.",
+    "strategy_card3_title": "Komunikazioa eta Baimendutako Zeinuak",
+    "strategy_card3_desc": "Musak zure bikoteari karten berri emateko aurpegi-zeinu kodetu eta ofizialak erabiltzea ahalbidetzen du. Guztiz debekatuta dago zeinuekin gezurra esatea, zeinu faltsuak egitea edo zeinua aurkariari ezkutatzea hark zuzenean begiratzen badizu. Zeinu ofizialak dira: beheko ezpaina hozkatzea (bi errege), mihia ateratzea (bi as), begia keztatzea (erdikoak), kulkak jasotzea (dupleak), ahoa bihurritzea (31 jokora) eta sorbaldak jasotzea (ez daramat ezer/parerik gabe).",
+    "org_title": "3. Mus Txapelketa Antolatzeko Gida",
+    "org_intro": "Txapelketa arrakastatsu bat antolatzeak zorroztasun matematikoa eskatzen du emparejamenduetan eta jokalariek erraz ulertzeko moduko egitura argia.",
+    "org_card1_title": "Zuzeneko Kanporaketa Formatua",
+    "org_card1_desc": "Formatu klasiko eta zirraragarriena. Bikoteak zozketa bidez parekatzen dira eta elkarren aurka lehiatzen dira. Joko gehiago emateko, txapelketa tradizional askok 'Kanporaketa Bikoitza' edo 'Erreenganxe' (Kontsolazioa) sistema erabiltzen dute; lehen partida galtzen duten bikoteak bigarren koadro batera igarotzen dira, final handira iristeko bigarren aukera bat izanez.",
+    "org_card2_title": "Liga Sistema (Denak Denen Aurka)",
+    "org_card2_desc": "Egokia bilerak aldizka (astero edo hilero) egiten dituzten peña eta klub egonkorrentzat. Bikote guztiek elkarren aurka jokatzen dute hainbat jardunalditan zehar. Irabazitako partida bakoitzeko 3 puntu ematen dira eta galdutako bakoitzeko 1 (edo tokiko araudiaren arabera). Berdinketa hautustea irabazitako eta galdutako chicoen alde orokorrak erabikitzen du, eta azkenik tantu kopuruak.",
+    "org_card3_title": "Multzoen Fasea + Amaierako Fasea",
+    "org_card3_desc": "Formatu hibrido ezin hobea asteburu bateko txapelketa ertain eta handietarako. Bikoteak 4 edo 5 taldetako multzotan banatzen dira. Liguilla azkar bat jokatzen dute eta talde bakoitzeko 2 onenak zuzeneko kanporaketa koadrorako sailkatzen dira. Kanporaketa saioak hasi aurretik jokalari guztiek gutxieneko partida kopuru bat jokatuko dutela bermatzen du.",
+    "rules_variant_title": "Erregeen Aldagaia",
+    "rules_variant_text": "Musean 4 Erregerekin (jatorrizkoa) edo 8 Erregerekin (Nafarroa/Euskal Herria) joka daiteke. 8 Erregerekin, Hirukoak Erregetzat hartzen dira, eta Bikokoak Asotzat. Ezinbestekoa da aldagaia zehaztea banatu aurretik!",
+    "rules_lance_label": "{num}. Ustaldia"
   }
 }

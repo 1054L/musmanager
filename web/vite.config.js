@@ -8,11 +8,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://api:80',
+        target: process.env.VITE_API_PROXY || 'http://127.0.0.1:8002',
         changeOrigin: true
       },
       '/uploads': {
-        target: 'http://api:80',
+        target: process.env.VITE_API_PROXY || 'http://127.0.0.1:8002',
         changeOrigin: true
       }
     },

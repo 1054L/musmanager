@@ -42,6 +42,8 @@
     "organizer": "Organizador",
     "about": "Sobre Nosotros",
     "howItWorks": "¿Cómo funciona?",
+    "rules": "Reglamento",
+    "faq": "FAQ",
     "theme": "Cambiar Tema",
     "lightMode": "Modo Claro",
     "darkMode": "Modo Oscuro",
@@ -110,7 +112,13 @@
     "detailed_section": {
       "title": "Potencia bajo el capó",
       "p1": "Mus Manager no es solo una cara bonita; es un motor de cálculo optimizado para las complejas casuísticas del Mus. Hemos invertido cientos de horas en asegurar que los algoritmos de emparejamiento respeten las normas tradicionales, evitando que parejas del mismo club se enfrenten prematuramente o asegurando una distribución de mesas equitativa.",
-      "p2": "Nuestra arquitectura en la nube garantiza que los datos estén seguros y accesibles 24/7. Si tu batería se agota o pierdes la conexión, el sistema guarda automáticamente el último estado del torneo. Además, nuestra API está preparada para integrarse con pantallas gigantes en los locales de juego, permitiendo una experiencia de 'Estadio' que dejará boquiabiertos a tus socios."
+      "p2": "Nuestra arquitectura en la nube garantiza que los datos estén seguros y accesibles 24/7. Si tu batería se agota o pierdes la conexión, el sistema guarda automáticamente el último estado del torneo. Además, nuestra API está preparada para integrarse con pantallas gigantes en los locales de juego, permitiendo una experiencia de 'Estadio' que dejará boquiabiertos a tus socios.",
+      "infra_title": "Infraestructura",
+      "infra_desc": "Cloud 24/7 Autoscale",
+      "security_title": "Seguridad",
+      "security_desc": "AES-256 Encryption",
+      "performance_title": "Rendimiento",
+      "performance_desc": "Real-time Event Bus"
     }
   },
   "stats": {
@@ -299,6 +307,7 @@
     "company": "Empresa",
     "about": "Nosotros",
     "contact": "Contacto",
+    "faq": "FAQ",
     "legal": "Legal",
     "subscribe": "Subscríbete",
     "rights": "© 2026 Mus Manager. Todos los derechos reservados.",
@@ -438,7 +447,13 @@
     "forgot_password_title": "Recuperar Contraseña | Mus Manager",
     "forgot_password_desc": "Recupera el acceso a tu cuenta de Mus Manager.",
     "reset_password_title": "Restablecer Contraseña | Mus Manager",
-    "reset_password_desc": "Elige una nueva contraseña segura para tu cuenta."
+    "reset_password_desc": "Elige una nueva contraseña segura para tu cuenta.",
+    "contacto_title": "Contacto y Soporte | Mus Manager",
+    "contacto_desc": "Contacta con Mus Manager. Formulario de soporte y correo electrónico oficial de contacto info@musmanager.com.",
+    "faq_title": "Preguntas Frecuentes | Mus Manager",
+    "faq_desc": "Resuelve tus dudas sobre el Mus, los torneos, la gestión, tu cuenta y la publicidad en Mus Manager.",
+    "reglas_title": "Reglas del Mus | Guía Completa de Reglamento y Estrategia",
+    "reglas_desc": "Aprende las reglas oficiales de Mus (4 reyes y 8 reyes), estrategias y tácticas de juego y cómo organizar torneos profesionales."
   },
   "tournaments_page": {
     "title": "Torneos",
@@ -663,6 +678,7 @@
     "generate_matches": "Generar Calendario de Partidas"
   },
   "how_it_works_page": {
+    "step_label": "Paso {step}",
     "title": "Tu Torneo, Paso a Paso",
     "subtitle": "Descubre lo fácil que es profesionalizar tu peña de Mus.",
     "intro": "Organizar un torneo de Mus no debería ser un examen de matemáticas. En Mus Manager hemos simplificado el proceso para que cualquier persona, sin importar sus conocimientos tecnológicos, pueda lanzar un evento exitoso en cuestión de minutos. Aquí te explicamos el camino desde el registro hasta el podio.",
@@ -785,5 +801,160 @@
     "checkbox_label": "He leído y acepto los Términos y Condiciones de Uso y la Política de Privacidad de Mus Manager.",
     "accept_btn": "ACEPTAR Y CONTINUAR",
     "error_accepting": "Error al aceptar los términos. Inténtalo de nuevo."
+  },
+  "contacto": {
+    "title": "Contacto y Soporte",
+    "subtitle": "Estamos aquí para ayudarte. Ponte en contacto con nosotros para cualquier duda o consulta.",
+    "email_us": "Escríbenos directamente a",
+    "form_title": "Enviar un mensaje",
+    "name": "Nombre",
+    "name_placeholder": "Tu nombre completo",
+    "email": "Email de contacto",
+    "email_placeholder": "tu@email.com",
+    "subject": "Asunto",
+    "subject_placeholder": "Ej: Duda sobre torneos, Problema técnico...",
+    "message": "Mensaje",
+    "message_placeholder": "Escribe aquí tu mensaje detallado...",
+    "submit": "Enviar Mensaje",
+    "sending": "Enviando...",
+    "success": "¡Mensaje enviado con éxito! Nos pondremos en contacto contigo lo antes posible.",
+    "error": "Ha ocurrido un error al enviar el mensaje. Por favor, inténtalo de nuevo o escríbenos directamente.",
+    "has_questions": "¿Tienes dudas sobre Mus Manager? Te recomendamos consultar nuestro completo centro de Preguntas Frecuentes (FAQ) antes de escribirnos.",
+    "view_faq": "Ver Preguntas Frecuentes"
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Todo lo que necesitas saber sobre Mus Manager",
+    "search_placeholder": "Buscar pregunta...",
+    "no_results": "No se encontraron preguntas que coincidan con tu búsqueda.",
+    "cta_title": "¿No encuentras la respuesta?",
+    "cta_desc": "Si tienes una consulta particular o necesitas soporte técnico personalizado, no dudes en escribirnos.",
+    "cta_button": "Contactar con Soporte",
+    "categories": {
+      "mus": "El Mus y los torneos",
+      "mgmt": "Gestión y Organización",
+      "account": "Cuenta y Datos",
+      "ads": "Publicidad y Financiación"
+    },
+    "questions": {
+      "mus": [
+        {
+          "q": "¿Qué tipos de torneo puedo crear?",
+          "a": "Puedes crear tres formatos principales de competición: Eliminación Directa (con cuadro de consolación opcional), Liga (todos contra todos) donde juegas jornadas regulares, y el formato híbrido de Liguilla + Fase Final, ideal para torneos rápidos pero justos. Próximamente añadiremos el formato tradicional de Ceros."
+        },
+        {
+          "q": "¿Cuántas parejas puedo inscribir en un torneo?",
+          "a": "No hay un límite estricto impuesto por la aplicación. Puedes gestionar desde pequeños torneos de 4 parejas hasta macroeventos de más de 128 parejas. El sistema adaptará automáticamente el número de mesas y las rondas necesarias según el formato elegido."
+        },
+        {
+          "q": "¿Puedo crear un torneo privado que solo vean los participantes?",
+          "a": "¡Sí, totalmente! Al crear o editar un torneo, puedes marcar la opción de \"Privacidad\" para hacerlo privado. Esto evitará que aparezca en los buscadores y listados públicos de la web. Solo las personas que tengan el enlace directo que tú compartas podrán acceder a ver los resultados y emparejamientos."
+        },
+        {
+          "q": "¿Cómo se genera el cuadro de eliminatorias automáticamente?",
+          "a": "Una vez confirmadas las parejas participantes en la pestaña de Administración, si el formato es de Eliminatoria, el sistema realiza un sorteo aleatorio justo para emparejar a los participantes y ubicar las mesas de juego con un solo clic. Si es un formato híbrido, el cuadro final se genera de forma automática al finalizar la fase de grupos basándose en las clasificaciones oficiales."
+        },
+        {
+          "q": "¿Puedo modificar los resultados una vez introducidos?",
+          "a": "Sí, como administrador y creador del torneo, tienes total libertad para corregir cualquier resultado en cualquier momento desde la sección de administración de la partida. La clasificación general y los siguientes cruces se recalcularán de forma automática e inmediata al guardar el nuevo marcador."
+        },
+        {
+          "q": "¿Qué pasa si hay un número impar de parejas en una liga?",
+          "a": "El sistema está preparado para gestionar números impares de equipos de forma inteligente. En cada jornada, una de las parejas tendrá un estado de \"Descanso\" asignado automáticamente. En la clasificación general, se compensan las partidas jugadas de forma proporcional y limpia sin alterar el transcurso reglamentario."
+        }
+      ],
+      "mgmt": [
+        {
+          "q": "¿Puedo delegar la gestión de un torneo a otra persona?",
+          "a": "Actualmente, la gestión está vinculada a la cuenta del organizador que creó el torneo. Sin embargo, estamos trabajando activamente en un sistema de co-administradores para permitir que invites a otros usuarios registrados a introducir resultados y configurar las mesas desde sus propios dispositivos de forma simultánea."
+        },
+        {
+          "q": "¿Cómo comparto el torneo con los participantes?",
+          "a": "En el panel de control de tu torneo encontrarás un botón para \"Copiar Enlace\". Puedes enviar este enlace web por WhatsApp, Telegram, correo electrónico o redes sociales. Los participantes podrán abrirlo y ver toda la información de clasificaciones y cruces en vivo sin necesidad de tener una cuenta o instalar nada."
+        },
+        {
+          "q": "¿Puedo añadir un cartel o imagen al torneo?",
+          "a": "¡Sí! Durante la creación del torneo o en su edición posterior, puedes subir una imagen en formato JPG o PNG para que actúe como el cartel oficial. Esta imagen aparecerá de forma prominente en la cabecera del torneo, en la vista pública de los participantes y en el listado general de la plataforma."
+        },
+        {
+          "q": "¿Los participantes pueden ver los resultados en tiempo real?",
+          "a": "Sí, la plataforma se actualiza de forma instantánea. En cuanto guardas el resultado de una mesa en tu panel, cualquier participante que esté visualizando la vista pública del torneo verá el marcador actualizado, los cambios en la clasificación y el siguiente emparejamiento de forma inmediata."
+        },
+        {
+          "q": "¿Puedo exportar los resultados del torneo?",
+          "a": "Actualmente los resultados y clasificaciones se almacenan digitalmente de forma permanente para que puedas consultarlos siempre que quieras. Estamos implementando una opción de descarga en formato PDF y hoja de cálculo (Excel) para que los organizadores puedan archivar o imprimir las clasificaciones oficiales de forma física."
+        }
+      ],
+      "account": [
+        {
+          "q": "¿Puedo tener varios torneos activos a la vez?",
+          "a": "Sí, no hay restricciones sobre la cantidad de torneos simultáneos que puedes tener bajo tu gestión. Como organizador, puedes llevar la administración de varios torneos de forma paralela en el mismo local o en diferentes ubicaciones sin interferencias."
+        },
+        {
+          "q": "¿Cómo elimino mi cuenta y mis datos?",
+          "a": "Respetamos tu privacidad al máximo. Si deseas dar de baja tu cuenta y borrar de forma permanente toda la información asociada a ella (incluidos torneos creados), puedes enviarnos una solicitud formal desde tu correo registrado a info@musmanager.com y procederemos al borrado inmediato."
+        },
+        {
+          "q": "¿Mis datos están seguros?",
+          "a": "Absolutamente. Toda la información personal y los registros de tus torneos se transmiten mediante conexiones seguras cifradas HTTPS y se almacenan en servidores en la nube con protocolos de seguridad industriales. Nunca venderemos tus datos ni los compartiremos con terceros no autorizados."
+        }
+      ],
+      "ads": [
+        {
+          "q": "¿Por qué hay publicidad en la app?",
+          "a": "Para mantener Mus Manager como una herramienta gratuita, accesible y de alta calidad para toda la comunidad de aficionados sin requerir cuotas de suscripción. Los ingresos publicitarios nos permiten sufragar los costes de los servidores, la base de datos y el mantenimiento del desarrollo técnico."
+        },
+        {
+          "q": "¿La publicidad está dirigida a menores?",
+          "a": "No. Mus Manager cumple estrictamente con las normativas legales de protección del menor. Implementamos filtros publicitarios avanzados para evitar la aparición de contenidos inapropiados o dirigidos a menores, promoviendo una navegación segura y respetuosa en todo momento."
+        },
+        {
+          "q": "¿Puedo usar la app sin ver publicidad?",
+          "a": "Actualmente el acceso completo a todas las herramientas de organización y visualización se sustenta mediante anuncios para garantizar la gratuidad. No obstante, estamos evaluando la posibilidad de introducir en el futuro una suscripción premium libre de anuncios para locales comerciales o federaciones."
+        }
+      ]
+    }
+  },
+  "reglas_page": {
+    "title": "Aprende a Jugar y Organizar Mus",
+    "subtitle": "La guía definitiva sobre el reglamento tradicional del Mus, estrategias avanzadas y sistemas organizativos profesionales.",
+    "nav_rules": "Reglamento Oficial",
+    "nav_strategy": "Estrategias y Tácticas",
+    "nav_org": "Organización de Torneos",
+    "rules_title": "1. Reglamento Oficial del Mus (4 Reyes / 8 Reyes)",
+    "rules_intro": "El Mus es un juego de cartas tradicional de baraja española con siglos de historia. Se juega por parejas (4 jugadores en total) y destaca por su combinación de estrategia, psicología, descarte y, sobre todo, el arte de farolear.",
+    "rules_deck_title": "La Baraja y Valor de las Cartas",
+    "rules_deck_text": "Se utiliza una baraja española de 40 cartas. En la variante más común (8 Reyes, típica del Mus de Navarra y País Vasco), los Treses equivalen a Reyes (figuras) y los Doses equivalen a Ases (pitos). Así, hay 8 Reyes y 8 Ases en la baraja. En la variante de 4 Reyes (típica del Mus castellano), cada carta mantiene su valor nominal original y no se realizan estas equivalencias.",
+    "rules_rounds_title": "Los Cuatro Lances del Mus",
+    "rules_rounds_intro": "Cada mano consta obligatoriamente de cuatro lances independientes que se juegan en el siguiente orden estricto:",
+    "rules_round1_title": "Grande:",
+    "rules_round1_desc": "Gana la pareja con las cartas de mayor valor nominal (Reyes, Caballos, Sotas...). El orden es de mayor a menor.",
+    "rules_round2_title": "Chica:",
+    "rules_round2_desc": "Gana la pareja con las cartas de menor valor. El orden es inverso (Ases, doses/pitos, treses...).",
+    "rules_round3_title": "Pares:",
+    "rules_round3_desc": "Se requiere tener al menos dos cartas iguales. Hay tres tipos de pares: Par simple (dos cartas iguales), Medias (tres cartas iguales) y Duples (cuatro cartas iguales o dos parejas de cartas iguales). Duples gana a Medias, y Medias gana a Par. A igual tipo, gana el de mayor valor.",
+    "rules_round4_title": "Juego o Punto:",
+    "rules_round4_desc": "Se suman los valores de las 4 cartas (Figuras valen 10, Ases valen 1, otras cartas su valor). Si la suma es 31 o más, se tiene 'Juego'. El mejor juego es 31, seguido de 40, 36, 35, 34, 33 y 32. Si nadie alcanza 31, se juega al 'Punto', ganando el que más se acerque a 30.",
+    "rules_betting_title": "El Envite y los Tantos",
+    "rules_betting_text": "En cada lance, el jugador mano inicia el turno diciendo 'Paso' o 'Envido' (apuesta 2 tantos). La pareja rival puede 'Querer' (aceptar), 'Pasar' (retirarse, perdiendo 1 tanto) o 'Reenvidar' (aumentar la apuesta). El envite supremo es el 'Órdago', donde se apuesta todo el juego (chico) completo. Si el rival acepta un órdago, se muestran las cartas inmediatamente para decidir quién gana el chico.",
+    "strategy_title": "2. Estrategias y Tácticas Avanzadas",
+    "strategy_intro": "El Mus es un juego de información incompleta donde la coordinación con tu pareja y la lectura de los rivales define a los verdaderos campeones.",
+    "strategy_card1_title": "El Arte de Descartarse",
+    "strategy_card1_desc": "Saber cuándo pedir cartas (dar mus) y cuándo cortar (no dar mus) es vital. Ser 'mano' (el primero en hablar) es una ventaja táctica inmensa. Si tienes buena mano o quieres cortar el juego de los rivales, di 'No hay mus'. El descarte selectivo ayuda a tu compañero a deducir tus intenciones.",
+    "strategy_card2_title": "El Envite Psicológico (Farol)",
+    "strategy_card2_desc": "El farol (apostar sin llevar juego o pares) es la esencia del juego. Un buen farolero estudia la gestualidad del rival y su historial de apuestas. La clave es la consistencia: tus envites deben contar una historia creíble. No envides siempre con buenas cartas, ni farolees sin salida.",
+    "strategy_card3_title": "Comunicación y Señas Autorizadas",
+    "strategy_card3_desc": "El Mus permite transmitir información sobre tus cartas a tu pareja mediante señas faciales codificadas y oficiales. Está estrictamente prohibido mentir con las señas, hacer señas falsas o esconderlas al rival si este te está mirando directamente. Las señas oficiales son: morderse el labio inferior (dos reyes), sacar la lengua (dos ases), guiñar un ojo (medias), levantar las cejas (duples), torcer la boca (31 al juego) y encoger los hombros (no llevo nada).",
+    "org_title": "3. Guía de Organización de Torneos de Mus",
+    "org_intro": "Organizar un torneo exitoso requiere rigor matemático en los emparejamientos y una estructura clara que los jugadores puedan comprender fácilmente.",
+    "org_card1_title": "Formato de Eliminatorias Directas",
+    "org_card1_desc": "El formato clásico y más emocionante. Las parejas se emparejan por sorteo y compiten. Para dar más juego, muchos torneos tradicionales utilizan el sistema de 'Doble Eliminación' o 'Reenganche' (Consolación), donde las parejas que pierden su primera partida pasan a un cuadro secundario, teniendo una segunda oportunidad para llegar a la gran final.",
+    "org_card2_title": "Sistema de Liga (Todos contra Todos)",
+    "org_card2_desc": "Ideal para peñas y clubes estables con reuniones periódicas (semanales o mensuales). Todas las parejas juegan entre sí a lo largo de varias jornadas. Se otorgan 3 puntos por partida ganada y 1 por perdida (o según reglamento local). El desempate se decide por la diferencia general de chicos ganados y perdidos, y en última instancia por la suma de tantos.",
+    "org_card3_title": "Fase de Grupos + Fase Final",
+    "org_card3_desc": "El formato híbrido perfecto para torneos medianos y grandes de un fin de semana. Las parejas se dividen en grupos de 4 o 5 equipos. Juegan una liguilla rápida y los 2 mejores de cada grupo clasifican al cuadro final de eliminación directa. Garantiza que todos jueguen un número mínimo de partidas antes de las rondas eliminatorias.",
+    "rules_variant_title": "Variante de Reyes",
+    "rules_variant_text": "El mus se puede jugar a 4 Reyes (original) o 8 Reyes (Navarra/País Vasco). Con 8 reyes, las cartas 3 se consideran Reyes, y las cartas 2 se consideran Ases. ¡Es crucial definir la variante antes de repartir!",
+    "rules_lance_label": "Lance {num}"
   }
 }

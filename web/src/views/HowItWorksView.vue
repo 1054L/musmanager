@@ -41,14 +41,14 @@ const steps = [
            :class="i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'">
         
         <!-- Icon Node -->
-        <div class="absolute left-0 md:left-1/2 md:-translate-x-1/2 w-10 h-10 rounded-full bg-[#0fb361] flex items-center justify-center z-10 shadow-[0_0_20px_rgba(15,179,97,0.4)]">
+        <div class="timeline-icon-node">
           <i :class="'pi ' + step.icon" class="text-black font-bold"></i>
         </div>
 
         <!-- Content Card -->
         <div class="w-full md:w-[45%] pl-14 md:pl-0">
           <div class="mus-glass p-8 rounded-3xl border-white/5 hover:border-emerald-500/20 transition-all group">
-            <span class="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest block mb-2">Paso {{ i + 1 }}</span>
+            <span class="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest block mb-2">{{ t('how_it_works_page.step_label', { step: i + 1 }) }}</span>
             <h3 class="mus-h3 mb-4 group-hover:text-white transition-colors">{{ t(`how_it_works_page.${step.key}.title`) }}</h3>
             <p class="mus-p-small opacity-60 leading-relaxed">{{ t(`how_it_works_page.${step.key}.desc`) }}</p>
           </div>
@@ -100,4 +100,30 @@ const steps = [
 .timeline-item:nth-child(3) { animation-delay: 0.3s; }
 .timeline-item:nth-child(4) { animation-delay: 0.4s; }
 .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+
+/* Timeline Icon Node styling to prevent stretching */
+.timeline-icon-node {
+  position: absolute !important;
+  left: 0px !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  max-width: 40px !important;
+  max-height: 40px !important;
+  border-radius: 50% !important;
+  background-color: #0fb361 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 10 !important;
+  box-shadow: 0 0 20px rgba(15, 179, 97, 0.4) !important;
+}
+
+@media (min-width: 768px) {
+  .timeline-icon-node {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
 </style>

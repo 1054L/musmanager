@@ -21,6 +21,7 @@ import { authService } from '../services/api'
           <li><router-link to="/caracteristicas" class="footer-link">{{ $t('nav.features') }}</router-link></li>
           <li><router-link to="/como-funciona" class="footer-link">{{ $t('features.how_it_works.title') }}</router-link></li>
           <li><router-link :to="{ path: '/tournaments', query: { status: 'active' } }" class="footer-link">{{ $t('nav.tournaments') }}</router-link></li>
+          <li><router-link to="/reglas-del-mus" class="footer-link">{{ $t('reglas_page.nav_rules') }}</router-link></li>
         </ul>
       </div>
 
@@ -28,7 +29,8 @@ import { authService } from '../services/api'
         <h4 class="footer-h4">{{ $t('footer.company') }}</h4>
         <ul class="footer-ul">
           <li><router-link to="/sobre-nosotros" class="footer-link">{{ $t('footer.about') }}</router-link></li>
-          <li>{{ $t('footer.contact') }}</li>
+          <li><router-link to="/contacto" class="footer-link">{{ $t('footer.contact') }}</router-link></li>
+          <li><router-link to="/faq" class="footer-link">{{ $t('footer.faq') }}</router-link></li>
         </ul>
       </div>
 

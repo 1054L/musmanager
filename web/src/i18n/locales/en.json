@@ -33,6 +33,8 @@
     "organizer": "Organizer",
     "about": "About Us",
     "howItWorks": "How it Works",
+    "rules": "Rules",
+    "faq": "FAQ",
     "theme": "Toggle Theme",
     "lightMode": "Light Mode",
     "darkMode": "Dark Mode",
@@ -101,7 +103,13 @@
     "detailed_section": {
       "title": "Power under the hood",
       "p1": "Mus Manager is not just a pretty face; it is a calculation engine optimized for the complex scenarios of Mus. We have invested hundreds of hours ensuring that matching algorithms respect traditional rules, preventing pairs from the same club from facing each other prematurely or ensuring an equitable table distribution.",
-      "p2": "Our cloud architecture ensures that data is secure and accessible 24/7. If your battery runs out or you lose connection, the system automatically saves the tournament's last state. Furthermore, our API is ready to integrate with giant screens in game venues, allowing a 'Stadium' experience that will leave your members speechless."
+      "p2": "Our cloud architecture ensures that data is secure and accessible 24/7. If your battery runs out or you lose connection, the system automatically saves the tournament's last state. Furthermore, our API is ready to integrate with giant screens in game venues, allowing a 'Stadium' experience that will leave your members speechless.",
+      "infra_title": "Infrastructure",
+      "infra_desc": "Cloud 24/7 Autoscale",
+      "security_title": "Security",
+      "security_desc": "AES-256 Encryption",
+      "performance_title": "Performance",
+      "performance_desc": "Real-time Event Bus"
     }
   },
   "stats": {
@@ -288,6 +296,7 @@
     "company": "Company",
     "about": "About Us",
     "contact": "Contact",
+    "faq": "FAQ",
     "legal": "Legal",
     "subscribe": "Subscribe",
     "rights": "© 2026 Mus Manager. All rights reserved.",
@@ -426,7 +435,13 @@
     "forgot_password_title": "Recover Password | Mus Manager",
     "forgot_password_desc": "Recover access to your Mus Manager account.",
     "reset_password_title": "Reset Password | Mus Manager",
-    "reset_password_desc": "Choose a new secure password for your account."
+    "reset_password_desc": "Choose a new secure password for your account.",
+    "contacto_title": "Contact & Support | Mus Manager",
+    "contacto_desc": "Contact Mus Manager. Support form and official contact email info@musmanager.com.",
+    "reglas_title": "Rules of Mus | Complete Guide to Rules and Strategy",
+    "reglas_desc": "Learn the official rules of Mus (4 kings and 8 kings), strategies, tactics and how to organize professional tournaments.",
+    "faq_title": "Frequently Asked Questions | Mus Manager",
+    "faq_desc": "Solve your doubts about Mus, tournaments, management, your account, and advertising in Mus Manager."
   },
   "tournaments_page": {
     "title": "Tournaments",
@@ -653,6 +668,7 @@
     "generate_matches": "Generate Match Schedule"
   },
   "how_it_works_page": {
+    "step_label": "Step {step}",
     "title": "Your Tournament, Step by Step",
     "subtitle": "Discover how easy it is to professionalize your Mus club.",
     "intro": "Organizing a Mus tournament shouldn't be a math exam. At Mus Manager, we've simplified the process so that anyone, regardless of their technical knowledge, can launch a successful event in minutes. Here we explain the path from registration to the podium.",
@@ -770,5 +786,160 @@
     "checkbox_label": "I have read and accept the Terms and Conditions of Use and the Privacy Policy of Mus Manager.",
     "accept_btn": "ACCEPT AND CONTINUE",
     "error_accepting": "Error accepting terms. Please try again."
+  },
+  "contacto": {
+    "title": "Contact & Support",
+    "subtitle": "We are here to help. Get in touch with us for any questions or inquiries.",
+    "email_us": "Write to us directly at",
+    "form_title": "Send a Message",
+    "name": "Name",
+    "name_placeholder": "Your full name",
+    "email": "Contact Email",
+    "email_placeholder": "you@email.com",
+    "subject": "Subject",
+    "subject_placeholder": "E.g., Tournament questions, Technical issues...",
+    "message": "Message",
+    "message_placeholder": "Write your detailed message here...",
+    "submit": "Send Message",
+    "sending": "Sending...",
+    "success": "Message sent successfully! We will get in touch with you as soon as possible.",
+    "error": "An error occurred while sending the message. Please try again or write to us directly.",
+    "has_questions": "Do you have questions about Mus Manager? We recommend checking our comprehensive Frequently Asked Questions (FAQ) center before contacting us.",
+    "view_faq": "View Frequently Asked Questions"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about Mus Manager",
+    "search_placeholder": "Search question...",
+    "no_results": "No questions found matching your search.",
+    "cta_title": "Can't find the answer?",
+    "cta_desc": "If you have a specific inquiry or need personalized technical support, don't hesitate to write to us.",
+    "cta_button": "Contact Support",
+    "categories": {
+      "mus": "Mus & Tournaments",
+      "mgmt": "Management & Organization",
+      "account": "Account & Data",
+      "ads": "Advertising & Funding"
+    },
+    "questions": {
+      "mus": [
+        {
+          "q": "What types of tournaments can I create?",
+          "a": "You can create three main competition formats: Direct Knockout (with an optional consolation bracket), League (round-robin) where you play regular matches, and the hybrid Group Stage + Final Stage format, ideal for fast but fair tournaments. We will be adding the traditional Ceros format soon."
+        },
+        {
+          "q": "How many pairs can I register in a tournament?",
+          "a": "There is no strict limit imposed by the application. You can manage everything from small tournaments of 4 pairs to macro-events of more than 128 pairs. The system will automatically adapt the number of tables and rounds required based on the chosen format."
+        },
+        {
+          "q": "Can I create a private tournament that only participants can see?",
+          "a": "Yes, absolutely! When creating or editing a tournament, you can check the \"Privacy\" option to make it private. This will prevent it from appearing in search engines and public listings on the website. Only people with the direct link you share will be able to access and view the results and pairings."
+        },
+        {
+          "q": "How is the knockout bracket generated automatically?",
+          "a": "Once the participating pairs are confirmed in the Administration tab, if the format is Knockout, the system performs a fair random draw to pair the participants and arrange the play tables with a single click. If it's a hybrid format, the final bracket is automatically generated at the end of the group stage based on the official standings."
+        },
+        {
+          "q": "Can I modify results once they have been entered?",
+          "a": "Yes, as the administrator and creator of the tournament, you have full freedom to correct any result at any time from the game administration section. The overall classification and subsequent matchups will be recalculated automatically and immediately upon saving the new score."
+        },
+        {
+          "q": "What happens if there is an odd number of pairs in a league?",
+          "a": "The system is designed to handle odd numbers of teams intelligently. In each round, one of the pairs will automatically be assigned a \"Rest\" status. In the overall standings, matches played are balanced proportionally and cleanly without altering the official rules."
+        }
+      ],
+      "mgmt": [
+        {
+          "q": "Can I delegate the management of a tournament to someone else?",
+          "a": "Currently, management is linked to the account of the organizer who created the tournament. However, we are actively working on a co-administrator system to allow you to invite other registered users to enter results and configure tables from their own devices simultaneously."
+        },
+        {
+          "q": "How do I share the tournament with participants?",
+          "a": "In your tournament dashboard, you will find a \"Copy Link\" button. You can send this web link via WhatsApp, Telegram, email, or social media. Participants can open it and see all rankings and matchups live without needing an account or installing anything."
+        },
+        {
+          "q": "Can I add a poster or image to the tournament?",
+          "a": "Yes! During tournament creation or editing, you can upload a JPG or PNG image to act as the official poster. This image will appear prominently in the tournament header, in the participants' public view, and in the platform's general directory."
+        },
+        {
+          "q": "Can participants see results in real time?",
+          "a": "Yes, the platform updates instantly. As soon as you save a table's result in your panel, any participant viewing the tournament's public view will immediately see the updated score, standings changes, and the next pairing."
+        },
+        {
+          "q": "Can I export the tournament results?",
+          "a": "Currently, results and standings are permanently stored digitally so you can access them whenever you want. We are implementing a download option in PDF and spreadsheet (Excel) formats so organizers can archive or physically print the official standings."
+        }
+      ],
+      "account": [
+        {
+          "q": "Can I have multiple active tournaments at the same time?",
+          "a": "Yes, there are no restrictions on the number of simultaneous tournaments you can manage. As an organizer, you can run multiple tournaments in parallel in the same venue or in different locations without any interference."
+        },
+        {
+          "q": "How do I delete my account and data?",
+          "a": "We respect your privacy to the absolute fullest. If you wish to delete your account and permanently remove all associated information (including created tournaments), you can send us a formal request from your registered email to info@musmanager.com, and we will proceed with the immediate deletion."
+        },
+        {
+          "q": "Is my data secure?",
+          "a": "Absolutely. All personal information and tournament records are transmitted via secure HTTPS encrypted connections and stored on cloud servers with industry-standard security protocols. We will never sell your data or share it with unauthorized third parties."
+        }
+      ],
+      "ads": [
+        {
+          "q": "Why is there advertising in the app?",
+          "a": "To keep Mus Manager as a free, accessible, and high-quality tool for the entire community of players without requiring subscription fees. Advertising revenue allows us to cover the costs of servers, databases, and technical development maintenance."
+        },
+        {
+          "q": "Is the advertising targeted at minors?",
+          "a": "No. Mus Manager strictly complies with legal regulations regarding minor protection. We implement advanced advertising filters to prevent inappropriate content or ads targeted at minors, ensuring a safe and respectful browsing experience at all times."
+        },
+        {
+          "q": "Can I use the app without seeing ads?",
+          "a": "Currently, full access to all organization and viewing tools is supported by ads to ensure they remain free. However, we are evaluating the possibility of introducing a premium ad-free subscription in the future for commercial venues or federations."
+        }
+      ]
+    }
+  },
+  "reglas_page": {
+    "title": "Learn to Play and Organize Mus",
+    "subtitle": "The ultimate guide on traditional Mus rules, advanced strategies, and professional tournament organizational systems.",
+    "nav_rules": "Official Rules",
+    "nav_strategy": "Strategies & Tactics",
+    "nav_org": "Tournament Organization",
+    "rules_title": "1. Official Rules of Mus (4 Kings / 8 Kings)",
+    "rules_intro": "Mus is a traditional Spanish deck card game with centuries of history. It is played by pairs (4 players in total) and stands out for its combination of strategy, psychology, discarding, and, above all, the art of bluffing.",
+    "rules_deck_title": "The Deck and Card Values",
+    "rules_deck_text": "A standard 40-card Spanish deck is used. In the most common variant (8 Kings, typical of Basque and Navarre Mus), Threes equal Kings (face cards) and Twos equal Aces. Thus, there are 8 Kings and 8 Aces in the deck. In the 4 Kings variant (typical of Castilian Mus), each card maintains its original nominal value and these equivalences are not used.",
+    "rules_rounds_title": "The Four Lances of Mus",
+    "rules_rounds_intro": "Each hand strictly consists of four independent betting rounds played in this exact order:",
+    "rules_round1_title": "Grande (Big):",
+    "rules_round1_desc": "Won by the pair with the highest face-value cards (Kings, Knights, Jacks...). The order is from highest to lowest.",
+    "rules_round2_title": "Chica (Small):",
+    "rules_round2_desc": "Won by the pair with the lowest face-value cards. The order is reversed (Aces, twos, threes...).",
+    "rules_round3_title": "Pares (Pairs):",
+    "rules_round3_desc": "Requires having at least two matching cards. There are three types: Simple pair (two matching cards), Medias (three matching cards), and Duples (four matching cards or two pairs of matching cards). Duples beats Medias, and Medias beats Simple pair. At equal rank, the highest card wins.",
+    "rules_round4_title": "Juego (Game) or Punto (Point):",
+    "rules_round4_desc": "Card values are added up (Face cards are worth 10, Aces are worth 1, other cards their face value). If the sum is 31 or more, players have 'Juego'. The best game is 31, followed by 40, 36, 35, 34, 33, and 32. If no one reaches 31, 'Punto' is played, and the pair closest to 30 wins.",
+    "rules_betting_title": "The Bet and Points",
+    "rules_betting_text": "In each lance, the first active player (mano) starts by saying 'Paso' (pass) or 'Envido' (bet 2 points). The opposing pair can 'Querer' (call), 'Pasar' (fold, losing 1 point), or 'Reenvidar' (raise). The ultimate bet is the 'Órdago', wagering the entire set (chico). If the opponent calls an órdago, cards are shown immediately to decide the set.",
+    "strategy_title": "2. Advanced Strategies and Tactics",
+    "strategy_intro": "Mus is a game of incomplete information where coordination with your partner and reading your opponents defines true champions.",
+    "strategy_card1_title": "The Art of Discarding",
+    "strategy_card1_desc": "Knowing when to ask for cards (mus) and when to cut (no mus) is vital. Being the first to speak (mano) is an immense tactical advantage. If you have a strong hand or want to disrupt the opponents' draw, declare 'No hay mus'. Selectively discarding helps your partner deduce your hand strength.",
+    "strategy_card2_title": "Psychological Betting (Bluffing)",
+    "strategy_card2_desc": "Bluffing (betting without matching pairs or game) is the heart of the game. A good bluffer studies the opponent's body language and betting patterns. Consistency is key: your bets must tell a believable story. Do not always bet on solid hands, nor bluff with no backup plan.",
+    "strategy_card3_title": "Communication and Authorized Signs",
+    "strategy_card3_desc": "Mus allows transmitting information about your cards to your partner using official coded facial expressions. It is strictly forbidden to lie with signs, make false signs, or hide signs from opponents if they are looking directly at you. The official signs are: biting the lower lip (two kings), sticking out the tongue (two aces), winking (medias), raising eyebrows (duples), twisting the mouth (31 game), and shrugging (nothing/no pairs).",
+    "org_title": "3. Guide to Organizing Mus Tournaments",
+    "org_intro": "Organizing a successful tournament requires mathematical rigor in pairings and a clear structure that players can easily understand.",
+    "org_card1_title": "Direct Knockout Format",
+    "org_card1_desc": "The classic and most exciting format. Pairs are matched by draw and compete. To prolong play, many traditional tournaments use the 'Double Elimination' or 'Re-entry' (Consolation) system, where losing pairs enter a secondary bracket, giving them a second chance to reach the grand final.",
+    "org_card2_title": "League System (Round-Robin)",
+    "org_card2_desc": "Perfect for stable clubs and social groups with recurring meetings (weekly or monthly). All pairs play each other over several rounds. 3 points are awarded for a win, and 1 for a loss (or as per local rules). Tiebreaks are decided by overall set difference, and ultimately by the sum of points.",
+    "org_card3_title": "Group Stage + Final Stage",
+    "org_card3_desc": "The perfect hybrid format for medium to large weekend tournaments. Pairs are divided into groups of 4 or 5. They play a quick round-robin, and the top 2 from each group advance to the knockout stage. Ensures everyone plays a minimum number of matches before elimination rounds.",
+    "rules_variant_title": "Kings Variant",
+    "rules_variant_text": "Mus can be played with 4 Kings (original) or 8 Kings (Navarre/Basque Country). With 8 Kings, Threes are considered Kings, and Twos are considered Aces. It is crucial to define the variant before dealing!",
+    "rules_lance_label": "Round {num}"
   }
 }

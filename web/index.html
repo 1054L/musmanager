@@ -31,7 +31,76 @@
 </head>
 
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <!-- Static Fallback for Search Engines and Google AdSense Crawlers -->
+    <header style="padding: 20px; text-align: center; border-bottom: 1px solid #e2e8f0; font-family: 'Inter', sans-serif;">
+      <h1 style="color: #0fb361; font-size: 2.5rem; margin-bottom: 10px;">Mus Manager</h1>
+      <p style="color: #bf953f; font-size: 1.2rem; font-style: italic;">La plataforma definitiva para la gestión y organización de torneos de mus.</p>
+    </header>
+
+    <main style="max-width: 900px; margin: 40px auto; padding: 0 20px; font-family: 'Inter', sans-serif; line-height: 1.8; color: #334155;">
+      <!-- About -->
+      <section style="margin-bottom: 40px;">
+        <h2 style="color: #0d2415; font-size: 1.8rem; border-bottom: 2px solid #0fb361; padding-bottom: 5px;">¿Qué es Mus Manager?</h2>
+        <p>
+          Mus Manager es una solución web de vanguardia diseñada de forma nativa y específica para resolver la complejidad organizativa del tradicional juego del Mus. 
+          A diferencia de otras herramientas genéricas de gestión de torneos deportivos, nuestra plataforma implementa todas las particularidades y casuísticas que definen al mus: 
+          sistemas de descarte selectivos (dar o cortar el mus), lances tradicionales (Grande, Chica, Pares y Juego/Punto), cómputo preciso de tantos y amarracos, 
+          así como el control de variantes por parejas de 4 Reyes y de 8 Reyes.
+        </p>
+        <p>
+          Ofrecemos un espacio digital seguro, rápido e intuitivo para que peñas, clubes, sociedades recreativas y grupos de amigos organicen sus competiciones de mus sin coste, 
+          aprovechando clasificaciones en tiempo real, actas digitales integradas, emparejamientos inteligentes y la máxima comodidad desde cualquier smartphone o tableta.
+        </p>
+      </section>
+
+      <!-- Key Features -->
+      <section style="margin-bottom: 40px;">
+        <h2 style="color: #0d2415; font-size: 1.8rem; border-bottom: 2px solid #0fb361; padding-bottom: 5px;">Características de la Plataforma</h2>
+        <ul>
+          <li><strong>Gestión de Sistemas de Juego:</strong> Configuración ágil de liguillas (round-robin), fases eliminatorias clásicas, fases de grupos híbridas y sistemas tradicionales por ceros/vidas.</li>
+          <li><strong>Clasificaciones Automatizadas:</strong> Actualización al instante de tablas de clasificación basadas en diferencia de chicos, tantos anotados, duelos directos y amarracos sumados.</li>
+          <li><strong>Actas Digitales y Resultados:</strong> Registro inmediato de las puntuaciones por parte de los jugadores o del árbitro del torneo.</li>
+          <li><strong>Optimización Móvil Completa:</strong> Controla todo el torneo desde la mesa de juego, con una interfaz adaptada para interactuar mientras sostienes las cartas.</li>
+        </ul>
+      </section>
+
+      <!-- Rules Overview -->
+      <section style="margin-bottom: 40px;">
+        <h2 style="color: #0d2415; font-size: 1.8rem; border-bottom: 2px solid #0fb361; padding-bottom: 5px;">El Reglamento Oficial del Mus</h2>
+        <p>
+          El Mus es un juego de cartas de baraja española con más de dos siglos de historia, jugado habitualmente por parejas (4 participantes). Cada mano consta obligatoriamente de cuatro lances independientes:
+        </p>
+        <ol>
+          <li><strong>Grande:</strong> Gana la pareja con las cartas de mayor valor nominal (Reyes &gt; Caballos &gt; Sotas...).</li>
+          <li><strong>Chica:</strong> Gana la pareja con las cartas de menor valor (Ases / pitos &lt; doses &lt; treses...).</li>
+          <li><strong>Pares:</strong> Se requiere tener dos o más cartas del mismo valor. Se dividen en Par simple, Medias (tres cartas iguales) y Duples (cuatro cartas iguales o dos parejas).</li>
+          <li><strong>Juego o Punto:</strong> Suma de las cuatro cartas del jugador. Si alcanza 31 o más, se disputa el "Juego" (siendo 31 la mejor puntuación). Si ningún jugador alcanza 31, se juega al "Punto".</li>
+        </ol>
+        <p>
+          En cada lance se permite el envite ("Envido" o apuesta inicial de 2 tantos) o el "Órdago" (apuesta de todo el juego o chico). El farol o envite psicológico y las señas faciales autorizadas configuran el núcleo estratégico de este noble deporte mental.
+        </p>
+      </section>
+
+      <!-- Contact -->
+      <section style="margin-bottom: 40px;">
+        <h2 style="color: #0d2415; font-size: 1.8rem; border-bottom: 2px solid #0fb361; padding-bottom: 5px;">Contacto y Soporte Técnico</h2>
+        <p>
+          Si tienes alguna consulta, sugerencia de mejora para la gestión de tus competiciones, o necesitas soporte técnico, puedes ponerte en contacto directo con nuestro equipo a través de la dirección de correo electrónico oficial:
+        </p>
+        <p style="font-weight: bold; font-size: 1.1rem; color: #0fb361;">
+          Email de Contacto: <a href="mailto:info@musmanager.com" style="color: #0fb361; text-decoration: underline;">info@musmanager.com</a>
+        </p>
+        <p>
+          Estamos comprometidos a responder todas las dudas relacionadas con las reglas de emparejamiento, el sistema de ceros, la privacidad de datos y la personalización de carteles de torneos.
+        </p>
+      </section>
+    </main>
+
+    <footer style="text-align: center; padding: 20px; border-top: 1px solid #e2e8f0; font-size: 0.9rem; color: #64748b; font-family: 'Inter', sans-serif;">
+      <p>&copy; 2026 Mus Manager. Todos los derechos reservados. Contacto: info@musmanager.com</p>
+    </footer>
+  </div>
   <script type="module" src="/src/main.js"></script>
 </body>
 

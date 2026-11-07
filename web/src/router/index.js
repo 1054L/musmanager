@@ -126,6 +126,24 @@ const routes = [
     name: 'Cookies',
     component: () => import('../views/CookiesView.vue'),
     meta: { titleKey: 'legal.cookies_title', descKey: 'legal.cookies_p1' }
+  },
+  {
+    path: '/contacto',
+    name: 'Contacto',
+    component: () => import('../views/ContactView.vue'),
+    meta: { titleKey: 'seo.contacto_title', descKey: 'seo.contacto_desc' }
+  },
+  {
+    path: '/faq',
+    name: 'Faq',
+    component: () => import('../views/FaqView.vue'),
+    meta: { titleKey: 'seo.faq_title', descKey: 'seo.faq_desc' }
+  },
+  {
+    path: '/reglas-del-mus',
+    name: 'ReglasMus',
+    component: () => import('../views/ReglasView.vue'),
+    meta: { titleKey: 'seo.reglas_title', descKey: 'seo.reglas_desc' }
   }
 ]
 

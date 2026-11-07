@@ -115,8 +115,8 @@ const benefits = [
                    <i class="pi pi-server text-black font-bold"></i>
                 </div>
                 <div>
-                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">Infraestructura</h4>
-                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Cloud 24/7 Autoscale</p>
+                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">{{ t('features.detailed_section.infra_title') }}</h4>
+                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{{ t('features.detailed_section.infra_desc') }}</p>
                 </div>
              </div>
              
@@ -125,8 +125,8 @@ const benefits = [
                    <i class="pi pi-lock text-black font-bold"></i>
                 </div>
                 <div>
-                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">Seguridad</h4>
-                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">AES-256 Encryption</p>
+                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">{{ t('features.detailed_section.security_title') }}</h4>
+                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{{ t('features.detailed_section.security_desc') }}</p>
                 </div>
              </div>
 
@@ -135,8 +135,8 @@ const benefits = [
                    <i class="pi pi-bolt text-black font-bold"></i>
                 </div>
                 <div>
-                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">Rendimiento</h4>
-                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Real-time Event Bus</p>
+                   <h4 class="text-white font-black uppercase text-[10px] tracking-widest mb-1">{{ t('features.detailed_section.performance_title') }}</h4>
+                   <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{{ t('features.detailed_section.performance_desc') }}</p>
                 </div>
              </div>
           </div>
