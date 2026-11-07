@@ -75,7 +75,7 @@
       "points": [
         "Historical records of each player",
         "Quick registration of pairs and teams",
-        "Payment and registration status control",
+        "Attendance and registration status control",
         "Global participant search"
       ]
     },
@@ -357,7 +357,7 @@
     "terms_sections": [
       {
         "title": "1. Subject of Service",
-        "text": "Mus Manager provides a digital tool for the organization, management, and visualization of mus tournaments. The service is offered 'as is' and free of charge to the end user."
+        "text": "Mus Manager exclusively provides a technological and digital tool for the organization, bracket management, standings, and visualization of recreational and social mus tournaments. The service is offered 'as is', 100% free of charge, and without any financial intermediation whatsoever."
       },
       {
         "title": "2. Registration and Responsibility",
@@ -365,11 +365,11 @@
       },
       {
         "title": "3. Prohibited Use",
-        "text": "It is strictly prohibited to use Mus Manager for: (a) Organizing illegal gambling or fraudulent activities. (b) Introducing offensive, violent, or discriminatory content. (c) Performing reverse engineering or damaging the technological infrastructure of the web."
+        "text": "It is strictly prohibited to use Mus Manager for: (a) Organizing real-money gambling, games of chance, or fraudulent activities. (b) Introducing offensive, violent, or discriminatory content. (c) Performing reverse engineering or damaging the technological infrastructure of the web."
       },
       {
-        "title": "4. Disclaimer",
-        "text": "Mus Manager does not intervene in physical bets or tournament prizes organized by third parties. We are not responsible for disputes between players or organizers nor for service malfunctions due to causes beyond our control."
+        "title": "4. Disclaimer and No Financial Intermediation",
+        "text": "Mus Manager is solely a scoreboard and sports/recreational management software: it DOES NOT process payments, DOES NOT collect entry fees, DOES NOT distribute cash prizes, and never intervenes or intermediates with money under any circumstances. We are not responsible for private agreements or disputes between players or organizers nor for service malfunctions due to causes beyond our control."
       },
       {
         "title": "5. Modifications",
@@ -388,7 +388,7 @@
         "text": "You can configure your browser to block or delete cookies at any time. Note that disabling technical cookies may affect the operation of your account. More info: Chrome (support.google.com/chrome), Firefox (support.mozilla.org), Safari (support.apple.com), Edge (support.microsoft.com)."
       }
     ],
-    "age_notice": "This site displays online gambling advertisements. Gambling is prohibited for minors under 18. If you are a minor, please leave the site. Gambling can be addictive. Play responsibly. www.juegoseguro.es",
+    "age_notice": "IMPORTANT NOTICE: Mus Manager is exclusively a technological bracket and standings management tool for recreational and social tournaments. This platform DOES NOT conduct, promote, or intermediate with real money, entry fee collection, prize distribution, or gambling of any kind. Service intended for users aged 18 and over.",
     "contact_footer": "For any queries related to these policies, you can contact us at info{'@'}musmanager.com",
     "cookies_table_headers": {
       "type": "Type",
@@ -701,7 +701,7 @@
       "add_btn": "REGISTER NEW PAIR",
       "list_title": "Registered Pairs",
       "empty": "No pairs registered yet",
-      "confirmed_tooltip": "Confirmed / Paid",
+      "confirmed_tooltip": "Attendance Confirmed",
       "delete_success": "Pair removed successfully",
       "add_success": "Pair registered successfully",
       "delete_confirm_title": "Confirm Removal",
@@ -710,8 +710,8 @@
       "delete_btn": "Remove",
       "team_name_label": "Pair Name",
       "team_name_placeholder": "E.g.: The Mus Kings",
-      "is_confirmed_label": "Confirmed / Paid",
-      "is_confirmed_help": "Check this option if they have already confirmed or paid",
+      "is_confirmed_label": "Attendance Confirmed",
+      "is_confirmed_help": "Check this option if the pair has already confirmed their participation",
       "is_confirmed_active": "Registration confirmed",
       "error_name_required": "Pair name is required",
       "submit_btn": "REGISTER",
@@ -779,7 +779,7 @@
     "welcome": "Terms Update",
     "intro": "To continue enjoying Mus Manager, we need you to review and accept our updated privacy policy and terms of use.",
     "section1_title": "Terms and Conditions of Use",
-    "section1_text": "By using our platform, you agree that Mus Manager provides a digital tool for tournament organization 'as is'. The user is responsible for their credentials and use for illegal gambling or offensive content is prohibited.",
+    "section1_text": "By using our platform, you agree that Mus Manager exclusively provides a digital bracket and standings management tool 'as is', without intermediating in any case with money, entry fee payments, or cash prizes. The user is responsible for their credentials and use for unlawful activities or offensive content is prohibited.",
     "section2_title": "Privacy Policy",
     "section2_text": "We process your data (email, name, results) to manage your account and generate rankings. The legal basis is your consent and the execution of the terms of use. You can exercise your rights of access and deletion at any time.",
     "last_updated": "Last updated: May 2026",
@@ -896,6 +896,10 @@
         {
           "q": "Can I use the app without seeing ads?",
           "a": "Currently, full access to all organization and viewing tools is supported by ads to ensure they remain free. However, we are evaluating the possibility of introducing a premium ad-free subscription in the future for commercial venues or federations."
+        },
+        {
+          "q": "Does Mus Manager intermediate with money, payments, or betting?",
+          "a": "No, not at all. Mus Manager is exclusively a sports and recreational management software to generate brackets, record match scores, and display standings. The platform does not process payments, does not collect entry fees, does not manage cash prizes, and does not allow financial betting of any kind."
         }
       ]
     }
@@ -920,8 +924,8 @@
     "rules_round3_desc": "Requires having at least two matching cards. There are three types: Simple pair (two matching cards), Medias (three matching cards), and Duples (four matching cards or two pairs of matching cards). Duples beats Medias, and Medias beats Simple pair. At equal rank, the highest card wins.",
     "rules_round4_title": "Juego (Game) or Punto (Point):",
     "rules_round4_desc": "Card values are added up (Face cards are worth 10, Aces are worth 1, other cards their face value). If the sum is 31 or more, players have 'Juego'. The best game is 31, followed by 40, 36, 35, 34, 33, and 32. If no one reaches 31, 'Punto' is played, and the pair closest to 30 wins.",
-    "rules_betting_title": "The Bet and Points",
-    "rules_betting_text": "In each lance, the first active player (mano) starts by saying 'Paso' (pass) or 'Envido' (bet 2 points). The opposing pair can 'Querer' (call), 'Pasar' (fold, losing 1 point), or 'Reenvidar' (raise). The ultimate bet is the 'Órdago', wagering the entire set (chico). If the opponent calls an órdago, cards are shown immediately to decide the set.",
+    "rules_betting_title": "The Bid and Scoring Points",
+    "rules_betting_text": "In each lance, the first active player (mano) starts by saying 'Paso' (pass) or 'Envido' (putting 2 scoring points or counters at stake in the match). The opposing pair can 'Querer' (accept the point challenge), 'Pasar' (fold the round, yielding 1 point), or 'Reenvidar' (increase the points at stake). The ultimate bid is the 'Órdago', contesting all points of the entire set (chico). These points (amarracos) are strictly scoring units inherent to the card game rules and have no monetary value.",
     "strategy_title": "2. Advanced Strategies and Tactics",
     "strategy_intro": "Mus is a game of incomplete information where coordination with your partner and reading your opponents defines true champions.",
     "strategy_card1_title": "The Art of Discarding",

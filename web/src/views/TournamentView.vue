@@ -296,6 +296,18 @@ const qrCodeUrl = computed(() => `https://api.qrserver.com/v1/create-qr-code/?si
 
 const thirdPlaceMatch = computed(() => matches.value.find(x => x.stage === t('tournament_view.knockout.third_place') || x.stage === '3º y 4º puesto'))
 
+const hasActiveTabContent = computed(() => {
+  if (loading.value || error.value || !tournament.value) return false
+  if (activeTab.value === 'matches') return matches.value.length > 0
+  if (activeTab.value === 'standings') {
+    return Object.keys(normalizedClassification.value).length > 0 &&
+           Object.values(normalizedClassification.value).flat().length > 0
+  }
+  if (activeTab.value === 'bracket') return bracketMatches.value.length > 0
+  if (activeTab.value === 'teams') return (tournament.value.teams?.length || 0) > 0
+  return false
+})
+
 const handleTabChange = (tab) => {
   console.log('Changing tab to:', tab)
   activeTab.value = tab
@@ -512,7 +524,7 @@ const saveMatchResult = async () => {
       </div>
 
       <!-- Google Ad Slot (Top) -->
-      <div class="col-12 px-4">
+      <div v-if="hasActiveTabContent" class="col-12 px-4">
         <GoogleAd :key="'top-' + activeTab" />
       </div>
 
@@ -708,7 +720,7 @@ const saveMatchResult = async () => {
                  </div>
                </div>
               <!-- Inner Ad -->
-              <GoogleAd :key="'inner-' + activeTab" />
+              <GoogleAd v-if="matches.length > 0" :key="'inner-' + activeTab" />
            </div>
 
            <div v-else-if="activeTab === 'standings'" class="classification-container">

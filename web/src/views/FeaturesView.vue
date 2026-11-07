@@ -59,9 +59,6 @@ const benefits = [
       </div>
     </section>
 
-    <div class="col-12 px-4">
-      <GoogleAd :key="'middle-features'" />
-    </div>
     <!-- How it Works Section -->
     <section class="how-it-works">
       <h2 class="mus-h2 text-center italic mb-12">{{ t('features.how_it_works.title') }}</h2>

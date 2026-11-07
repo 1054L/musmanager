@@ -84,7 +84,7 @@
       "points": [
         "Fichas históricas de cada jugador",
         "Registro rápido de parejas y equipos",
-        "Control de pagos y estados de inscripción",
+        "Control de asistencia y estados de inscripción",
         "Buscador global de participantes"
       ]
     },
@@ -369,7 +369,7 @@
     "terms_sections": [
       {
         "title": "1. Objeto del Servicio",
-        "text": "Mus Manager proporciona una herramienta digital para la organización, gestión y visualización de torneos de mus. El servicio se ofrece 'tal cual' y de forma gratuita para el usuario final."
+        "text": "Mus Manager proporciona exclusivamente una herramienta tecnológica y digital para la organización, gestión de cuadros, clasificaciones y visualización de torneos recreativos y sociales de mus. El servicio se ofrece 'tal cual', de forma 100% gratuita y sin intermediación económica de ningún tipo."
       },
       {
         "title": "2. Registro y Responsabilidad",
@@ -377,11 +377,11 @@
       },
       {
         "title": "3. Uso Prohibido",
-        "text": "Está estrictamente prohibido utilizar Mus Manager para: (a) Organizar apuestas ilegales o actividades fraudulentas. (b) Introducir contenido ofensivo, violento o discriminatorio. (c) Realizar ingeniería inversa o dañar la infraestructura tecnológica de la web."
+        "text": "Está estrictamente prohibido utilizar Mus Manager para: (a) Organizar apuestas con dinero real, actividades de juego de azar o actividades fraudulentas. (b) Introducir contenido ofensivo, violento o discriminatorio. (c) Realizar ingeniería inversa o dañar la infraestructura tecnológica de la web."
       },
       {
-        "title": "4. Exención de Responsabilidad",
-        "text": "Mus Manager no interviene en las apuestas físicas ni en los premios de los torneos organizados por terceros. No nos hacemos responsables de las disputas entre jugadores u organizadores ni del mal funcionamiento del servicio por causas ajenas a nuestro control."
+        "title": "4. Exención de Responsabilidad y No Intermediación Económica",
+        "text": "Mus Manager es únicamente un software de marcador y gestión deportiva/recreativa: NO procesa pagos, NO cobra inscripciones, NO reparte premios económicos ni interviene o intermedia con dinero en ningún caso. No nos hacemos responsables de los acuerdos privados o disputas entre jugadores u organizadores ni del mal funcionamiento del servicio por causas ajenas a nuestro control."
       },
       {
         "title": "5. Modificaciones",
@@ -400,7 +400,7 @@
         "text": "Puedes configurar tu navegador para bloquear o eliminar cookies en cualquier momento. Ten en cuenta que deshabilitar las cookies técnicas puede afectar al funcionamiento de tu cuenta. Más información: Chrome (support.google.com/chrome), Firefox (support.mozilla.org), Safari (support.apple.com), Edge (support.microsoft.com)."
       }
     ],
-    "age_notice": "Este sitio muestra publicidad de juego online. El juego está prohibido a menores de 18 años. Si eres menor de edad, abandona el sitio. El juego puede crear adicción. Juega con responsabilidad. www.juegoseguro.es",
+    "age_notice": "AVISO IMPORTANTE: Mus Manager es exclusivamente una herramienta tecnológica de gestión de cuadros y clasificaciones para torneos recreativos y sociales. Esta plataforma NO realiza, promueve ni intermedia con dinero real, cobros de inscripciones, reparto de premios ni apuestas de ningún tipo. Servicio destinado a mayores de 18 años.",
     "contact_footer": "Para cualquier consulta relacionada con estas políticas, puedes contactarnos en info{'@'}musmanager.com",
     "cookies_table_headers": {
       "type": "Tipo",
@@ -712,7 +712,7 @@
       "add_btn": "INSCRIBIR NUEVA PAREJA",
       "list_title": "Parejas Inscritas",
       "empty": "No hay inscripciones todavía",
-      "confirmed_tooltip": "Confirmado / Pagado",
+      "confirmed_tooltip": "Asistencia Confirmada",
       "confirmed_success": "Pareja confirmada correctamente",
       "unconfirmed_success": "Confirmación anulada correctamente",
       "delete_success": "Pareja eliminada correctamente",
@@ -723,8 +723,8 @@
       "delete_btn": "Eliminar",
       "team_name_label": "Nombre de la Pareja",
       "team_name_placeholder": "Ej: Los Reyes del Mus",
-      "is_confirmed_label": "Confirmado / Pagado",
-      "is_confirmed_help": "Marca esta opción si ya han confirmado o pagado",
+      "is_confirmed_label": "Asistencia Confirmada",
+      "is_confirmed_help": "Marca esta opción si la pareja ya ha confirmado su participación",
       "is_confirmed_active": "Inscripción confirmada",
       "error_name_required": "El nombre de la pareja es obligatorio",
       "submit_btn": "INSCRIBIR",
@@ -794,7 +794,7 @@
     "welcome": "Actualización de Términos",
     "intro": "Para seguir disfrutando de Mus Manager, necesitamos que revises y aceptes nuestra política de privacidad y condiciones de uso actualizadas.",
     "section1_title": "Términos y Condiciones de Uso",
-    "section1_text": "Al utilizar nuestra plataforma, aceptas que Mus Manager proporciona una herramienta digital para la organización de torneos 'tal cual'. El usuario es responsable de sus credenciales y se prohíbe el uso para apuestas ilegales o contenido ofensivo.",
+    "section1_text": "Al utilizar nuestra plataforma, aceptas que Mus Manager proporciona exclusivamente una herramienta digital de gestión de cuadros y clasificaciones 'tal cual', sin intermediar en ningún caso con dinero, pagos de inscripciones ni premios económicos. El usuario es responsable de sus credenciales y se prohíbe el uso para actividades ilícitas o contenido ofensivo.",
     "section2_title": "Política de Privacidad",
     "section2_text": "Tratamos tus datos (email, nombre, resultados) para gestionar tu cuenta y generar rankings. La base legal es tu consentimiento y la ejecución de los términos de uso. Puedes ejercer tus derechos de acceso y supresión en cualquier momento.",
     "last_updated": "Última actualización: Mayo 2026",
@@ -911,6 +911,10 @@
         {
           "q": "¿Puedo usar la app sin ver publicidad?",
           "a": "Actualmente el acceso completo a todas las herramientas de organización y visualización se sustenta mediante anuncios para garantizar la gratuidad. No obstante, estamos evaluando la posibilidad de introducir en el futuro una suscripción premium libre de anuncios para locales comerciales o federaciones."
+        },
+        {
+          "q": "¿Mus Manager intermedia con dinero, pagos o apuestas?",
+          "a": "No, en absoluto. Mus Manager es exclusivamente un software de gestión deportiva y recreativa para generar cuadros, anotar marcadores y mostrar clasificaciones. La plataforma no procesa pagos, no cobra inscripciones, no gestiona premios en metálico ni permite apuestas económicas de ningún tipo."
         }
       ]
     }
@@ -935,8 +939,8 @@
     "rules_round3_desc": "Se requiere tener al menos dos cartas iguales. Hay tres tipos de pares: Par simple (dos cartas iguales), Medias (tres cartas iguales) y Duples (cuatro cartas iguales o dos parejas de cartas iguales). Duples gana a Medias, y Medias gana a Par. A igual tipo, gana el de mayor valor.",
     "rules_round4_title": "Juego o Punto:",
     "rules_round4_desc": "Se suman los valores de las 4 cartas (Figuras valen 10, Ases valen 1, otras cartas su valor). Si la suma es 31 o más, se tiene 'Juego'. El mejor juego es 31, seguido de 40, 36, 35, 34, 33 y 32. Si nadie alcanza 31, se juega al 'Punto', ganando el que más se acerque a 30.",
-    "rules_betting_title": "El Envite y los Tantos",
-    "rules_betting_text": "En cada lance, el jugador mano inicia el turno diciendo 'Paso' o 'Envido' (apuesta 2 tantos). La pareja rival puede 'Querer' (aceptar), 'Pasar' (retirarse, perdiendo 1 tanto) o 'Reenvidar' (aumentar la apuesta). El envite supremo es el 'Órdago', donde se apuesta todo el juego (chico) completo. Si el rival acepta un órdago, se muestran las cartas inmediatamente para decidir quién gana el chico.",
+    "rules_betting_title": "El Envite y los Tantos de Puntuación",
+    "rules_betting_text": "En cada lance, el jugador mano inicia el turno diciendo 'Paso' o 'Envido' (poniendo en juego 2 tantos o piedras de puntuación de la partida). La pareja rival puede 'Querer' (aceptar el reto de puntos), 'Pasar' (retirarse del lance, cediendo 1 tanto) o 'Reenvidar' (aumentar los tantos en juego). El envite supremo es el 'Órdago', donde se disputan todos los tantos del juego (chico) completo. Estos tantos (amarracos) son exclusivamente unidades de puntuación propias del reglamento del juego de cartas y carecen de valor monetario.",
     "strategy_title": "2. Estrategias y Tácticas Avanzadas",
     "strategy_intro": "El Mus es un juego de información incompleta donde la coordinación con tu pareja y la lectura de los rivales define a los verdaderos campeones.",
     "strategy_card1_title": "El Arte de Descartarse",

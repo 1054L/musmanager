@@ -5,7 +5,6 @@ import MusSidebar from './MusSidebar.vue'
 import MusFooter from '../components/MusFooter.vue'
 import AuthModal from '../components/AuthModal.vue'
 import { authService } from '../services/api'
-import CookieBanner from '../components/CookieBanner.vue'
 import TermsModal from '../components/TermsModal.vue'
 import ConfirmDialog from 'primevue/confirmdialog'
 import Toast from 'primevue/toast'
@@ -51,7 +50,7 @@ provide('logout', handleLogout)
   <div class="mus-layout">
     <Toast />
     <ConfirmDialog />
-    <CookieBanner />
+    <!-- CookieBanner desactivado: se gestiona el consentimiento CMP directamente desde Google AdSense -->
     
     <!-- Fondo y Efectos Atmosféricos (Solo en Modo Oscuro) -->
     <div v-if="themeStore.isDark" class="bg-elements">

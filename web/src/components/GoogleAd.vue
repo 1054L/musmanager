@@ -1,50 +1,56 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 const props = defineProps({
   slotId: {
     type: String,
-    default: 'default-ad'
+    default: ''
+  },
+  format: {
+    type: String,
+    default: 'auto'
+  },
+  fullWidthResponsive: {
+    type: Boolean,
+    default: true
   }
 })
 
-const loaded = ref(false)
+const adInitialized = ref(false)
 
 onMounted(() => {
-  // Simulate ad loading delay
-  setTimeout(() => {
-    loaded.value = true
-  }, 300)
+  try {
+    if (typeof window !== 'undefined') {
+      ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+      adInitialized.value = true
+    }
+  } catch (e) {
+    // AdSense script blocked by adblocker or already initialized for this slot
+  }
 })
 </script>
 
 <template>
-  <div class="ad-container mus-glass-dark my-4 overflow-hidden rounded-2xl border border-white/5">
-    <div v-if="!loaded" class="flex flex-column align-items-center justify-content-center h-full py-10 opacity-20">
-      <div class="spinner-sm mb-2"></div>
-      <span class="text-[8px] font-black uppercase tracking-[0.3em]">Cargando Publicidad...</span>
-    </div>
-    
-    <div v-else class="relative h-full min-h-[100px] flex align-items-center justify-content-center p-4">
-      <div class="absolute top-2 right-4 text-[8px] font-black text-slate-600 uppercase tracking-widest w-full h-full"></div>
-    </div>
+  <div class="ad-container my-4 overflow-hidden rounded-2xl">
+    <ins
+      class="adsbygoogle"
+      style="display: block"
+      data-ad-client="ca-pub-4985794971723153"
+      :data-ad-slot="props.slotId || undefined"
+      :data-ad-format="props.format"
+      :data-full-width-responsive="props.fullWidthResponsive ? 'true' : 'false'"
+    ></ins>
   </div>
 </template>
 
 <style scoped>
 .ad-container {
-  min-height: 120px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
   position: relative;
+  text-align: center;
 }
-.ad-container::before {
-  content: 'AD';
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 8px;
-  font-weight: 950;
-  color: #1e293b;
-  opacity: 0.5;
+
+/* Hide container collapse when AdSense has no fill */
+:deep(ins.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none !important;
 }
 </style>

@@ -69,7 +69,7 @@ onMounted(() => {
       <p class="mus-p opacity-60 mt-4">{{ t('tournaments_page.subtitle') }}</p>
     </header>
 
-    <div class="col-12 px-4">
+    <div class="col-12 px-4" v-if="!loading && !error && filteredTournaments.length > 0">
       <GoogleAd :key="'ad1'" />
     </div>
     

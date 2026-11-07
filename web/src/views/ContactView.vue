@@ -1,7 +1,6 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
-import GoogleAd from '../components/GoogleAd.vue'
 
 const { t } = useI18n()
 
@@ -47,11 +46,6 @@ const submitForm = () => {
       <p class="mus-p-gold text-2xl font-bold italic tracking-wider">{{ t('contacto.subtitle') }}</p>
       <div class="mus-divider mx-auto mt-8"></div>
     </section>
-
-    <!-- Top Ad Block -->
-    <div class="col-12 px-4 mb-12">
-      <GoogleAd :key="'top-contact'" />
-    </div>
 
     <!-- FAQ Redirect Banner (Full width at the top of content) -->
     <div class="w-full mb-12 animate-fade-in">
@@ -181,11 +175,6 @@ const submitForm = () => {
           </a>
         </div>
       </div>
-    </div>
-
-    <!-- Bottom Ad Block -->
-    <div class="col-12 px-4">
-      <GoogleAd :key="'bottom-contact'" />
     </div>
   </div>
 </template>

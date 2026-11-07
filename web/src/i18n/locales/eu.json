@@ -75,7 +75,7 @@
       "points": [
         "Jokalari bakoitzaren fitxa historikoak",
         "Bikote eta taldeen erregistro azkarra",
-        "Ordainketen eta inskripzio-egoeren kontrola",
+        "Bertaratzearen eta inskripzio-egoeren kontrola",
         "Parte-hartzaileen bilatzaile globala"
       ]
     },
@@ -352,7 +352,7 @@
     "terms_sections": [
       {
         "title": "1. Zerbitzuaren Helburua",
-        "text": "Mus Manager-ek mus txapelketak antolatzeko, kudeatzeko eta bistaratzeko tresna digital bat eskaintzen du. Zerbitzua 'dagoen bezala' eta doan eskaintzen zaio azken erabiltzaileari."
+        "text": "Mus Manager-ek lagunarteko eta gizarteko mus txapelketak antolatzeko, koadroak zein sailkapenak kudeatzeko eta bistaratzeko tresna teknologiko eta digital bat soilik eskaintzen du. Zerbitzua 'dagoen bezala', %100 doan eta inolako bitartekaritza ekonomikorik gabe eskaintzen da."
       },
       {
         "title": "2. Erregistroa eta Erantzukizuna",
@@ -360,11 +360,11 @@
       },
       {
         "title": "3. Debekatutako Erabilera",
-        "text": "Zertarako debekatuta dago Mus Manager erabiltzea: (a) Legez kanpoko apustuak edo iruzurrezko jarduerak antolatzeko. (b) Eduki iraingarria, bortitza edo diskriminatzailea sartzeko. (c) Ingeniaritza alderantzikatua egiteko edo webgunearen azpiegitura teknologikoa kaltetzeko."
+        "text": "Guztiz debekatuta dago Mus Manager erabiltzea: (a) Benetako diruarekin egindako apustuak, zorizko jokoak edo iruzurrezko jarduerak antolatzeko. (b) Eduki iraingarria, bortitza edo diskriminatzailea sartzeko. (c) Ingeniaritza alderantzikatua egiteko edo webgunearen azpiegitura teknologikoa kaltetzeko."
       },
       {
-        "title": "4. Erantzukizunetik Salbuestea",
-        "text": "Mus Manager-ek ez du parte hartzen hirugarrenek antolatutako txapelketetako apustu fisikoetan edo sarietan. Ez gara jokalarien edo antolatzaileen arteko gatazken erantzule, ezta gure kontroletik kanpoko kausengatik zerbitzuak gaizki funtzionatzearen erantzule ere."
+        "title": "4. Erantzukizunetik Salbuestea eta Bitartekaritza Ekonomikorik Eza",
+        "text": "Mus Manager markagailu eta kirol/aisialdiko kudeaketa-software bat da soilik: EZ ditu ordainketak prozesatzen, EZ ditu izen-emateak kobratzen, EZ ditu diru-sariak banatzen eta inola ere ez du esku hartzen edo bitartekaritzarik egiten diruarekin. Ez gara jokalarien edo antolatzaileen arteko akordio pribatuen edo gatazken erantzule, ezta gure kontroletik kanpoko kausengatik zerbitzuak gaizki funtzionatzearen erantzule ere."
       },
       {
         "title": "5. Aldaketak",
@@ -383,7 +383,7 @@
         "text": "Zure nabigatzailea cookieak edonoiz blokeatzeko edo ezabatzeko konfigura dezakezu. Kontuan izan cookie teknikoak desgaitzeak zure kontuaren funtzionamenduan eragina izan dezakeela. Informazio gehiago: Chrome (support.google.com/chrome), Firefox (support.mozilla.org), Safari (support.apple.com), Edge (support.microsoft.com)."
       }
     ],
-    "age_notice": "Gune honek online jokoen publizitatea erakusten du. Jokoa debekatuta dago 18 urtetik beherakoentzat. Adingabea bazara, irten gunetik. Jokoak mendekotasuna sor dezake. Jokatu arduraz. www.juegoseguro.es",
+    "age_notice": "OHAR GARRANTZITSUA: Mus Manager lagunarteko eta gizarteko txapelketetarako koadroak eta sailkapenak kudeatzeko tresna teknologiko bat da soilik. Plataforma honek EZ du benetako diruarekin, izen-emate kobrantzekin, sari-banaketekin edo inolako apusturekin jarduten, sustatzen ezta bitartekaritzarik egiten ere. 18 urtetik gorakoentzako zerbitzua.",
     "contact_footer": "Politika hauekin lotutako edozein zalantza izanez gero, gurekin harremanetan jar zaitezke info{'@'}musmanager.com helbidean",
     "cookies_table_headers": {
       "type": "Mota",
@@ -693,7 +693,7 @@
       "add_btn": "INSKRIBATU BIKOTE BERRIA",
       "list_title": "Inskribatutako Bikoteak",
       "empty": "Ez dago inskripziorik oraindik",
-      "confirmed_tooltip": "Konfirmatuta / Ordainduta",
+      "confirmed_tooltip": "Parte-hartzea Konfirmatuta",
       "confirmed_success": "Bikotea ongi konfirmatu da",
       "unconfirmed_success": "Konfirmazioa ongi kendu da",
       "delete_success": "Bikotea ongi ezabatu da",
@@ -704,8 +704,8 @@
       "delete_btn": "Ezabatu",
       "team_name_label": "Bikotearen Izena",
       "team_name_placeholder": "Adib: Mus Erregeak",
-      "is_confirmed_label": "Konfirmatuta / Ordainduta",
-      "is_confirmed_help": "Markatu aukera hau ordaindu badute",
+      "is_confirmed_label": "Parte-hartzea Konfirmatuta",
+      "is_confirmed_help": "Markatu aukera hau bikoteak bere parte-hartzea baieztatu badu",
       "is_confirmed_active": "Inskripzioa konfirmatuta",
       "error_name_required": "Bikotearen izena derrigorrezkoa da",
       "submit_btn": "INSKRIBATU",
@@ -778,7 +778,7 @@
     "welcome": "Baldintzak Eguneratzea",
     "intro": "Mus Manager-ez gozatzen jarraitzeko, gure pribatutasun-politika eta erabilera-baldintza eguneratuak berrikusi eta onartu behar dituzu.",
     "section1_title": "Erabilera Baldintzak eta Baldintzak",
-    "section1_text": "Gure plataforma erabiltzean, onartzen duzu Mus Manager-ek txapelketak antolatzeko tresna digital bat eskaintzen duela 'dagoen bezala'. Erabiltzailea da bere kredentzialen arduraduna eta debekatuta dago legez kanpoko apustuetarako edo eduki iraingarrirako erabiltzea.",
+    "section1_text": "Gure plataforma erabiltzean, onartzen duzu Mus Manager-ek koadroak eta sailkapenak kudeatzeko tresna digital bat soilik eskaintzen duela 'dagoen bezala', diruarekin, izen-emate ordainketekin edo diru-sariekin inola ere bitartekaritzarik egin gabe. Erabiltzailea da bere kredentzialen arduraduna eta debekatuta dago legez kanpoko jardueretarako edo eduki iraingarrirako erabiltzea.",
     "section2_title": "Pribatutasun Politika",
     "section2_text": "Zure datuak (emaila, izena, emaitzak) tratatzen ditugu zure kontua kudeatzeko eta rankingak sortzeko. Oinarri legala zure baimena eta erabilera-baldintzak gauzatzea da. Zure sarbide- eta ezabatz-eskubideak edozein unetan erabil ditzakezu.",
     "last_updated": "Azken eguneratzea: 2026ko maiatza",
@@ -895,6 +895,10 @@
         {
           "q": "Erabili dezaket aplikazioa publizitaterik ikusi gabe?",
           "a": "Gaur egun, kudeaketa eta ikuspen tresna guztien sarbide osoa iragarkien bidez mantentzen da doakotasuna bermatzeko. Hala ere, etorkizunean iragarkirik gabeko harpidetza premium bat eskaintzeko aukera aztertzen ari gara, saltoki komertzial edo federazioentzako."
+        },
+        {
+          "q": "Mus Manager-ek diruarekin, ordainketekin edo apustuekin bitartekaritzarik egiten al du?",
+          "a": "Ez, inola ere ez. Mus Manager kirol eta aisialdiko kudeaketa-software bat da soilik, koadroak sortzeko, markagailuak gordetzeko eta sailkapenak erakusteko. Plataformak ez ditu ordainketak prozesatzen, ez ditu izen-emateak kobratzen, ez ditu diru-sariak kudeatzen eta ez du inolako apustu ekonomikorik onartzen."
         }
       ]
     }
@@ -919,8 +923,8 @@
     "rules_round3_desc": "Gutxienez bi karta berdin izatea eskatzen da. Hiru pare mota daude: Pare sinplea (bi karta berdin), Erdikoak (hiru karta berdin) eta Dupleak (lau karta berdin edo bi pare berdin). Dupleak Erdikoak gainditzen ditu, eta Erdikoak Parea. Pare mota bera izatekotan, baliorik altuenak irabazten du.",
     "rules_round4_title": "Jokoa edo Puntua:",
     "rules_round4_desc": "Karten balioak batzen dira (Irudiek 10 balio dute, Asek 1, eta gainerakoek beren balio izendatua). Baturak 31 edo gehiago ematen badu, 'Jokoa' daukate jokalariek. Jokorik onena 31 da, eta ondoren 40, 36, 35, 34, 33 eta 32. Inork ez badu 31 lortzen, 'Puntura' jokatzen da, eta 30era gehien hurbiltzen denak irabazten du.",
-    "rules_betting_title": "Apustua eta Tantuak",
-    "rules_betting_text": "Ustaldi bakoitzean, lehen hitza duenak (eskuak) 'Paso' edo 'Enbido' (2 tantuko apustua) esan dezake. Aurkariak 'Nahi' (onartu), 'Paso' (apustua utzi, tantu 1 galduz) edo 'Berrenbido' (apustua igotzea) esan dezake. Apustu nagusia 'Hordagoa' da, joko edo chico osoa jokoan jartzen duena. Aurkariak hordagoa onartzen badu, kartak berehala erakusten dira chicoa nork irabazten duen erabakitzeko.",
+    "rules_betting_title": "Enbidoa eta Puntuazio Tantuak",
+    "rules_betting_text": "Ustaldi bakoitzean, lehen hitza duenak (eskuak) 'Paso' edo 'Enbido' (partidako 2 puntuazio-tantu edo hamarreko jokoan jarriz) esan dezake. Aurkariak 'Nahi' (puntu-erronka onartu), 'Paso' (ustaldia utzi, tantu 1 emanez) edo 'Berrenbido' (jokoan dauden tantuak igo) esan dezake. Enbido nagusia 'Hordagoa' da, joko edo ustaldi osoaren puntuak erabakitzen dituena. Tantu hauek (hamarrekoak) karta-jokoaren araudiko puntuazio-unitateak dira soilik eta ez dute inolako diru-baliorik.",
     "strategy_title": "2. Estrategia eta Taktika Aurreratuak",
     "strategy_intro": "Musa informazio osatugabeko jokoa da, non bikotearen arteko koordinazioak eta aurkarien irakurketak txapeldun handiak definitzen dituen.",
     "strategy_card1_title": "Kartak Baztertzeko Artea (Deskartea)",
