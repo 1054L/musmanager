@@ -150,7 +150,7 @@ const handleCreate = async () => {
   <div class="form-page">
     <header class="form-header mb-8">
       <h1 class="mus-h1 italic text-2xl mb-1">
-        NUEVO <span class="mus-gold-text">TORNEO</span>
+        {{ t('tournament_form.create_header_1') }} <span class="mus-gold-text">{{ t('tournament_form.create_header_2') }}</span>
       </h1>
       <p class="mus-p text-sm opacity-60">
         {{ t('tournament_form.create_desc') }}
@@ -365,7 +365,7 @@ const handleCreate = async () => {
         </div>
 
         <div class="mt-12 pt-10 border-t border-white/5 flex gap-4">
-           <button type="button" @click="router.push('/my-tournaments')" class="cancel-btn">Cancelar</button>
+           <button type="button" @click="router.push('/my-tournaments')" class="cancel-btn">{{ t('tournament_form.actions.cancel') }}</button>
            <button type="submit" :disabled="loading" class="mus-btn-gold-large flex-1">
             <i v-if="!loading" class="pi pi-trophy mr-3"></i>
             {{ loading ? t('tournament_form.actions.saving') : t('tournament_form.actions.create') }}

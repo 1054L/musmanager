@@ -9,7 +9,18 @@
     "error": "Errorea",
     "delete": "Ezabatu",
     "edit": "Editatu",
-    "deadline": "Muga-eguna"
+    "accept": "Onartu",
+    "decline": "Baztertu",
+    "more_info": "Informazio gehiago",
+    "deadline": "Muga-eguna",
+    "all": "Guztiak",
+    "group_name": "{name} Taldea"
+  },
+  "cookie_banner": {
+    "title": "Cookieen Konfigurazioa",
+    "desc": "Cookie propioak eta hirugarrenenak erabiltzen ditugu zure esperientzia hobetzeko, trafikoa aztertzeko eta publizitate pertsonalizatua erakusteko. Nabigatzen jarraitzean, gure cookie politika eta erabilera baldintzak onartzen dituzu.",
+    "accept": "Onartu guztiak",
+    "settings": "Konfiguratu"
   },
   "stages": {
     "t64": "Hirurogeita laurdenak",
@@ -110,6 +121,11 @@
       "security_desc": "AES-256 Enkriptatzea",
       "performance_title": "Errendimendua",
       "performance_desc": "Real-time Event Bus"
+    },
+    "stats_labels": {
+      "digital": "Digitala",
+      "cost": "Kostua",
+      "access": "Sarbidea"
     }
   },
   "stats": {
@@ -205,11 +221,18 @@
     "empty_cta": "Sortu zure lehen txapelketa",
     "empty_subtitle": "Hasi zure ondarea Mus Manager antolatzaile gisa gaur bertan.",
     "my_tournaments": "Nire Txapelketak",
+    "my_tournaments_desc": "Kudeatu zure lehiaketa-ekitaldiak eta erregistratutako bikoteak",
     "view_all": "Ikusi guztiak",
     "recent": "Azken",
     "recent_gold": "Txapelketak",
     "recent_tournaments": "Azken Txapelketak",
     "recent_teams": "AZKEN BIKOTEAK",
+    "stats": {
+      "total_tournaments": "Txapelketak Guztira",
+      "active_tournaments": "Txapelketa Aktiboak",
+      "total_teams": "Bikoteak Guztira",
+      "total_matches": "Jokatutako Partidak"
+    },
     "copy_link": "Kopiatu Esteka",
     "copy_link_help": "Partekatu esteka hau muslarien artean",
     "link_copied": "Esteka kopiatua!",
@@ -283,7 +306,12 @@
       "pairs": "Bikoteak",
       "results": "Emaitzak",
       "live_round": "Zuzenean • Egungo Jardunaldia"
-    }
+    },
+    "no_recent_enrollments": "Azken inskripziorik gabe",
+    "unnamed_pair": "Izenik gabeko bikotea",
+    "recent_label": "Berria",
+    "registered_badge": "ERREGISTRATUA",
+    "players_badge": "{count} JOKALARI"
   },
   "footer": {
     "desc": "Mus komunitate lehiakorrarentzako txapelketak kudeatzeko plataforma nagusia. Zehaztasuna, dotorezia eta pasioa.",
@@ -453,6 +481,7 @@
     "players_count": "{count} Jokalari",
     "pairs_count": "{count} Bikote",
     "owner": "Antolatzailea",
+    "admin_info": "Admin Info",
     "filters": {
       "all": "Guztiak",
       "active": "Abian",
@@ -462,8 +491,12 @@
   },
   "tournament_form": {
     "create_title": "Txapelketa Sortu",
+    "create_header_1": "TXAPELKETA",
+    "create_header_2": "BERRIA",
     "create_desc": "Konfiguratu zure lehiaketa berriaren arauak eta xehetasunak",
     "edit_title": "Editatu Txapelketa",
+    "edit_header_1": "EDITATU",
+    "edit_header_2": "TXAPELKETA",
     "back_dashboard": "Itzuli Dashboard-era",
     "sections": {
       "identity": "Txapelketaren Nortasuna",
@@ -599,15 +632,43 @@
       "tc": "TC",
       "tdiff": "+/- T",
       "pts": "Pts",
+      "played_title": "Jokatutako Partidak",
+      "mw_title": "Irabazitako Partidak",
+      "ml_title": "Galdutako Partidak",
+      "vw_title": "Irabazitako Jokoak",
+      "vl_title": "Galdutako Jokoak",
+      "vdiff_title": "Jokoen Aldea",
+      "tf_title": "Aldeko Tantuak",
+      "tc_title": "Aurkako Tantuak",
+      "tdiff_title": "Tantuen Aldea",
+      "pts_title": "Puntuak Guztira",
+      "qual_zone_label": "Sailkapen Gunea:",
+      "qual_zone_single": "Multzo bakoitzeko bikote onena (Top 1) hurrengo fasera igarotzen da",
+      "qual_zone_multi": "Multzo bakoitzeko {count} bikote onenak (Top {count}) hurrengo fasera igarotzen dira",
+      "total_final_bracket": "Azken Koadroa Guztira: {count} bikote",
+      "group_qual_single": "Bikote 1 sailkatzen da",
+      "group_qual_multi": "{count} bikote sailkatzen dira",
+      "qualified_badge": "Sailkatua",
       "empty": "Ez dago sailkapenik eskuragarri oraindik"
     },
     "bracket": {
       "title": "Kanporaketa Koadroa",
-      "empty_desc": "Koadroa automatikoki sortuko da ligaxkaren ondoren"
+      "empty_desc": "Koadroa automatikoki sortuko da ligaxkaren ondoren",
+      "live_subtitle": "KANPORAKETA KOADROA - ZUZENEKO EMAITZAK",
+      "follow_tournament": "JARRAITU TXAPELKETA",
+      "live_results": "ZUZENEKO EMAITZAK",
+      "close_esc": "Itxi ESC teklarekin",
+      "finalist_a": "A FINALISTA",
+      "finalist_b": "B FINALISTA",
+      "semifinalist_a": "A FINALERDIKOA",
+      "semifinalist_b": "B FINALERDIKOA"
     },
     "teams": {
       "empty": "Ez dago talderik izena emanda oraindik",
-      "enrolled_count": "Izena Emandako Taldeak"
+      "enrolled_count": "Izena Emandako Taldeak",
+      "groups": {
+        "enrolled_count": "Izena Emandako Taldeak"
+      }
     },
     "active_matches_desc": "Gorde partiden emaitzak sailkapena eguneratzeko",
     "match_edit": {
@@ -616,7 +677,10 @@
       "save_success": "Emaitza ondo gorde da",
       "local": "Etxekoa",
       "visitor": "Kanpokoa",
-      "rule_summary": "{games} umeko eta {points} tantoko partida"
+      "rule_summary": "{games} umeko eta {points} tantoko partida",
+      "date_title": "Muga-eguna",
+      "date_tooltip": "Editatu jardunaldiaren data",
+      "date_save_success": "Jardunaldiaren data eguneratuta"
     },
     "activity": {
       "title": "Azken Jarduera",
@@ -646,7 +710,8 @@
     "tournament": "Txapelketa",
     "submit": "Sortu eta Inskribatu Bikotea",
     "success_msg": "Bikotea ongi sortu eta inskribatu da! Beste bat gehi dezakezu.",
-    "error_loading_tournaments": "Errorea txapelketak kargatzean."
+    "error_loading_tournaments": "Errorea txapelketak kargatzean.",
+    "error_no_tournament": "Txapelketa bat hautatu behar duzu."
   },
   "tournament_mgmt": {
     "team_mgmt": "Taldeen Kudeaketa",
@@ -656,6 +721,7 @@
     "no_group": "Mahairik Gabe",
     "groups_count_label": "Mahai Kopurua",
     "draw_groups": "Mahaien Zozketa",
+    "groups_success": "Multzoak ongi zozketatu dira",
     "generate_matches": "Sortu Partiden Egutegia"
   },
   "how_it_works_page": {
@@ -712,9 +778,40 @@
       "submitting_btn": "GORDETZEN..."
     },
     "groups": {
-      "config_title": "Mahaien Konfigurazioa",
-      "count_label": "Mahai Kopurua",
-      "generate_btn": "MAHAIETAN BANATU"
+      "config_title": "Multzoen Konfigurazioa",
+      "count_label": "Multzo Kopurua",
+      "generate_btn": "MULTZOETAN BANATU",
+      "modal_title_1": "Konfiguratu",
+      "modal_title_2": "Ligaxka + Kanporaketak",
+      "enrolled_pairs_subtitle": "{count} bikote inskribatuta",
+      "step1_title": "1. Zenbat multzotan banatu bikoteak?",
+      "step1_desc": "{count} bikoteak modu ekitatiboan zozketatuko dira",
+      "n_groups_btn": "{count} Multzo",
+      "dist_even": "{size} bikoteko {groups} multzo",
+      "dist_uneven": "{sizePlus} bikoteko {rem} multzo eta {size} bikoteko {rest} multzo",
+      "league_matches_count": "ligaxkako {count} partida",
+      "step2_title": "2. Zenbat bikote igarotzen dira multzo bakoitzetik?",
+      "step2_desc": "Azken kanporaketa-koadrora sailkatuko dira",
+      "step2_summary": "{groups} multzoetako bakoitzetik {qual} onenak igarotzen dira",
+      "qualified_to_round": "{count} bikote → {round}",
+      "step3_title": "3. Kanporaketetako gurutzaketa formatua",
+      "pairing_seeded_title": "1.a vs 2.a (Gurutzatua)",
+      "pairing_seeded_desc": "A Multzoko 1.a vs B Multzoko 2.a, multzo bereko gurutzaketak Finalera arte saihestuz.",
+      "pairing_random_title": "Zozketa Aleatorioa",
+      "pairing_random_desc": "Sailkatutako bikote guztiak zozketa hutsez parekatzen dira.",
+      "confirm_draw_btn": "Baieztatu eta Zozketa Sortu",
+      "knockout_card_title": "Kanporaketa Fasea (Azken Koadroa)",
+      "group_matches_progress": "Multzoetako Partidak: {finished} / {total}",
+      "knockout_card_desc": "Multzoen ligaxka amaitzean, sortu automatikoki kanporaketa-koadroa multzo bakoitzeko bikote onenekin.",
+      "qualify_per_group_label": "Multzoko sailkatuak:",
+      "pairings_label": "Gurutzaketak:",
+      "generate_bracket_btn": "Sortu Koadroa ({count} bikote)",
+      "generate_bracket_confirm_title": "Sortu Kanporaketa Fasea",
+      "generate_bracket_confirm_msg": "Multzo bakoitzeko {count} bikote onenekin kanporaketa-koadroa sortu nahi duzu?",
+      "generate_bracket_confirm_accept": "Sortu Koadroa",
+      "generate_bracket_success": "Kanporaketa-koadroa ongi sortu da",
+      "standings_panel_title": "Multzoen Sailkapena",
+      "top_qualify_badge": "Top {count} sailkatzen dira"
     },
     "status": {
       "title": "Txapelketaren Fasea",
@@ -748,7 +845,12 @@
       "error_desc": "Zerbaitek huts egin du. Saiatu egutegia berriro sortzen.",
       "tbd": "ERABAKITZEKE",
       "order_asc": "FINALA BEHEAN",
-      "order_desc": "FINALA GOIAN"
+      "order_desc": "FINALA GOIAN",
+      "reset_btn": "Zozketa Berrabiarazi",
+      "reset_confirm_title": "Zozketa Berrabiarazi",
+      "reset_confirm_msg": "Ziur al zaude zozketa berrabiarazi nahi duzula? Egungo partidak eta multzoen esleipena ezabatuko dira (inskribatutako bikoteak mantenduko dira) multzoak berriro konfiguratu ahal izateko.",
+      "reset_confirm_accept": "Bai, zozketa berrabiarazi",
+      "reset_success": "Zozketa berrabiarazi da. Orain multzoak berriro konfigura ditzakezu."
     },
     "match_edit": {
       "title": "Emaitzen Kudeaketa",

@@ -22,7 +22,9 @@
     "accept": "Aceptar",
     "decline": "Rechazar",
     "more_info": "Más información",
-    "deadline": "Límite"
+    "deadline": "Límite",
+    "all": "Todos",
+    "group_name": "Grupo {name}"
   },
   "cookie_banner": {
     "title": "Configuración de Cookies",
@@ -119,6 +121,11 @@
       "security_desc": "AES-256 Encryption",
       "performance_title": "Rendimiento",
       "performance_desc": "Real-time Event Bus"
+    },
+    "stats_labels": {
+      "digital": "Digital",
+      "cost": "Coste",
+      "access": "Acceso"
     }
   },
   "stats": {
@@ -299,7 +306,12 @@
       "pairs": "Parejas",
       "results": "Resultados",
       "live_round": "En Vivo • Ronda Actual"
-    }
+    },
+    "no_recent_enrollments": "Sin inscripciones recientes",
+    "unnamed_pair": "Pareja sin nombre",
+    "recent_label": "Reciente",
+    "registered_badge": "REGISTRADO",
+    "players_badge": "{count} JUGADORES"
   },
   "footer": {
     "desc": "La plataforma líder de gestión de torneos para la comunidad competitiva del Mus. Precisión, elegancia y pasión.",
@@ -470,6 +482,7 @@
     "players_count": "{count} Jugadores",
     "pairs_count": "{count} Parejas",
     "owner": "Organizador",
+    "admin_info": "Info Admin",
     "filters": {
       "all": "Todos",
       "active": "En Curso",
@@ -479,8 +492,12 @@
   },
   "tournament_form": {
     "create_title": "Crear Torneo",
+    "create_header_1": "NUEVO",
+    "create_header_2": "TORNEO",
     "create_desc": "Configura las reglas y detalles de tu nueva competición",
     "edit_title": "Torneo",
+    "edit_header_1": "EDITAR",
+    "edit_header_2": "TORNEO",
     "back_dashboard": "Volver al Dashboard",
     "sections": {
       "identity": "Identidad del Torneo",
@@ -606,6 +623,7 @@
       "team": "Pareja",
       "played": "PJ",
       "won": "PG",
+      "lost": "PP",
       "mw": "PG",
       "ml": "PP",
       "vw": "VG",
@@ -615,15 +633,43 @@
       "tc": "TC",
       "tdiff": "+/- T",
       "pts": "Pts",
+      "played_title": "Partidas Jugadas",
+      "mw_title": "Partidas Ganadas",
+      "ml_title": "Partidas Perdidas",
+      "vw_title": "Vacas Ganadas",
+      "vl_title": "Vacas Perdidas",
+      "vdiff_title": "Diferencia de Vacas",
+      "tf_title": "Tantos a Favor",
+      "tc_title": "Tantos en Contra",
+      "tdiff_title": "Diferencia de Tantos",
+      "pts_title": "Puntos Totales",
+      "qual_zone_label": "Zona de Clasificación:",
+      "qual_zone_single": "Pasa a la siguiente fase la mejor pareja (Top 1) de cada grupo",
+      "qual_zone_multi": "Pasan a la siguiente fase las {count} mejores parejas (Top {count}) de cada grupo",
+      "total_final_bracket": "Total Cuadro Final: {count} parejas",
+      "group_qual_single": "Clasifica 1 pareja",
+      "group_qual_multi": "Clasifican {count} parejas",
+      "qualified_badge": "Clasifica",
       "empty": "No hay clasificación disponible todavía"
     },
     "bracket": {
       "title": "Cuadro de Eliminatorias",
-      "empty_desc": "El cuadro se generará automáticamente tras la liguilla"
+      "empty_desc": "El cuadro se generará automáticamente tras la liguilla",
+      "live_subtitle": "CUADRO DE ELIMINATORIAS - RESULTADOS EN VIVO",
+      "follow_tournament": "SIGUE EL TORNEO",
+      "live_results": "RESULTADOS EN VIVO",
+      "close_esc": "Cerrar con ESC",
+      "finalist_a": "FINALISTA A",
+      "finalist_b": "FINALISTA B",
+      "semifinalist_a": "SEMIFINALISTA A",
+      "semifinalist_b": "SEMIFINALISTA B"
     },
     "teams": {
       "empty": "No hay equipos inscritos todavía",
-      "enrolled_count": "Equipos Inscritos"
+      "enrolled_count": "Equipos Inscritos",
+      "groups": {
+        "enrolled_count": "Equipos Inscritos"
+      }
     },
     "active_matches_desc": "Registra los resultados de los enfrentamientos para actualizar la clasificación",
     "match_edit": {
@@ -665,7 +711,8 @@
     "tournament": "Torneo",
     "submit": "Crear e Inscribir Pareja",
     "success_msg": "¡Pareja creada e inscrita con éxito! Puedes añadir otra.",
-    "error_loading_tournaments": "Error al cargar los torneos."
+    "error_loading_tournaments": "Error al cargar los torneos.",
+    "error_no_tournament": "Debes seleccionar un torneo."
   },
   "tournament_mgmt": {
     "team_mgmt": "Gestión de Equipos",
@@ -675,6 +722,7 @@
     "no_group": "Sin Mesa",
     "groups_count_label": "Número de Mesas",
     "draw_groups": "Sorteo de Mesas",
+    "groups_success": "Grupos sorteados con éxito",
     "generate_matches": "Generar Calendario de Partidas"
   },
   "how_it_works_page": {
@@ -731,9 +779,40 @@
       "submitting_btn": "GUARDANDO..."
     },
     "groups": {
-      "config_title": "Configuración de Mesas",
-      "count_label": "Número de Mesas",
-      "generate_btn": "REPARTIR EN MESAS"
+      "config_title": "Configuración de Grupos",
+      "count_label": "Número de Grupos",
+      "generate_btn": "REPARTIR EN GRUPOS",
+      "modal_title_1": "Configurar",
+      "modal_title_2": "Liguilla + Eliminatorias",
+      "enrolled_pairs_subtitle": "{count} parejas inscritas",
+      "step1_title": "1. ¿En cuántos grupos repartir las parejas?",
+      "step1_desc": "Las {count} parejas se sortearán equitativamente",
+      "n_groups_btn": "{count} Grupos",
+      "dist_even": "{groups} grupos de {size} parejas",
+      "dist_uneven": "{rem} grupo(s) de {sizePlus} parejas y {rest} grupo(s) de {size} parejas",
+      "league_matches_count": "{count} partidas de liguilla",
+      "step2_title": "2. ¿Cuántas parejas pasan por cada grupo?",
+      "step2_desc": "Clasificarán al cuadro eliminatorio final",
+      "step2_summary": "Pasan las {qual} mejores de cada uno de los {groups} grupos",
+      "qualified_to_round": "{count} parejas → {round}",
+      "step3_title": "3. Formato de cruces en Eliminatorias",
+      "pairing_seeded_title": "1.º vs 2.º (Cruzado)",
+      "pairing_seeded_desc": "1.º Grupo A vs 2.º Grupo B, evitando cruces del mismo grupo hasta la Final.",
+      "pairing_random_title": "Sorteo Aleatorio",
+      "pairing_random_desc": "Todas las parejas clasificadas se emparejan por sorteo puro.",
+      "confirm_draw_btn": "Confirmar y Generar Sorteo",
+      "knockout_card_title": "Fase Eliminatoria (Cuadro Final)",
+      "group_matches_progress": "Partidas de Grupos: {finished} / {total}",
+      "knockout_card_desc": "Cuando finalice la liguilla de grupos, genera automáticamente el cuadro eliminatorio con las mejores parejas de cada grupo.",
+      "qualify_per_group_label": "Clasifican por grupo:",
+      "pairings_label": "Cruces:",
+      "generate_bracket_btn": "Generar Cuadro ({count} parejas)",
+      "generate_bracket_confirm_title": "Generar Fase Eliminatoria",
+      "generate_bracket_confirm_msg": "¿Generar el cuadro eliminatorio con las {count} mejores parejas de cada grupo?",
+      "generate_bracket_confirm_accept": "Generar Cuadro",
+      "generate_bracket_success": "Cuadro eliminatorio generado correctamente",
+      "standings_panel_title": "Clasificación de Grupos",
+      "top_qualify_badge": "Top {count} clasifican"
     },
     "status": {
       "title": "Fase del Torneo",
@@ -767,7 +846,12 @@
       "error_desc": "Algo ha ido mal. Intenta generar el calendario de nuevo.",
       "tbd": "POR DECIDIR",
       "order_asc": "FINAL ABAJO",
-      "order_desc": "FINAL ARRIBA"
+      "order_desc": "FINAL ARRIBA",
+      "reset_btn": "Reiniciar Sorteo",
+      "reset_confirm_title": "Reiniciar Sorteo",
+      "reset_confirm_msg": "¿Estás seguro de que quieres reiniciar el sorteo? Se borrarán las partidas actuales y la asignación de grupos (las parejas inscritas se mantienen) para que puedas volver a configurar los grupos.",
+      "reset_confirm_accept": "Sí, reiniciar sorteo",
+      "reset_success": "Sorteo reiniciado. Ahora puedes volver a configurar los grupos."
     },
     "match_edit": {
       "title": "Gestión de Resultado",
@@ -782,7 +866,10 @@
       "games_breakdown": "Desglose de Juegos",
       "points_per_game": "{points} tantos/juego",
       "game_label": "Juego",
-      "win_tooltip": "Ganar"
+      "win_tooltip": "Ganar",
+      "date_title": "Fecha Límite de la Jornada",
+      "date_tooltip": "Editar fecha límite de la jornada",
+      "date_save_success": "Fecha límite actualizada correctamente"
     },
     "stats": {
       "confirmed": "Confirmadas",

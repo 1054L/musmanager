@@ -134,7 +134,7 @@ onMounted(() => {
             <div v-if="isSuperAdmin && tny.owner" class="admin-meta mt-4 p-3 rounded-xl bg-primary/5 border border-primary/20">
               <div class="flex items-center gap-2 text-[10px] font-black text-primary">
                 <i class="pi pi-shield text-[10px]"></i>
-                <span class="uppercase tracking-widest">Admin Info</span>
+                <span class="uppercase tracking-widest">{{ t('tournaments_page.admin_info') }}</span>
               </div>
               <div class="mt-1 text-[11px] text-slate-300 font-bold">
                 <span class="text-slate-500">{{ t('tournaments_page.owner') }}:</span> {{ tny.owner.firstName || '' }} {{ tny.owner.lastName || tny.owner.name || '' }} 

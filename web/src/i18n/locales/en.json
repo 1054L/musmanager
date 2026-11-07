@@ -9,7 +9,18 @@
     "error": "Error",
     "delete": "Delete",
     "edit": "Edit",
-    "deadline": "Deadline"
+    "accept": "Accept",
+    "decline": "Decline",
+    "more_info": "More information",
+    "deadline": "Deadline",
+    "all": "All",
+    "group_name": "Group {name}"
+  },
+  "cookie_banner": {
+    "title": "Cookie Settings",
+    "desc": "We use our own and third-party cookies to improve your experience, analyze traffic, and show personalized advertising. By continuing to browse, you accept our cookie policy and terms of use.",
+    "accept": "Accept all",
+    "settings": "Settings"
   },
   "stages": {
     "t64": "Round of 64",
@@ -110,6 +121,11 @@
       "security_desc": "AES-256 Encryption",
       "performance_title": "Performance",
       "performance_desc": "Real-time Event Bus"
+    },
+    "stats_labels": {
+      "digital": "Digital",
+      "cost": "Cost",
+      "access": "Access"
     }
   },
   "stats": {
@@ -204,6 +220,8 @@
     "empty_title": "Your dashboard is empty",
     "empty_cta": "Create your first tournament",
     "empty_subtitle": "Start your legacy as a Mus Manager organizer today.",
+    "my_tournaments": "My Tournaments",
+    "my_tournaments_desc": "Manage your competitive events and registered pairs",
     "view_all": "View all",
     "recent": "Recent",
     "recent_gold": "Tournaments",
@@ -288,7 +306,12 @@
       "pairs": "Pairs",
       "results": "Results",
       "live_round": "Live • Current Round"
-    }
+    },
+    "no_recent_enrollments": "No recent registrations",
+    "unnamed_pair": "Unnamed pair",
+    "recent_label": "Recent",
+    "registered_badge": "REGISTERED",
+    "players_badge": "{count} PLAYERS"
   },
   "footer": {
     "desc": "The leading tournament management platform for the competitive Mus community. Precision, elegance, and passion.",
@@ -458,6 +481,7 @@
     "players_count": "{count} Players",
     "pairs_count": "{count} Pairs",
     "owner": "Organizer",
+    "admin_info": "Admin Info",
     "filters": {
       "all": "All",
       "active": "Active",
@@ -467,8 +491,12 @@
   },
   "tournament_form": {
     "create_title": "Create Tournament",
+    "create_header_1": "NEW",
+    "create_header_2": "TOURNAMENT",
     "create_desc": "Configure the rules and details of your new competition",
     "edit_title": "Tournament",
+    "edit_header_1": "EDIT",
+    "edit_header_2": "TOURNAMENT",
     "back_dashboard": "Back to Dashboard",
     "sections": {
       "identity": "Tournament Identity",
@@ -555,7 +583,8 @@
       "draft": "Draft",
       "pending": "Pending",
       "active": "Active",
-      "finished": "Finished"
+      "finished": "Finished",
+      "resting": "Resting"
     }
   },
   "tournament_view": {
@@ -594,6 +623,7 @@
       "team": "Pair",
       "played": "MP",
       "won": "MW",
+      "lost": "ML",
       "mw": "MW",
       "ml": "ML",
       "vw": "VW",
@@ -603,14 +633,40 @@
       "tc": "TC",
       "tdiff": "+/- T",
       "pts": "Pts",
+      "played_title": "Matches Played",
+      "mw_title": "Matches Won",
+      "ml_title": "Matches Lost",
+      "vw_title": "Sets Won",
+      "vl_title": "Sets Lost",
+      "vdiff_title": "Sets Difference",
+      "tf_title": "Points For",
+      "tc_title": "Points Against",
+      "tdiff_title": "Points Difference",
+      "pts_title": "Total Points",
+      "qual_zone_label": "Qualification Zone:",
+      "qual_zone_single": "The top pair (Top 1) from each group advances to the next stage",
+      "qual_zone_multi": "The top {count} pairs from each group advance to the next stage",
+      "total_final_bracket": "Final Bracket Total: {count} pairs",
+      "group_qual_single": "1 pair qualifies",
+      "group_qual_multi": "{count} pairs qualify",
+      "qualified_badge": "Qualifies",
       "empty": "No standings available yet"
     },
     "bracket": {
       "title": "Knockout Bracket",
-      "empty_desc": "The bracket will be generated automatically after the group stage"
+      "empty_desc": "The bracket will be generated automatically after the group stage",
+      "live_subtitle": "KNOCKOUT BRACKET - LIVE RESULTS",
+      "follow_tournament": "FOLLOW THE TOURNAMENT",
+      "live_results": "LIVE RESULTS",
+      "close_esc": "Close with ESC",
+      "finalist_a": "FINALIST A",
+      "finalist_b": "FINALIST B",
+      "semifinalist_a": "SEMIFINALIST A",
+      "semifinalist_b": "SEMIFINALIST B"
     },
     "teams": {
       "empty": "No enrollments yet",
+      "enrolled_count": "Enrolled Teams",
       "groups": {
         "enrolled_count": "Enrolled Teams"
       }
@@ -655,7 +711,8 @@
     "tournament": "Tournament",
     "submit": "Create and Enroll Pair",
     "success_msg": "Pair created and enrolled successfully! You can add another.",
-    "error_loading_tournaments": "Error loading tournaments."
+    "error_loading_tournaments": "Error loading tournaments.",
+    "error_no_tournament": "You must select a tournament."
   },
   "tournament_mgmt": {
     "team_mgmt": "Team Management",
@@ -665,6 +722,7 @@
     "no_group": "No Table",
     "groups_count_label": "Number of Tables",
     "draw_groups": "Draw Tables",
+    "groups_success": "Groups drawn successfully",
     "generate_matches": "Generate Match Schedule"
   },
   "how_it_works_page": {
@@ -698,10 +756,13 @@
     "back_tooltip": "Back to My Tournaments",
     "enrollment": {
       "title": "Pair Registration",
+      "subtitle": "ADD NEW PARTICIPANTS TO THE TOURNAMENT",
       "add_btn": "REGISTER NEW PAIR",
       "list_title": "Registered Pairs",
       "empty": "No pairs registered yet",
       "confirmed_tooltip": "Attendance Confirmed",
+      "confirmed_success": "Pair confirmed successfully",
+      "unconfirmed_success": "Confirmation cancelled successfully",
       "delete_success": "Pair removed successfully",
       "add_success": "Pair registered successfully",
       "delete_confirm_title": "Confirm Removal",
@@ -718,9 +779,40 @@
       "submitting_btn": "SAVING..."
     },
     "groups": {
-      "config_title": "Tables Configuration",
-      "count_label": "Number of Tables",
-      "generate_btn": "DISTRIBUTE INTO TABLES"
+      "config_title": "Groups Configuration",
+      "count_label": "Number of Groups",
+      "generate_btn": "DISTRIBUTE INTO GROUPS",
+      "modal_title_1": "Configure",
+      "modal_title_2": "Groups + Knockout",
+      "enrolled_pairs_subtitle": "{count} registered pairs",
+      "step1_title": "1. Into how many groups should pairs be divided?",
+      "step1_desc": "The {count} pairs will be drawn evenly",
+      "n_groups_btn": "{count} Groups",
+      "dist_even": "{groups} groups of {size} pairs",
+      "dist_uneven": "{rem} group(s) of {sizePlus} pairs and {rest} group(s) of {size} pairs",
+      "league_matches_count": "{count} group matches",
+      "step2_title": "2. How many pairs qualify per group?",
+      "step2_desc": "They will qualify for the final knockout bracket",
+      "step2_summary": "Top {qual} from each of the {groups} groups qualify",
+      "qualified_to_round": "{count} pairs → {round}",
+      "step3_title": "3. Knockout Pairing Format",
+      "pairing_seeded_title": "1st vs 2nd (Cross-seeded)",
+      "pairing_seeded_desc": "1st Group A vs 2nd Group B, avoiding same-group matchups until the Final.",
+      "pairing_random_title": "Random Draw",
+      "pairing_random_desc": "All qualified pairs are matched by a pure random draw.",
+      "confirm_draw_btn": "Confirm & Generate Draw",
+      "knockout_card_title": "Knockout Stage (Final Bracket)",
+      "group_matches_progress": "Group Matches: {finished} / {total}",
+      "knockout_card_desc": "When the group stage finishes, automatically generate the knockout bracket with the top pairs from each group.",
+      "qualify_per_group_label": "Qualify per group:",
+      "pairings_label": "Pairings:",
+      "generate_bracket_btn": "Generate Bracket ({count} pairs)",
+      "generate_bracket_confirm_title": "Generate Knockout Stage",
+      "generate_bracket_confirm_msg": "Generate the knockout bracket with the top {count} pairs from each group?",
+      "generate_bracket_confirm_accept": "Generate Bracket",
+      "generate_bracket_success": "Knockout bracket generated successfully",
+      "standings_panel_title": "Group Standings",
+      "top_qualify_badge": "Top {count} qualify"
     },
     "status": {
       "title": "Tournament Phase",
@@ -749,14 +841,21 @@
     },
     "matches": {
       "title": "Tournament Matches",
+      "empty": "No matches generated",
       "no_matchups": "No match-ups yet",
       "error_desc": "Generate matches to start recording results",
       "tbd": "TBD",
       "order_asc": "FINALS AT BOTTOM",
-      "order_desc": "FINALS AT TOP"
+      "order_desc": "FINALS AT TOP",
+      "reset_btn": "Reset Draw",
+      "reset_confirm_title": "Reset Draw",
+      "reset_confirm_msg": "Are you sure you want to reset the draw? Current matches and group assignments will be cleared (registered pairs are kept) so you can reconfigure the groups.",
+      "reset_confirm_accept": "Yes, reset draw",
+      "reset_success": "Draw reset. You can now reconfigure the groups."
     },
     "match_edit": {
       "title": "Result Management",
+      "subtitle": "RESULTS AND SCORES MANAGEMENT",
       "panel_title": "Control Panel",
       "score_games": "SETS SCORE",
       "regulation": "REGULATION",
@@ -767,7 +866,10 @@
       "games_breakdown": "Sets Breakdown",
       "points_per_game": "{points} points/set",
       "game_label": "Set",
-      "win_tooltip": "Win"
+      "win_tooltip": "Win",
+      "date_title": "Match Day Deadline",
+      "date_tooltip": "Edit match day deadline",
+      "date_save_success": "Match day deadline updated"
     },
     "stats": {
       "confirmed": "Confirmed",

@@ -65,6 +65,10 @@ const formatMesa = (mesa) => {
     const number = mesa.match(/\d+/)
     return number ? `${t('common.table')} ${number[0]}` : t('common.table')
   }
+  const groupMatch = mesa.trim().match(/^(?:grupo|group|talde)\s+([a-z0-9]+)$/i)
+  if (groupMatch) {
+    return t('common.group_name', { name: groupMatch[1].toUpperCase() })
+  }
   return mesa
 }
 
@@ -86,6 +90,11 @@ const getStageLabel = (stage) => {
     return locale.value === 'eu'
       ? `${day}. ${matchDayLabel}`
       : `${matchDayLabel} ${day}`
+  }
+
+  const groupMatch = stage.trim().match(/^(?:grupo|group|talde)\s+([a-z0-9]+)$/i)
+  if (groupMatch) {
+    return t('common.group_name', { name: groupMatch[1].toUpperCase() })
   }
 
   const normalizedStage = normalizeStageKey(stage)
@@ -765,26 +774,26 @@ const saveMatchResult = async () => {
                 <div class="flex align-items-center gap-3">
                   <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399] inline-block"></span>
                   <span class="text-xs font-black uppercase tracking-wider text-white">
-                    Zona de Clasificación:
+                    {{ t('tournament_view.classification.qual_zone_label') }}
                     <span class="text-emerald-400">
-                      Pasan a la siguiente fase {{ teamsPerGroup === 1 ? 'la mejor pareja (Top 1)' : `las ${teamsPerGroup} mejores parejas (Top ${teamsPerGroup})` }} de cada grupo
+                      {{ teamsPerGroup === 1 ? t('tournament_view.classification.qual_zone_single') : t('tournament_view.classification.qual_zone_multi', { count: teamsPerGroup }) }}
                     </span>
                   </span>
                 </div>
                 <span class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-widest">
-                  Total Cuadro Final: {{ Object.keys(classification || {}).length * teamsPerGroup }} parejas
+                  {{ t('tournament_view.classification.total_final_bracket', { count: Object.keys(classification || {}).length * teamsPerGroup }) }}
                 </span>
               </div>
 
               <div v-for="(teams, mesaName) in (tournament.type === 'league' ? { 'General': Object.values(classification).flat() } : classification)" :key="mesaName" class="mb-10">
                 <div class="flex align-items-center justify-content-between mb-4">
                   <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest m-0 flex items-center gap-2">
-                    <i class="pi pi-table"></i> {{ mesaName }}
+                    <i class="pi pi-table"></i> {{ mesaName === 'General' ? t('tournament_view.rounds.general') : getStageLabel(mesaName) }}
                   </h4>
                   <span v-if="tournament.type === 'groups'"
                         class="px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-widest flex align-items-center gap-2">
                     <i class="pi pi-check-circle text-[10px]"></i>
-                    {{ teamsPerGroup === 1 ? 'Clasifica 1 pareja' : `Clasifican ${teamsPerGroup} parejas` }}
+                    {{ teamsPerGroup === 1 ? t('tournament_view.classification.group_qual_single') : t('tournament_view.classification.group_qual_multi', { count: teamsPerGroup }) }}
                   </span>
                 </div>
                 <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5 overflow-x-auto">
@@ -793,16 +802,16 @@ const saveMatchResult = async () => {
                       <tr class="bg-white/5 text-[10px] uppercase font-black tracking-widest text-slate-500">
                         <th class="p-4 w-[60px] text-center border-r border-white/5">#</th>
                         <th class="p-4 min-w-[200px]">{{ t('tournament_view.classification.team') }}</th>
-                        <th class="p-4 w-[60px] text-center border-l border-white/5" title="Partidas Jugadas">{{ t('tournament_view.classification.played') }}</th>
-                        <th class="p-4 w-[60px] text-center" title="Partidas Ganadas">{{ t('tournament_view.classification.mw') }}</th>
-                        <th class="p-4 w-[60px] text-center" title="Partidas Perdidas">{{ t('tournament_view.classification.ml') }}</th>
-                        <th class="p-4 w-[60px] text-center bg-white/[0.03]" title="Vacas Ganadas">{{ t('tournament_view.classification.vw') }}</th>
-                        <th class="p-4 w-[60px] text-center bg-white/[0.03]" title="Vacas Perdidas">{{ t('tournament_view.classification.vl') }}</th>
-                        <th class="p-4 w-[80px] text-center italic" title="Diferencia de Vacas">{{ t('tournament_view.classification.vdiff') }}</th>
-                        <th class="p-4 w-[80px] text-center" title="Tantos a Favor">{{ t('tournament_view.classification.tf') }}</th>
-                        <th class="p-4 w-[80px] text-center" title="Tantos en Contra">{{ t('tournament_view.classification.tc') }}</th>
-                        <th class="p-4 w-[80px] text-center italic" title="Diferencia de Tantos">{{ t('tournament_view.classification.tdiff') }}</th>
-                        <th class="p-4 w-[80px] text-center text-main bg-white/[0.05]" title="Puntos Totales">{{ t('tournament_view.classification.pts') }}</th>
+                        <th class="p-4 w-[60px] text-center border-l border-white/5" :title="t('tournament_view.classification.played_title')">{{ t('tournament_view.classification.played') }}</th>
+                        <th class="p-4 w-[60px] text-center" :title="t('tournament_view.classification.mw_title')">{{ t('tournament_view.classification.mw') }}</th>
+                        <th class="p-4 w-[60px] text-center" :title="t('tournament_view.classification.ml_title')">{{ t('tournament_view.classification.ml') }}</th>
+                        <th class="p-4 w-[60px] text-center bg-white/[0.03]" :title="t('tournament_view.classification.vw_title')">{{ t('tournament_view.classification.vw') }}</th>
+                        <th class="p-4 w-[60px] text-center bg-white/[0.03]" :title="t('tournament_view.classification.vl_title')">{{ t('tournament_view.classification.vl') }}</th>
+                        <th class="p-4 w-[80px] text-center italic" :title="t('tournament_view.classification.vdiff_title')">{{ t('tournament_view.classification.vdiff') }}</th>
+                        <th class="p-4 w-[80px] text-center" :title="t('tournament_view.classification.tf_title')">{{ t('tournament_view.classification.tf') }}</th>
+                        <th class="p-4 w-[80px] text-center" :title="t('tournament_view.classification.tc_title')">{{ t('tournament_view.classification.tc') }}</th>
+                        <th class="p-4 w-[80px] text-center italic" :title="t('tournament_view.classification.tdiff_title')">{{ t('tournament_view.classification.tdiff') }}</th>
+                        <th class="p-4 w-[80px] text-center text-main bg-white/[0.05]" :title="t('tournament_view.classification.pts_title')">{{ t('tournament_view.classification.pts') }}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -831,7 +840,7 @@ const saveMatchResult = async () => {
                             </span>
                             <span v-if="tournament.type === 'groups' && index < teamsPerGroup"
                                   class="px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[9px] font-black uppercase tracking-wider not-italic whitespace-nowrap">
-                              Clasifica
+                              {{ t('tournament_view.classification.qualified_badge') }}
                             </span>
                           </div>
                         </td>
@@ -871,14 +880,14 @@ const saveMatchResult = async () => {
                         <img src="/logo.png" class="h-14" alt="Logo" />
                          <div>
                             <h2 class="text-4xl font-black text-main italic uppercase tracking-tighter m-0">{{ tournament.name }}</h2>
-                            <div class="text-[12px] font-bold text-secondary uppercase tracking-[0.4em] mt-1">CUADRO DE ELIMINATORIAS - RESULTADOS EN VIVO</div>
+                            <div class="text-[12px] font-bold text-secondary uppercase tracking-[0.4em] mt-1">{{ t('tournament_view.bracket.live_subtitle') }}</div>
                          </div>
 
                          <!-- QR Code for Public Access -->
                          <div class="flex align-items-center gap-4 ml-12 bg-white/5 p-3 rounded-2xl border border-white/10">
                             <div class="text-right">
-                               <div class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] mb-1">SIGUE EL TORNEO</div>
-                               <div class="text-[8px] font-bold text-slate-500 uppercase">RESULTADOS EN VIVO</div>
+                               <div class="text-[9px] font-black text-secondary uppercase tracking-[0.2em] mb-1">{{ t('tournament_view.bracket.follow_tournament') }}</div>
+                               <div class="text-[8px] font-bold text-slate-500 uppercase">{{ t('tournament_view.bracket.live_results') }}</div>
                             </div>
                             <div class="relative p-1 bg-white rounded-lg shadow-xl">
                                <img :src="qrCodeUrl" class="w-14 h-14 block" alt="QR Code" />
@@ -893,8 +902,8 @@ const saveMatchResult = async () => {
                            <span class="text-xs font-bold text-secondary ml-1 min-w-[45px]">{{ Math.round(zoomLevel * 100) }}%</span>
                         </div>
                         <div class="text-right">
-                           <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Cerrar con ESC</div>
-                           <button @click="toggleFullscreen" class="mus-btn-secondary px-4 py-2 text-[10px] font-black uppercase">SALIR</button>
+                           <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{{ t('tournament_view.bracket.close_esc') }}</div>
+                           <button @click="toggleFullscreen" class="mus-btn-secondary px-4 py-2 text-[10px] font-black uppercase">{{ t('tournament_view.exit') }}</button>
                         </div>
                      </div>
                   </div>
@@ -922,11 +931,11 @@ const saveMatchResult = async () => {
                                    </div>
                                     <div class="bracket-match-card flex-grow-1 mus-glass border-white/5 overflow-hidden">
                                        <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
-                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA?.name || m.teamA || 'TBD' }}</span>
+                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA?.name || m.teamA || t('tournament_admin.matches.tbd') }}</span>
                                           <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
                                        </div>
                                        <div class="team-row-bracket flex justify-content-between align-items-center p-3">
-                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2" :class="{ 'opacity-40': !m.teamB && m.status === 'finished' }">{{ m.teamB?.name || m.teamB || (m.teamA && m.status === 'finished' ? 'BYE' : 'TBD') }}</span>
+                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2" :class="{ 'opacity-40': !m.teamB && m.status === 'finished' }">{{ m.teamB?.name || m.teamB || (m.teamA && m.status === 'finished' ? 'BYE' : t('tournament_admin.matches.tbd')) }}</span>
                                           <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
                                        </div>
                                     </div>
@@ -953,11 +962,11 @@ const saveMatchResult = async () => {
                                 </div>
                                 <div class="bracket-match-card mus-glass border-secondary/50 w-[480px] shadow-2xl scale-110 bg-secondary/5">
                                    <div class="p-5 border-b border-white/10 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreA > m.scoreB }">
-                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA?.name || m.teamA || 'FINALISTA A' }}</span>
+                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA?.name || m.teamA || t('tournament_view.bracket.finalist_a') }}</span>
                                       <span class="text-5xl font-black text-secondary">{{ m.scoreA }}</span>
                                    </div>
                                    <div class="p-5 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreB > m.scoreA }">
-                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB?.name || m.teamB || 'FINALISTA B' }}</span>
+                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB?.name || m.teamB || t('tournament_view.bracket.finalist_b') }}</span>
                                       <span class="text-5xl font-black text-secondary">{{ m.scoreB }}</span>
                                    </div>
                                 </div>
@@ -976,11 +985,11 @@ const saveMatchResult = async () => {
                                 </div>
                                 <div class="bracket-match-card mus-glass border-white/20 w-[480px] shadow-2xl scale-100">
                                    <div class="p-4 border-b border-white/10 flex justify-content-between align-items-center" :class="{ 'bg-white/5': m.scoreA > m.scoreB }">
-                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA?.name || m.teamA || 'SEMIFINALISTA A' }}</span>
+                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA?.name || m.teamA || t('tournament_view.bracket.semifinalist_a') }}</span>
                                       <span class="text-4xl font-black text-slate-400">{{ m.scoreA }}</span>
                                    </div>
                                    <div class="p-4 flex justify-content-between align-items-center" :class="{ 'bg-white/5': m.scoreB > m.scoreA }">
-                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB?.name || m.teamB || 'SEMIFINALISTA B' }}</span>
+                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB?.name || m.teamB || t('tournament_view.bracket.semifinalist_b') }}</span>
                                       <span class="text-4xl font-black text-slate-400">{{ m.scoreB }}</span>
                                    </div>
                                 </div>
@@ -1005,11 +1014,11 @@ const saveMatchResult = async () => {
                                    </div>
                                    <div class="bracket-match-card flex-grow-1 mus-glass border-white/5 overflow-hidden">
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
-                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA?.name || m.teamA || 'TBD' }}</span>
+                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA?.name || m.teamA || t('tournament_admin.matches.tbd') }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
                                       </div>
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3">
-                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2" :class="{ 'opacity-40': !m.teamB && m.status === 'finished' }">{{ m.teamB?.name || m.teamB || (m.teamA && m.status === 'finished' ? 'BYE' : 'TBD') }}</span>
+                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2" :class="{ 'opacity-40': !m.teamB && m.status === 'finished' }">{{ m.teamB?.name || m.teamB || (m.teamA && m.status === 'finished' ? 'BYE' : t('tournament_admin.matches.tbd')) }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
                                       </div>
                                    </div>
@@ -1037,7 +1046,7 @@ const saveMatchResult = async () => {
                               {{ tt.name }}
                            </td>
                            <td class="p-4 text-right w-1/3 border-l border-white/5">
-                              <span class="text-slate-400 text-xs font-black uppercase tracking-widest">{{ tt.mesa || '-' }}</span>
+                              <span class="text-slate-400 text-xs font-black uppercase tracking-widest">{{ tt.mesa ? getStageLabel(tt.mesa) : '-' }}</span>
                            </td>
                         </tr>
                      </tbody>

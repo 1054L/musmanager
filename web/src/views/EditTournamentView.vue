@@ -191,7 +191,7 @@ const handleSave = async () => {
   <div class="form-page">
     <header class="form-header mb-8">
       <h1 class="mus-h1 italic text-2xl mb-1">
-        EDITAR <span class="mus-gold-text">TORNEO</span>
+        {{ t('tournament_form.edit_header_1') }} <span class="mus-gold-text">{{ t('tournament_form.edit_header_2') }}</span>
       </h1>
       <p class="uuid-badge opacity-40">{{ $t('tournament_view.uuid') }}: {{ uuid }}</p>
     </header>
@@ -379,7 +379,7 @@ const handleSave = async () => {
         </div>
 
         <div class="form-actions mt-12 pt-10 border-t border-white/5 flex gap-4">
-          <button type="button" @click="router.push('/my-tournaments')" class="cancel-btn">Cancelar</button>
+          <button type="button" @click="router.push('/my-tournaments')" class="cancel-btn">{{ t('tournament_form.actions.cancel') }}</button>
           <button type="submit" :disabled="saving || success" class="mus-btn-gold-large flex-1">
             <i class="pi" :class="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
             <span>{{ saving ? t('tournament_form.actions.saving') : t('tournament_form.actions.save') }}</span>

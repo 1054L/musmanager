@@ -417,7 +417,7 @@ onMounted(() => {
           <div class="mus-glass rounded-[32px] border-white/5 overflow-hidden">
             <div v-if="recentTeams.length === 0" class="p-20 text-center">
                <i class="pi pi-users text-4xl text-slate-700 mb-4"></i>
-               <p class="text-slate-500 font-black uppercase tracking-widest text-[10px]">Sin inscripciones recientes</p>
+               <p class="text-slate-500 font-black uppercase tracking-widest text-[10px]">{{ t('dashboard.no_recent_enrollments') }}</p>
             </div>
             <div v-else class="divide-y divide-white/5">
               <div v-for="teamItem in recentTeams" :key="teamItem.id" 
@@ -429,7 +429,7 @@ onMounted(() => {
                   </div>
                   <div>
                     <h4 class="text-lg font-black text-white italic uppercase tracking-tight group-hover:text-blue-400 transition-colors">
-                      {{ teamItem.team?.name || 'Pareja sin nombre' }}
+                      {{ teamItem.team?.name || t('dashboard.unnamed_pair') }}
                     </h4>
                     <div class="flex items-center gap-4 mt-1">
                       <span class="text-[9px] uppercase font-bold tracking-widest text-slate-500">
@@ -437,14 +437,14 @@ onMounted(() => {
                       </span>
                       <div class="w-1 h-1 rounded-full bg-white/10"></div>
                       <span class="text-[9px] uppercase font-bold tracking-widest text-slate-500">
-                        {{ teamItem.createdAt ? new Date(teamItem.createdAt).toLocaleDateString() : 'Reciente' }}
+                        {{ teamItem.createdAt ? new Date(teamItem.createdAt).toLocaleDateString() : t('dashboard.recent_label') }}
                       </span>
                     </div>
                   </div>
                 </div>
                 <div class="flex flex-col items-end gap-1">
-                   <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest">REGISTRADO</span>
-                   <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ teamItem.team?.players?.length || 0 }} JUGADORES</span>
+                   <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest">{{ t('dashboard.registered_badge') }}</span>
+                   <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{{ t('dashboard.players_badge', { count: teamItem.team?.players?.length || 0 }) }}</span>
                 </div>
               </div>
             </div>
