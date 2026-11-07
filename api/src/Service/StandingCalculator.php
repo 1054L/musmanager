@@ -34,8 +34,8 @@ class StandingCalculator
             );
 
             foreach ($allMatches as $match) {
-                // Only count finished matches
-                if ($match->getWinner() === null && $match->getScoreTeam1() === 0 && $match->getScoreTeam2() === 0) {
+                // Only count finished matches that have a winner
+                if ($match->getWinner() === null) {
                     continue;
                 }
 

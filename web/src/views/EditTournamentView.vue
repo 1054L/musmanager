@@ -77,9 +77,10 @@ const onProvinceChange = (isManual = true) => {
 watch(() => form.value.provinceId, () => onProvinceChange(true))
 
 const types = computed(() => [
-  { value: 'eliminatory', label: t('tournament_form.types.eliminatory') },
-  { value: 'league', label: t('tournament_form.types.league') },
-  { value: 'groups', label: t('tournament_form.types.groups') }
+  { value: 'eliminatory', label: t('tournament_form.types.eliminatory'), disabled: false },
+  { value: 'league', label: t('tournament_form.types.league'), disabled: false },
+  { value: 'groups', label: t('tournament_form.types.groups'), disabled: true },
+  { value: 'ceros', label: t('tournament_form.types.ceros'), disabled: true }
 ])
 
 const statuses = computed(() => [
@@ -326,11 +327,21 @@ const handleSave = async () => {
             <section class="form-section">
                <h3 class="section-title"><i class="pi pi-cog mr-2"></i> {{ t('tournament_form.sections.rules') }}</h3>
                <div class="grid grid-cols-2 gap-3 mb-4">
-                  <div v-for="opt in types" :key="opt.value" @click="form.type = opt.value" class="option-card" :class="{ active: form.type === opt.value }">
+                  <div v-for="opt in types" :key="opt.value" @click="!opt.disabled && (form.type = opt.value)" class="option-card" :class="{ active: form.type === opt.value, 'opacity-40 cursor-not-allowed': opt.disabled }">
                     <span class="option-label text-[10px]">{{ opt.label }}</span>
                   </div>
                </div>
                <div class="rules-box p-6 mus-glass-dark rounded-3xl border-white/5 flex flex-col gap-6">
+                  <div class="form-group">
+                    <label class="mus-label">{{ $t('tournament_form.labels.ruleKings') }}</label>
+                    <div class="flex gap-2">
+                      <button type="button" v-for="val in [4, 8]" :key="val"
+                              @click="form.ruleKings = val"
+                              class="compact-btn flex-1" :class="{ active: form.ruleKings === val }">
+                        {{ val }} {{ $t('tournament_form.labels.ruleKing') }}
+                      </button>
+                    </div>
+                  </div>
                   <div class="form-group">
                     <label class="mus-label">{{ t('tournament_form.labels.rulePoints') }}</label>
                     <div class="flex gap-2 mb-2">

@@ -76,10 +76,10 @@ const onProvinceChange = () => {
 watch(() => form.value.provinceId, onProvinceChange)
 
 const types = computed(() => [
-  { value: 'eliminatory', label: t('tournament_form.types.eliminatory') },
-  { value: 'league', label: t('tournament_form.types.league') },
-  { value: 'groups', label: t('tournament_form.types.groups') },
-  { value: 'ceros', label: t('tournament_form.types.ceros') }
+  { value: 'eliminatory', label: t('tournament_form.types.eliminatory'), disabled: false },
+  { value: 'league', label: t('tournament_form.types.league'), disabled: false },
+  { value: 'groups', label: t('tournament_form.types.groups'), disabled: true },
+  { value: 'ceros', label: t('tournament_form.types.ceros'), disabled: true }
 ])
 
 const statuses = computed(() => [
@@ -283,8 +283,8 @@ const handleCreate = async () => {
               <h3 class="section-title"><i class="pi pi-sitemap mr-2"></i> {{ $t('tournament_form.labels.gameSystem') }}</h3>
               <div class="grid grid-cols-2 gap-3">
                 <div v-for="opt in types" :key="opt.value"
-                     @click="form.type = opt.value"
-                     class="option-card" :class="{ active: form.type === opt.value }">
+                     @click="!opt.disabled && (form.type = opt.value)"
+                     class="option-card" :class="{ active: form.type === opt.value, 'opacity-40 cursor-not-allowed': opt.disabled }">
                   <span class="option-label">{{ opt.label }}</span>
                 </div>
               </div>

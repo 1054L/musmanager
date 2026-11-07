@@ -320,6 +320,9 @@ const calculatedScore2 = computed(() => {
 })
 
 const openEditModal = (match) => {
+  if (!match.teamA || !match.teamB) {
+    return
+  }
   editingMatch.value = match
   editDeadlineDate.value = match.deadlineDate ? new Date(match.deadlineDate) : null
   
@@ -438,13 +441,16 @@ const groupedMatches = computed(() => {
   let entries = Object.entries(groups)
   
   // Sort entries
+  const stageOrder = ['t64', 't32', 't16', 't8', 't4', 'final', 'third_place']
   entries.sort((a, b) => {
     if (tournament.value?.type === 'league') {
       const dayA = parseInt(a[0].split('_')[1] || 0)
       const dayB = parseInt(b[0].split('_')[1] || 0)
       return dayA - dayB
     }
-    // For knockout, we could add custom sorting if needed
+    const idxA = stageOrder.indexOf(a[0])
+    const idxB = stageOrder.indexOf(b[0])
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB
     return 0
   })
 
@@ -452,6 +458,31 @@ const groupedMatches = computed(() => {
     entries.reverse()
   }
   return entries
+})
+
+const restingTeamsByDay = computed(() => {
+  if (!tournament.value || tournament.value.type !== 'league' || !enrolledTeams.value.length) return {}
+  if (enrolledTeams.value.length % 2 === 0) return {}
+
+  const resting = {}
+  const allTeams = enrolledTeams.value
+
+  groupedMatches.value.forEach(([stage, stageMatches]) => {
+    if (!stage.startsWith('matchDay_')) return
+
+    const playingTeamIds = new Set()
+    stageMatches.forEach(m => {
+      if (m.teamA?.id) playingTeamIds.add(m.teamA.id)
+      if (m.teamB?.id) playingTeamIds.add(m.teamB.id)
+    })
+
+    const restingOnDay = allTeams.filter(team => !playingTeamIds.has(team.id))
+    if (restingOnDay.length > 0) {
+      resting[stage] = restingOnDay
+    }
+  })
+
+  return resting
 })
 
 const toggleStage = (stage) => {
@@ -770,11 +801,21 @@ const normalizeStageKey = (stage) => {
                     <i class="pi text-xs text-slate-500" :class="collapsedStages[stage] ? 'pi-chevron-down' : 'pi-chevron-up'"></i>
                   </div>
                   
+                  <!-- Resting Teams Info -->
+                  <div v-if="!collapsedStages[stage] && restingTeamsByDay[stage]" class="flex flex-wrap gap-2 mb-4">
+                    <div v-for="team in restingTeamsByDay[stage]" :key="'rest-'+team.id" 
+                         class="bg-[#e9c349]/10 border border-[#e9c349]/20 rounded-xl px-3 py-2 flex align-items-center gap-2">
+                      <i class="pi pi-info-circle text-[#e9c349] text-xs"></i>
+                      <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">{{ t('tournament_view.match_status.resting') || 'Descansa' }}:</span>
+                      <span class="text-[10px] font-black text-white uppercase italic">{{ team.name }}</span>
+                    </div>
+                  </div>
+
                     <div v-show="!collapsedStages[stage]" class="grid">
                       <div v-for="match in stageMatches" :key="match.id" 
                            @click="openEditModal(match)"
                            :class="['final', 'third_place'].includes(normalizeStageKey(match.stage)) ? 'col-12 md:col-6 mb-4' : 'col-12 md:col-6 lg:col-3'">
-                      <div class="match-card-premium group">
+                      <div class="match-card-premium group" :class="{ 'cursor-default opacity-80': !match.teamA || !match.teamB }">
                       <div class="match-card-bg"></div>
                       <div class="relative z-10">
                         <div class="flex justify-content-between align-items-center mb-4">
@@ -786,16 +827,16 @@ const normalizeStageKey = (stage) => {
                                {{ t('tournament_view.match_status.' + match.status) }}
                              </span>
                           </div>
-                          <div class="flex gap-2 relative z-20">
+                          <div v-if="match.teamA && match.teamB" class="flex gap-2 relative z-20">
                              <div class="match-edit-icon"><i class="pi pi-pencil"></i></div>
                           </div>
                         </div>
                         <div class="team-row">
-                          <span class="team-name" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.teamA?.name || match.teamA || t('tournament_admin.matches.tbd') }}</span>
+                          <span class="team-name" :class="{ 'is-winner': match.scoreA > match.scoreB || (match.teamA && !match.teamB && match.status === 'finished') }">{{ match.teamA?.name || match.teamA || t('tournament_admin.matches.tbd') }}</span>
                           <span class="team-score" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.scoreA }}</span>
                         </div>
                         <div class="team-row mt-2">
-                          <span class="team-name" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.teamB?.name || match.teamB || t('tournament_admin.matches.tbd') }}</span>
+                          <span class="team-name" :class="{ 'is-winner': match.scoreB > match.scoreA, 'opacity-40': !match.teamB && match.status === 'finished' }">{{ match.teamB?.name || match.teamB || (match.teamA && match.status === 'finished' ? 'BYE' : t('tournament_admin.matches.tbd')) }}</span>
                           <span class="text-slate-700 font-black italic text-xl" v-if="match.scoreA === 0 && match.scoreB === 0 && !match.teamA && !match.teamB">VS</span>
                           <span v-else class="team-score" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.scoreB }}</span>
                         </div>

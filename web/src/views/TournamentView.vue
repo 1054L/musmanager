@@ -279,7 +279,7 @@ const splitBracketMatches = computed(() => {
   });
 
   // Make sure 3rd place match is included even if not in Round 1 data structure (fallback)
-  const thirdMatch = matches.value.find(x => x.stage === '3º y 4º puesto' || x.stage === t('tournament_view.knockout.third_place'));
+  const thirdMatch = matches.value.find(x => normalizeStageKey(x.stage) === 'third_place');
   if (thirdMatch && !final.find(m => m.id === thirdMatch.id)) {
     final.push(thirdMatch);
   }
@@ -294,7 +294,7 @@ const splitBracketMatches = computed(() => {
 const publicUrl = computed(() => window.location.origin + route.path);
 const qrCodeUrl = computed(() => `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(publicUrl.value)}&color=e9c349&bgcolor=111111`);
 
-const thirdPlaceMatch = computed(() => matches.value.find(x => x.stage === t('tournament_view.knockout.third_place') || x.stage === '3º y 4º puesto'))
+const thirdPlaceMatch = computed(() => matches.value.find(x => normalizeStageKey(x.stage) === 'third_place'))
 
 const hasActiveTabContent = computed(() => {
   if (loading.value || error.value || !tournament.value) return false
@@ -359,7 +359,7 @@ onMounted(() => {
   fetchTournament();
   
   // Subscribe to Mercure real-time updates
-  subscribe(`tournament/${uuid}`, (data) => {
+  subscribe(`tournament/${route.params.uuid}`, async (data) => {
     if (data.matchId) {
       const matchId = Number(data.matchId);
       const match = matches.value.find(m => Number(m.id) === matchId);
@@ -368,13 +368,30 @@ onMounted(() => {
         match.scoreB = data.score2;
         match.status = data.finished ? 'finished' : 'pending';
         match.games = data.games || [];
-        
-        // Update team names for advancements (knockout rounds)
-        if (data.team1) match.teamA = data.team1;
-        if (data.team2) match.teamB = data.team2;
-      } else {
-        // If match not found locally, might be new or need full refresh
-        fetchTournament();
+      }
+      // Refresh tournament data silently if bracket advancement or standings changed
+      if (data.bracketRound || tournament.value?.type === 'eliminatory') {
+        const updated = await tournamentService.getTournament(route.params.uuid);
+        if (updated?.matches) {
+          matches.value = updated.matches.map(m => ({
+            id: m.id,
+            status: m.status || (m.scoreA > 0 || m.scoreB > 0 ? 'finished' : 'pending'),
+            teamA: m.teamA,
+            scoreA: m.scoreA,
+            teamB: m.teamB,
+            scoreB: m.scoreB,
+            stage: m.stage,
+            bracketRound: m.bracketRound,
+            bracketPosition: m.bracketPosition,
+            matchDay: m.matchDay,
+            deadlineDate: m.deadlineDate,
+            mesa: m.mesa,
+            games: m.games || []
+          }));
+        }
+      }
+      if (tournament.value?.type === 'groups' || tournament.value?.type === 'league') {
+        classification.value = await tournamentService.getClassification(route.params.uuid);
       }
     }
   });
@@ -601,7 +618,7 @@ const saveMatchResult = async () => {
                                       <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
                                          <div class="flex flex-column align-items-center justify-center gap-4">
                                             <Tag :value="$t('tournament_view.grand_final')" severity="warning" class="text-[10px] font-black italic uppercase tracking-widest px-4 py-2" />
-                                            <button v-if="tournament.isManager" @click="openEditModal(match)" class="text-[9px] font-black text-secondary uppercase border border-secondary/30 px-3 py-1.5 rounded bg-secondary/5 hover:bg-secondary/20 transition-all">
+                                            <button v-if="tournament.isManager" @click="router.push(`/admin/tournament/${route.params.uuid}`)" class="text-[9px] font-black text-secondary uppercase border border-secondary/30 px-3 py-1.5 rounded bg-secondary/5 hover:bg-secondary/20 transition-all">
                                                {{ t('dashboard.manage') }}
                                             </button>
                                          </div>
@@ -613,7 +630,7 @@ const saveMatchResult = async () => {
                        </div>
 
                        <!-- 3rd Place -->
-                       <div v-for="match in matches.filter(m => m.stage === t('tournament_view.knockout.third_place') || m.stage === '3º y 4º puesto')" :key="'third-'+match.id" 
+                       <div v-for="match in matches.filter(m => normalizeStageKey(m.stage) === 'third_place')" :key="'third-'+match.id" 
                             :class="tournament.hasThirdPlace ? 'col-12 md:col-6 mb-4' : 'col-12 mb-4'">
                           <div class="mus-table-wrapper h-full rounded-2xl overflow-hidden border border-white/10 bg-white/5 p-1">
                              <table class="w-full h-full text-left border-collapse bg-slate-900/50 rounded-xl">
@@ -640,7 +657,7 @@ const saveMatchResult = async () => {
                                       <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
                                          <div class="flex flex-column align-items-center justify-center gap-3">
                                             <Tag :value="t('tournament_view.knockout.third_place')" severity="secondary" class="text-[9px] font-black uppercase" />
-                                            <button v-if="tournament.isManager" @click="openEditModal(match)" class="text-[9px] font-black text-slate-400 uppercase border border-white/10 px-3 py-1 rounded bg-white/5 hover:bg-white/10 transition-all">
+                                            <button v-if="tournament.isManager" @click="router.push(`/admin/tournament/${route.params.uuid}`)" class="text-[9px] font-black text-slate-400 uppercase border border-white/10 px-3 py-1 rounded bg-white/5 hover:bg-white/10 transition-all">
                                                {{ t('dashboard.manage') }}
                                             </button>
                                          </div>
@@ -708,8 +725,8 @@ const saveMatchResult = async () => {
                                <!-- Team B -->
                                <div class="flex align-items-center gap-2">
                                   <div style="width: 18px; height: 18px; flex-shrink: 0;" class="rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[7px] font-black opacity-30">B</div>
-                                  <span class="text-main font-black italic text-sm truncate uppercase flex-1" :class="{'opacity-50': match.status === 'finished' && match.scoreA > match.scoreB}">
-                                     {{ match.teamB?.name || match.teamB || t('tournament_admin.matches.tbd') }}
+                                  <span class="text-main font-black italic text-sm truncate uppercase flex-1" :class="{'opacity-50': match.status === 'finished' && (match.scoreA > match.scoreB || !match.teamB)}">
+                                     {{ match.teamB?.name || match.teamB || (match.teamA && match.status === 'finished' ? 'BYE' : t('tournament_admin.matches.tbd')) }}
                                   </span>
                                   <span class="text-lg font-black italic ml-2" :class="match.scoreB > match.scoreA ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreB }}</span>
                                </div>
@@ -837,13 +854,13 @@ const saveMatchResult = async () => {
                                          {{ formatMesa(m.mesa) }}
                                       </span>
                                    </div>
-                                    <div class="bracket-match-card flex-grow-1 mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
+                                    <div class="bracket-match-card flex-grow-1 mus-glass border-white/5 overflow-hidden">
                                        <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
-                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA || 'TBD' }}</span>
+                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA?.name || m.teamA || 'TBD' }}</span>
                                           <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
                                        </div>
                                        <div class="team-row-bracket flex justify-content-between align-items-center p-3">
-                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamB || 'TBD' }}</span>
+                                          <span class="text-xs font-black text-main uppercase italic truncate pr-2" :class="{ 'opacity-40': !m.teamB && m.status === 'finished' }">{{ m.teamB?.name || m.teamB || (m.teamA && m.status === 'finished' ? 'BYE' : 'TBD') }}</span>
                                           <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
                                        </div>
                                     </div>
@@ -868,14 +885,13 @@ const saveMatchResult = async () => {
                                    <Tag :value="$t('tournament_view.grand_final')" severity="warning" class="font-black italic uppercase tracking-[0.4em] text-xl px-6 py-3" />
                                    <div class="w-32 h-px bg-gradient-to-r from-transparent via-secondary to-transparent mx-auto mt-4"></div>
                                 </div>
-                                <div class="bracket-match-card mus-glass border-secondary/50 w-[480px] shadow-2xl scale-110 bg-secondary/5"
-                                     @click="canManage ? openEditModal(m) : null">
+                                <div class="bracket-match-card mus-glass border-secondary/50 w-[480px] shadow-2xl scale-110 bg-secondary/5">
                                    <div class="p-5 border-b border-white/10 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreA > m.scoreB }">
-                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA || 'FINALISTA A' }}</span>
+                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA?.name || m.teamA || 'FINALISTA A' }}</span>
                                       <span class="text-5xl font-black text-secondary">{{ m.scoreA }}</span>
                                    </div>
                                    <div class="p-5 flex justify-content-between align-items-center" :class="{ 'bg-secondary/10': m.scoreB > m.scoreA }">
-                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB || 'FINALISTA B' }}</span>
+                                      <span class="text-2xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB?.name || m.teamB || 'FINALISTA B' }}</span>
                                       <span class="text-5xl font-black text-secondary">{{ m.scoreB }}</span>
                                    </div>
                                 </div>
@@ -892,14 +908,13 @@ const saveMatchResult = async () => {
                                         class="font-black italic uppercase tracking-[0.3em] text-sm px-4 py-2" />
                                    <div class="w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mx-auto mt-3"></div>
                                 </div>
-                                <div class="bracket-match-card mus-glass border-white/20 w-[480px] shadow-2xl scale-100"
-                                     @click="canManage ? openEditModal(m) : null">
+                                <div class="bracket-match-card mus-glass border-white/20 w-[480px] shadow-2xl scale-100">
                                    <div class="p-4 border-b border-white/10 flex justify-content-between align-items-center" :class="{ 'bg-white/5': m.scoreA > m.scoreB }">
-                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA || 'SEMIFINALISTA A' }}</span>
+                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamA?.name || m.teamA || 'SEMIFINALISTA A' }}</span>
                                       <span class="text-4xl font-black text-slate-400">{{ m.scoreA }}</span>
                                    </div>
                                    <div class="p-4 flex justify-content-between align-items-center" :class="{ 'bg-white/5': m.scoreB > m.scoreA }">
-                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB || 'SEMIFINALISTA B' }}</span>
+                                      <span class="text-xl font-black text-main italic uppercase truncate pr-4">{{ m.teamB?.name || m.teamB || 'SEMIFINALISTA B' }}</span>
                                       <span class="text-4xl font-black text-slate-400">{{ m.scoreB }}</span>
                                    </div>
                                 </div>
@@ -922,13 +937,13 @@ const saveMatchResult = async () => {
                                          {{ formatMesa(m.mesa) }}
                                       </span>
                                    </div>
-                                   <div class="bracket-match-card flex-grow-1 mus-glass border-white/5 overflow-hidden" @click="canManage ? openEditModal(m) : null">
+                                   <div class="bracket-match-card flex-grow-1 mus-glass border-white/5 overflow-hidden">
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3 border-b border-white/5">
-                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA || 'TBD' }}</span>
+                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamA?.name || m.teamA || 'TBD' }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreA }}</span>
                                       </div>
                                       <div class="team-row-bracket flex justify-content-between align-items-center p-3">
-                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2">{{ m.teamB || 'TBD' }}</span>
+                                         <span class="text-xs font-black text-main uppercase italic truncate pr-2" :class="{ 'opacity-40': !m.teamB && m.status === 'finished' }">{{ m.teamB?.name || m.teamB || (m.teamA && m.status === 'finished' ? 'BYE' : 'TBD') }}</span>
                                          <span class="font-black italic text-lg ml-4">{{ m.scoreB }}</span>
                                       </div>
                                    </div>

@@ -214,14 +214,16 @@ export const tournamentService = {
 
   async updateTournament(uuid, data) {
     const isFormData = data instanceof FormData;
-    // Using POST for update to better support file uploads in various environments
+    const headers = {
+      ...authService.getAuthHeader()
+    };
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
     const response = await fetch(`${API_URL}/admin/tournament/${uuid}`, {
-      method: 'PATCH',
-      headers: {
-        ...authService.getAuthHeader(),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
+      method: isFormData ? 'POST' : 'PATCH',
+      headers,
+      body: isFormData ? data : JSON.stringify(data)
     });
 
     if (!response.ok) {
