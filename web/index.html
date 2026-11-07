@@ -35,11 +35,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Public+Sans:ital,wght@0,100..900;1,100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+      html, body {
+        background-color: #021709;
+        color: #ceead1;
+        margin: 0;
+        padding: 0;
+      }
+      html[data-theme="light"], html[data-theme="light"] body {
+        background-color: #f4f9f5;
+        color: #0d2415;
+      }
+    </style>
 </head>
 
 <body>
-  <div id="app">
-    <!-- Static Fallback for Search Engines and Google AdSense Crawlers -->
+  <div id="app"></div>
+  <noscript>
+    <!-- Static Fallback for Search Engines and Clients without JS -->
     <header style="padding: 20px; text-align: center; border-bottom: 1px solid #e2e8f0; font-family: 'Inter', sans-serif;">
       <h1 style="color: #0fb361; font-size: 2.5rem; margin-bottom: 10px;">Mus Manager</h1>
       <p style="color: #bf953f; font-size: 1.2rem; font-style: italic;">La plataforma definitiva para la gestión y organización de torneos de mus.</p>
@@ -107,7 +120,7 @@
     <footer style="text-align: center; padding: 20px; border-top: 1px solid #e2e8f0; font-size: 0.9rem; color: #64748b; font-family: 'Inter', sans-serif;">
       <p>&copy; 2026 Mus Manager. Todos los derechos reservados. Contacto: info@musmanager.com</p>
     </footer>
-  </div>
+  </noscript>
   <script type="module" src="/src/main.js"></script>
 </body>
 
