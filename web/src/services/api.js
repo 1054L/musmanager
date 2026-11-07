@@ -31,8 +31,8 @@ export const authService = {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || 'Error en el registro');
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || `Error en el registro (${response.status})`);
     }
 
     return response.json();

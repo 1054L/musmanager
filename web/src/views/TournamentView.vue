@@ -618,7 +618,7 @@ const saveMatchResult = async () => {
                                       <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
                                          <div class="flex flex-column align-items-center justify-center gap-4">
                                             <Tag :value="$t('tournament_view.grand_final')" severity="warning" class="text-[10px] font-black italic uppercase tracking-widest px-4 py-2" />
-                                            <button v-if="tournament.isManager" @click="router.push(`/admin/tournament/${route.params.uuid}`)" class="text-[9px] font-black text-secondary uppercase border border-secondary/30 px-3 py-1.5 rounded bg-secondary/5 hover:bg-secondary/20 transition-all">
+                                            <button v-if="tournament.isManager" @click="router.push(`/tournament/${route.params.uuid}/manage`)" class="text-[9px] font-black text-secondary uppercase border border-secondary/30 px-3 py-1.5 rounded bg-secondary/5 hover:bg-secondary/20 transition-all">
                                                {{ t('dashboard.manage') }}
                                             </button>
                                          </div>
@@ -657,7 +657,7 @@ const saveMatchResult = async () => {
                                       <td class="p-4 w-3/12 border-l border-white/5 align-middle text-center">
                                          <div class="flex flex-column align-items-center justify-center gap-3">
                                             <Tag :value="t('tournament_view.knockout.third_place')" severity="secondary" class="text-[9px] font-black uppercase" />
-                                            <button v-if="tournament.isManager" @click="router.push(`/admin/tournament/${route.params.uuid}`)" class="text-[9px] font-black text-slate-400 uppercase border border-white/10 px-3 py-1 rounded bg-white/5 hover:bg-white/10 transition-all">
+                                            <button v-if="tournament.isManager" @click="router.push(`/tournament/${route.params.uuid}/manage`)" class="text-[9px] font-black text-slate-400 uppercase border border-white/10 px-3 py-1 rounded bg-white/5 hover:bg-white/10 transition-all">
                                                {{ t('dashboard.manage') }}
                                             </button>
                                          </div>
