@@ -17,6 +17,10 @@ import { useToast } from 'primevue/usetoast'
 const normalizeStageKey = (stage) => {
   if (!stage) return 'general'
   const s = stage.toLowerCase().trim()
+
+  if (s.startsWith('grupo') || s.startsWith('mesa') || s.startsWith('group') || s.startsWith('talde') || s.startsWith('mahaia')) {
+    return stage.trim()
+  }
   
   const rondaMatch = s.match(/(?:ronda|round)\s*(\d+)/i)
   if (rondaMatch) {
@@ -120,6 +124,14 @@ const isSavingResult = ref(false)
 const showPosterDialog = ref(false)
 const isManager = computed(() => tournament.value?.isManager || false)
 
+const teamsPerGroup = computed(() => {
+  const cfg = tournament.value?.leagueMatchDays
+  if (cfg && typeof cfg === 'object' && !Array.isArray(cfg) && cfg.teamsPerGroup) {
+    return Number(cfg.teamsPerGroup)
+  }
+  return 2
+})
+
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
   const date = new Date(dateStr)
@@ -191,14 +203,20 @@ const groupedMatches = computed(() => {
   
   let entries = Object.entries(groups)
   
-  // Sort entries numerically for league match days
+  // Sort entries numerically for league match days or by group/knockout order
+  const stageOrder = ['t64', 't32', 't16', 't8', 't4', 'final', 'third_place']
   entries.sort((a, b) => {
     if (tournament.value?.type === 'league') {
       const dayA = parseInt(a[0].split('_')[1] || 0)
       const dayB = parseInt(b[0].split('_')[1] || 0)
       return dayA - dayB
     }
-    return 0
+    const idxA = stageOrder.indexOf(a[0])
+    const idxB = stageOrder.indexOf(b[0])
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB
+    if (idxA === -1 && idxB !== -1) return -1
+    if (idxA !== -1 && idxB === -1) return 1
+    return a[0].localeCompare(b[0], undefined, { numeric: true })
   })
 
   return entries
@@ -345,7 +363,7 @@ const fetchTournament = async () => {
     // Set default tab for different tournament types
     if (data.type === 'eliminatory' && activeTab.value === 'matches') {
        activeTab.value = 'bracket'
-    } else if (data.type === 'league' && activeTab.value === 'matches') {
+    } else if ((data.type === 'league' || data.type === 'groups') && activeTab.value === 'matches') {
        activeTab.value = 'standings'
     }
   } catch (e) {
@@ -741,10 +759,34 @@ const saveMatchResult = async () => {
            </div>
 
            <div v-else-if="activeTab === 'standings'" class="classification-container">
+              <!-- Qualification Legend Banner for Groups Tournaments -->
+              <div v-if="tournament.type === 'groups' && Object.keys(normalizedClassification).length > 0"
+                   class="mb-6 p-4 rounded-2xl bg-emerald-500/[0.07] border border-emerald-500/25 flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="flex align-items-center gap-3">
+                  <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399] inline-block"></span>
+                  <span class="text-xs font-black uppercase tracking-wider text-white">
+                    Zona de Clasificación:
+                    <span class="text-emerald-400">
+                      Pasan a la siguiente fase {{ teamsPerGroup === 1 ? 'la mejor pareja (Top 1)' : `las ${teamsPerGroup} mejores parejas (Top ${teamsPerGroup})` }} de cada grupo
+                    </span>
+                  </span>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-black uppercase tracking-widest">
+                  Total Cuadro Final: {{ Object.keys(classification || {}).length * teamsPerGroup }} parejas
+                </span>
+              </div>
+
               <div v-for="(teams, mesaName) in (tournament.type === 'league' ? { 'General': Object.values(classification).flat() } : classification)" :key="mesaName" class="mb-10">
-                <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <i class="pi pi-table"></i> {{ mesaName }}
-                </h4>
+                <div class="flex align-items-center justify-content-between mb-4">
+                  <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest m-0 flex items-center gap-2">
+                    <i class="pi pi-table"></i> {{ mesaName }}
+                  </h4>
+                  <span v-if="tournament.type === 'groups'"
+                        class="px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-widest flex align-items-center gap-2">
+                    <i class="pi pi-check-circle text-[10px]"></i>
+                    {{ teamsPerGroup === 1 ? 'Clasifica 1 pareja' : `Clasifican ${teamsPerGroup} parejas` }}
+                  </span>
+                </div>
                 <div class="mus-table-wrapper rounded-2xl overflow-hidden border border-white/5 bg-white/5 overflow-x-auto">
                   <table class="w-full text-left border-collapse min-w-[800px]">
                     <thead>
@@ -764,11 +806,35 @@ const saveMatchResult = async () => {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="(team, index) in teams" :key="team.teamName" class="border-t border-white/5 hover:bg-white/[0.03] transition-colors">
+                      <tr v-for="(team, index) in teams" :key="team.teamName"
+                          class="border-t border-white/5 transition-colors"
+                          :class="[
+                            tournament.type === 'groups' && index < teamsPerGroup
+                              ? 'bg-emerald-500/[0.09] hover:bg-emerald-500/[0.15] border-l-4 border-l-emerald-400'
+                              : 'hover:bg-white/[0.03]',
+                            tournament.type === 'groups' && index === teamsPerGroup - 1
+                              ? 'border-b-2 border-b-emerald-500/40'
+                              : ''
+                          ]">
                         <td class="p-4 w-[60px] text-center border-r border-white/5">
-                           <span class="text-xs font-black" :class="index < 3 ? 'text-[#e9c349]' : 'text-slate-500'">{{ index + 1 }}</span>
+                           <span v-if="tournament.type === 'groups'"
+                                 class="inline-flex align-items-center justify-content-center w-6 h-6 rounded-lg text-xs font-black"
+                                 :class="index < teamsPerGroup ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'text-slate-500'">
+                             {{ index + 1 }}
+                           </span>
+                           <span v-else class="text-xs font-black" :class="index < 3 ? 'text-[#e9c349]' : 'text-slate-500'">{{ index + 1 }}</span>
                         </td>
-                        <td class="p-4 min-w-[200px] font-black text-main uppercase italic text-sm">{{ team.teamName }}</td>
+                        <td class="p-4 min-w-[200px] font-black uppercase italic text-sm">
+                          <div class="flex align-items-center justify-content-between gap-2">
+                            <span :class="tournament.type === 'groups' && index < teamsPerGroup ? 'text-emerald-300' : 'text-main'">
+                              {{ team.teamName }}
+                            </span>
+                            <span v-if="tournament.type === 'groups' && index < teamsPerGroup"
+                                  class="px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[9px] font-black uppercase tracking-wider not-italic whitespace-nowrap">
+                              Clasifica
+                            </span>
+                          </div>
+                        </td>
                         <td class="p-4 w-[60px] text-center text-slate-500 font-bold border-l border-white/5">{{ team.matchesPlayed }}</td>
                         <td class="p-4 w-[60px] text-center font-black text-emerald-400">{{ team.matchesWon }}</td>
                         <td class="p-4 w-[60px] text-center font-bold text-rose-400/50">{{ team.matchesLost }}</td>

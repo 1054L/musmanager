@@ -290,10 +290,53 @@ class TournamentController extends AbstractController
         ]);
     }
 
+    #[Route('/api/admin/tournament/{uuid}/generate-groups', name: 'app_tournament_generate_groups', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function generateGroups(
+        string $uuid,
+        Request $request,
+        TournamentRepository $tournamentRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
+        if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+
+        $contentType = $request->headers->get('Content-Type', '');
+        if (str_contains($contentType, 'application/json')) {
+            $data = json_decode($request->getContent(), true) ?? [];
+            $groupsCountRaw = $data['groupsCount'] ?? null;
+        } else {
+            $groupsCountRaw = $request->request->get('groupsCount');
+        }
+
+        $teams = $tournament->getTournamentTeams()->toArray();
+        if (count($teams) < 2) {
+            return new JsonResponse(['error' => 'Se necesitan al menos 2 parejas para sortear grupos'], 400);
+        }
+
+        $defaultGroups = count($teams) >= 16 ? 4 : 2;
+        $groupsCount = max(2, min(26, (int)($groupsCountRaw ?: $defaultGroups)));
+
+        shuffle($teams);
+        $groupLetters = range('A', 'Z');
+        foreach ($teams as $index => $tt) {
+            $groupIndex = $index % $groupsCount;
+            $tt->setMesa('Grupo ' . $groupLetters[$groupIndex]);
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'groupsCount' => $groupsCount
+        ]);
+    }
+
     #[Route('/api/admin/tournament/{uuid}/generate-matches', name: 'app_tournament_generate_matches', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function generateMatches(
-        string $uuid, 
+        string $uuid,
+        Request $request,
         TournamentRepository $tournamentRepository, 
         EntityManagerInterface $entityManager,
         LeagueGenerator $leagueGenerator
@@ -312,69 +355,87 @@ class TournamentController extends AbstractController
 
         if ($tournament->getType() === 'eliminatory') {
             shuffle($teams);
-            $numTeams = count($teams);
-            $rounds = (int)ceil(log($numTeams, 2));
-            $bracketSize = (int)pow(2, $rounds);
-            $firstRoundMatchesCount = (int)($bracketSize / 2);
-
-            $bracketMatches = [];
-            for ($r = $rounds; $r >= 1; $r--) {
-                $matchesInRound = (int)pow(2, $r - 1);
-                for ($i = 0; $i < $matchesInRound; $i++) {
-                    $match = new MusMatch();
-                    $match->setTournament($tournament);
-                    $match->setBracketRound($r);
-                    $match->setBracketPosition($i);
-                    $match->setStage($r === 1 ? "Final" : "Ronda $r");
-                    $entityManager->persist($match);
-                    $bracketMatches[$r][$i] = $match;
-                }
-            }
-
-            // Distribute teams so the first $firstRoundMatchesCount teams occupy team1 of each match,
-            // and the remaining teams occupy team2. This avoids empty (null vs null) matches and distributes Byes cleanly.
-            for ($i = 0; $i < $firstRoundMatchesCount; $i++) {
-                $match = $bracketMatches[$rounds][$i];
-                if ($i < $numTeams) {
-                    $match->setTeam1($teams[$i]);
-                }
-                $team2Idx = $i + $firstRoundMatchesCount;
-                if ($team2Idx < $numTeams) {
-                    $match->setTeam2($teams[$team2Idx]);
-                }
-
-                if ($match->getTeam1() && !$match->getTeam2()) {
-                    $match->setWinner($match->getTeam1());
-                    $match->setScoreTeam1(0);
-                    $match->setScoreTeam2(0);
-
-                    if ($rounds > 1) {
-                        $nextRound = $rounds - 1;
-                        $nextPos = (int)floor($i / 2);
-                        $isTeam2 = ($i % 2 === 1);
-                        $nextMatch = $bracketMatches[$nextRound][$nextPos] ?? null;
-                        if ($nextMatch) {
-                            if ($isTeam2) {
-                                $nextMatch->setTeam2($match->getWinner());
-                            } else {
-                                $nextMatch->setTeam1($match->getWinner());
-                            }
-                        }
-                    }
-                }
-            }
-
-            if ($tournament->isHasThirdPlace() && $rounds >= 2) {
-                $match = new MusMatch();
-                $match->setTournament($tournament);
-                $match->setBracketRound(1);
-                $match->setBracketPosition(1);
-                $match->setStage("3er y 4º Puesto");
-                $entityManager->persist($match);
-            }
+            $this->createEliminatoryBracket($tournament, $teams, $entityManager);
         } elseif ($tournament->getType() === 'league') {
             shuffle($teams);
             $leagueGenerator->generate($tournament);
+        } elseif ($tournament->getType() === 'groups') {
+            $data = [];
+            $contentType = $request->headers->get('Content-Type', '');
+            if (str_contains($contentType, 'application/json')) {
+                $data = json_decode($request->getContent(), true) ?? [];
+            } else {
+                $data = $request->request->all();
+            }
+
+            $defaultGroups = count($teams) >= 12 ? 4 : 2;
+            $groupsCount = max(2, min(26, (int)($data['groupsCount'] ?? $defaultGroups)));
+            $redrawGroups = filter_var($data['redrawGroups'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+            $existingGroups = array_unique(array_filter(array_map(fn(TournamentTeam $tt) => $tt->getMesa(), $teams)));
+            $unassigned = array_filter($teams, fn(TournamentTeam $tt) => empty($tt->getMesa()));
+
+            // Re-assign groups if any team is unassigned, if the requested groupsCount differs from existing, or if redrawGroups is requested
+            if (count($unassigned) > 0 || count($existingGroups) !== $groupsCount || $redrawGroups) {
+                shuffle($teams);
+                $groupLetters = range('A', 'Z');
+                foreach ($teams as $index => $tt) {
+                    $groupIndex = $index % $groupsCount;
+                    $tt->setMesa('Grupo ' . $groupLetters[$groupIndex]);
+                }
+            }
+
+            if (isset($data['teamsPerGroup']) || isset($data['pairingMode'])) {
+                $tournament->setLeagueMatchDays([
+                    'groupsCount' => $groupsCount,
+                    'teamsPerGroup' => max(1, (int)($data['teamsPerGroup'] ?? 2)),
+                    'pairingMode' => $data['pairingMode'] ?? 'seeded'
+                ]);
+            }
+
+            $groups = [];
+            foreach ($teams as $tt) {
+                $groupName = $tt->getMesa() ?: 'Grupo A';
+                $groups[$groupName][] = $tt;
+            }
+            ksort($groups, SORT_NATURAL);
+
+            foreach ($groups as $groupName => $groupTeams) {
+                $gTeams = array_values($groupTeams);
+                shuffle($gTeams);
+                if (count($gTeams) < 2) {
+                    continue;
+                }
+                if (count($gTeams) % 2 !== 0) {
+                    $gTeams[] = null;
+                }
+                $gCount = count($gTeams);
+                $gRounds = $gCount - 1;
+                $half = (int)($gCount / 2);
+
+                for ($round = 1; $round <= $gRounds; $round++) {
+                    for ($i = 0; $i < $half; $i++) {
+                        $t1 = $gTeams[$i];
+                        $t2 = $gTeams[$gCount - 1 - $i];
+                        if ($t1 !== null && $t2 !== null) {
+                            $match = new MusMatch();
+                            $match->setTournament($tournament);
+                            if ($round % 2 === 0 && $i === 0) {
+                                $match->setTeam1($t2);
+                                $match->setTeam2($t1);
+                            } else {
+                                $match->setTeam1($t1);
+                                $match->setTeam2($t2);
+                            }
+                            $match->setStage($groupName);
+                            $match->setMesa($groupName);
+                            $entityManager->persist($match);
+                        }
+                    }
+                    $last = array_pop($gTeams);
+                    array_splice($gTeams, 1, 0, [$last]);
+                }
+            }
         } else {
             return new JsonResponse(['error' => 'Tipo de torneo no soportado para generación automática'], 400);
         }
@@ -383,6 +444,156 @@ class TournamentController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/api/admin/tournament/{uuid}/reset-matches', name: 'app_tournament_reset_matches', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function resetMatches(
+        string $uuid,
+        TournamentRepository $tournamentRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
+        if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+
+        foreach ($tournament->getMatches()->toArray() as $match) {
+            foreach ($match->getGames()->toArray() as $game) {
+                $match->removeGame($game);
+                $entityManager->remove($game);
+            }
+            $tournament->removeMatch($match);
+            $entityManager->remove($match);
+        }
+
+        foreach ($tournament->getTournamentTeams() as $tt) {
+            $tt->setMesa(null);
+        }
+
+        $tournament->setStatus('pending');
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/api/admin/tournament/{uuid}/generate-knockout', name: 'app_tournament_generate_knockout', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function generateKnockoutPhase(
+        string $uuid,
+        Request $request,
+        TournamentRepository $tournamentRepository,
+        EntityManagerInterface $entityManager,
+        StandingCalculator $standingCalculator
+    ): JsonResponse {
+        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
+        if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+
+        if ($tournament->getType() !== 'groups') {
+            return new JsonResponse(['error' => 'Este torneo no es de tipo Liguilla + Eliminatorias'], 400);
+        }
+
+        foreach ($tournament->getMatches() as $existingMatch) {
+            if ($existingMatch->getBracketRound() !== null) {
+                return new JsonResponse(['error' => 'El cuadro eliminatorio ya ha sido generado'], 400);
+            }
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+        $existingConfig = is_array($tournament->getLeagueMatchDays()) ? $tournament->getLeagueMatchDays() : [];
+        $teamsPerGroup = max(1, (int)($data['teamsPerGroup'] ?? $existingConfig['teamsPerGroup'] ?? 2));
+        $pairingMode = $data['pairingMode'] ?? $existingConfig['pairingMode'] ?? 'seeded';
+
+        $groupedStandings = $standingCalculator->calculateByGroups($tournament);
+        if (empty($groupedStandings)) {
+            return new JsonResponse(['error' => 'No hay grupos configurados en este torneo'], 400);
+        }
+
+        $tournament->setLeagueMatchDays([
+            'groupsCount' => count($groupedStandings),
+            'teamsPerGroup' => $teamsPerGroup,
+            'pairingMode' => $pairingMode
+        ]);
+
+        $ttById = [];
+        foreach ($tournament->getTournamentTeams() as $tt) {
+            $ttById[$tt->getId()] = $tt;
+        }
+
+        $groupNames = array_keys($groupedStandings);
+        $numGroups = count($groupNames);
+
+        $qualifiedTeams = [];
+        if ($pairingMode === 'seeded' && $teamsPerGroup === 2 && $numGroups >= 2) {
+            // Standard cross-group seeding:
+            // Left wing gets 1st of even groups (A, C...) vs 2nd of odd groups (B, D...)
+            // Right wing gets 1st of odd groups (B, D...) vs 2nd of even groups (A, C...)
+            // This guarantees 1st plays 2nd of another group, and teams from the same group only meet in the Final.
+            $evenGroupIndices = [];
+            $oddGroupIndices = [];
+            for ($g = 0; $g < $numGroups; $g++) {
+                if ($g % 2 === 0) {
+                    $evenGroupIndices[] = $g;
+                } else {
+                    $oddGroupIndices[] = $g;
+                }
+            }
+            $firstPlaceOrder = array_merge($evenGroupIndices, $oddGroupIndices);
+            $secondPlaceOrder = array_merge($oddGroupIndices, $evenGroupIndices);
+
+            $team1List = [];
+            foreach ($firstPlaceOrder as $gIdx) {
+                $gName = $groupNames[$gIdx];
+                if (isset($groupedStandings[$gName][0])) {
+                    $id = $groupedStandings[$gName][0]['id'];
+                    if (isset($ttById[$id])) {
+                        $team1List[] = $ttById[$id];
+                    }
+                }
+            }
+
+            $team2List = [];
+            foreach ($secondPlaceOrder as $gIdx) {
+                $gName = $groupNames[$gIdx];
+                if (isset($groupedStandings[$gName][1])) {
+                    $id = $groupedStandings[$gName][1]['id'];
+                    if (isset($ttById[$id])) {
+                        $team2List[] = $ttById[$id];
+                    }
+                }
+            }
+
+            $qualifiedTeams = array_merge($team1List, $team2List);
+        } else {
+            // General collection by rank across groups
+            for ($rank = 0; $rank < $teamsPerGroup; $rank++) {
+                for ($g = 0; $g < $numGroups; $g++) {
+                    // Shift group order on odd ranks so teams from the same group don't meet in match $i
+                    $gIdx = ($rank % 2 === 1) ? (($g + 1) % $numGroups) : $g;
+                    $gName = $groupNames[$gIdx];
+                    if (isset($groupedStandings[$gName][$rank])) {
+                        $id = $groupedStandings[$gName][$rank]['id'];
+                        if (isset($ttById[$id])) {
+                            $qualifiedTeams[] = $ttById[$id];
+                        }
+                    }
+                }
+            }
+
+            if ($pairingMode === 'random') {
+                shuffle($qualifiedTeams);
+            }
+        }
+
+        if (count($qualifiedTeams) < 2) {
+            return new JsonResponse(['error' => 'Se necesitan al menos 2 parejas clasificadas para generar las eliminatorias'], 400);
+        }
+
+        $this->createEliminatoryBracket($tournament, $qualifiedTeams, $entityManager);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'qualifiedCount' => count($qualifiedTeams)
+        ]);
     }
 
     #[Route('/api/admin/tournament/team/{teamId}', name: 'app_tournament_unenroll_team', methods: ['DELETE'])]
@@ -564,16 +775,21 @@ class TournamentController extends AbstractController
         $entityManager->flush();
 
         // Update tournament status if all matches have a winner
+        // For 'groups' tournaments, only auto-finish if the knockout bracket has already been generated
         $allMatches = $tournament->getMatches();
         if (count($allMatches) > 0) {
             $allFinished = true;
+            $hasKnockoutMatches = false;
             foreach ($allMatches as $m) {
+                if ($m->getBracketRound() !== null) {
+                    $hasKnockoutMatches = true;
+                }
                 if ($m->getWinner() === null) {
                     $allFinished = false;
-                    break;
                 }
             }
-            if ($allFinished && $tournament->getStatus() === 'active') {
+            $canAutoFinish = $tournament->getType() !== 'groups' || $hasKnockoutMatches;
+            if ($allFinished && $canAutoFinish && $tournament->getStatus() === 'active') {
                 $tournament->setStatus('finished');
                 $entityManager->flush();
             } elseif (!$allFinished && $tournament->getStatus() === 'finished') {
@@ -619,28 +835,76 @@ class TournamentController extends AbstractController
             return new JsonResponse($standingCalculator->calculate($tournament));
         }
 
-        $classification = [];
-        foreach ($tournament->getTournamentTeams() as $tt) {
-            $gn = $tt->getMesa() ?: 'General';
-            $classification[$gn][] = [
-                'teamName' => $tt->getTeam()->getName(),
-                'points' => $tt->getPoints(),
-                'won' => $tt->getGamesWon(),
-                'lost' => $tt->getGamesLost(),
-                'played' => $tt->getMatchesPlayed(),
-            ];
+        if ($tournament->getType() === 'groups') {
+            return new JsonResponse($standingCalculator->calculateByGroups($tournament));
         }
 
-        foreach ($classification as $key => $values) {
-            usort($classification[$key], function($a, $b) {
-                if ($b['points'] === $a['points']) {
-                    return ($b['won'] - $b['lost']) <=> ($a['won'] - $a['lost']);
+        return new JsonResponse($standingCalculator->calculateByGroups($tournament));
+    }
+
+    /**
+     * @param TournamentTeam[] $teams
+     */
+    private function createEliminatoryBracket(Tournament $tournament, array $teams, EntityManagerInterface $entityManager): void
+    {
+        $numTeams = count($teams);
+        $rounds = (int)ceil(log($numTeams, 2));
+        $bracketSize = (int)pow(2, $rounds);
+        $firstRoundMatchesCount = (int)($bracketSize / 2);
+
+        $bracketMatches = [];
+        for ($r = $rounds; $r >= 1; $r--) {
+            $matchesInRound = (int)pow(2, $r - 1);
+            for ($i = 0; $i < $matchesInRound; $i++) {
+                $match = new MusMatch();
+                $match->setTournament($tournament);
+                $match->setBracketRound($r);
+                $match->setBracketPosition($i);
+                $match->setStage($r === 1 ? "Final" : "Ronda $r");
+                $entityManager->persist($match);
+                $bracketMatches[$r][$i] = $match;
+            }
+        }
+
+        for ($i = 0; $i < $firstRoundMatchesCount; $i++) {
+            $match = $bracketMatches[$rounds][$i];
+            if ($i < $numTeams) {
+                $match->setTeam1($teams[$i]);
+            }
+            $team2Idx = $i + $firstRoundMatchesCount;
+            if ($team2Idx < $numTeams) {
+                $match->setTeam2($teams[$team2Idx]);
+            }
+
+            if ($match->getTeam1() && !$match->getTeam2()) {
+                $match->setWinner($match->getTeam1());
+                $match->setScoreTeam1(0);
+                $match->setScoreTeam2(0);
+
+                if ($rounds > 1) {
+                    $nextRound = $rounds - 1;
+                    $nextPos = (int)floor($i / 2);
+                    $isTeam2 = ($i % 2 === 1);
+                    $nextMatch = $bracketMatches[$nextRound][$nextPos] ?? null;
+                    if ($nextMatch) {
+                        if ($isTeam2) {
+                            $nextMatch->setTeam2($match->getWinner());
+                        } else {
+                            $nextMatch->setTeam1($match->getWinner());
+                        }
+                    }
                 }
-                return $b['points'] <=> $a['points'];
-            });
+            }
         }
 
-        return new JsonResponse($classification);
+        if ($tournament->isHasThirdPlace() && $rounds >= 2) {
+            $match = new MusMatch();
+            $match->setTournament($tournament);
+            $match->setBracketRound(1);
+            $match->setBracketPosition(1);
+            $match->setStage("3er y 4º Puesto");
+            $entityManager->persist($match);
+        }
     }
 
     private function advanceWinnerInBracket(MusMatch $match, EntityManagerInterface $entityManager): void

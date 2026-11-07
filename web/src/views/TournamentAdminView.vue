@@ -54,7 +54,12 @@ const matches = ref([])
 const enrolledTeams = ref([])
 const availableTeams = ref([])
 const enrollmentTeamId = ref(null)
-const groupsCount = ref(2)
+const groupsCount = ref(4)
+const teamsPerGroup = ref(2)
+const pairingMode = ref('seeded')
+const showGroupsConfigModal = ref(false)
+const classification = ref({})
+const showStandingsInAdmin = ref(true)
 const processing = ref(false)
 const showEnrollmentDialog = ref(false)
 const enrollmentForm = ref(null)
@@ -93,7 +98,20 @@ const fetchTournamentData = async (silent = false) => {
     const data = await tournamentService.getTournament(uuid)
     tournament.value = data
     enrolledTeams.value = data.teams || []
-    leagueMatchDays.value = data.leagueMatchDays || []
+    leagueMatchDays.value = Array.isArray(data.leagueMatchDays) ? data.leagueMatchDays : []
+
+    if (data.type === 'groups' && data.leagueMatchDays && typeof data.leagueMatchDays === 'object' && !Array.isArray(data.leagueMatchDays)) {
+      if (data.leagueMatchDays.groupsCount) groupsCount.value = Number(data.leagueMatchDays.groupsCount)
+      if (data.leagueMatchDays.teamsPerGroup) teamsPerGroup.value = Number(data.leagueMatchDays.teamsPerGroup)
+      if (data.leagueMatchDays.pairingMode) pairingMode.value = data.leagueMatchDays.pairingMode
+    } else {
+      const assignedGroups = new Set((data.teams || []).map(tt => tt.mesa).filter(Boolean))
+      if (assignedGroups.size >= 2) {
+        groupsCount.value = assignedGroups.size
+      } else if (!silent) {
+        groupsCount.value = (data.teams?.length || 0) >= 12 ? 4 : 2
+      }
+    }
     
     if (data.matches) {
       matches.value = data.matches.map(m => ({
@@ -110,6 +128,10 @@ const fetchTournamentData = async (silent = false) => {
         deadlineDate: m.deadlineDate,
         games: m.games || []
       }))
+    }
+
+    if (data.type === 'groups' || data.type === 'league') {
+      classification.value = await tournamentService.getClassification(uuid).catch(() => ({}))
     }
 
     availableTeams.value = await teamService.getTeams()
@@ -162,6 +184,10 @@ const onEnrollmentSuccess = (newTeam) => {
   if (newTeam) {
     enrolledTeams.value.push(newTeam)
     if (tournament.value) tournament.value.teamsCount++
+    const hasAssignedGroups = enrolledTeams.value.some(tt => tt.mesa)
+    if (tournament.value?.type === 'groups' && !hasAssignedGroups && enrolledTeams.value.length >= 12 && groupsCount.value === 2) {
+      groupsCount.value = 4
+    }
   }
   toast.add({ severity: 'success', summary: t('common.success'), detail: t('tournament_admin.enrollment.add_success'), life: 3000 })
 }
@@ -226,7 +252,104 @@ const handleGenerateGroups = async () => {
   }
 }
 
+const groupsDistributionSummary = computed(() => {
+  const totalTeams = enrolledTeams.value.length
+  const gCount = Math.max(2, groupsCount.value || 2)
+  if (totalTeams === 0) return { text: '0 parejas', totalMatches: 0, minSize: 0 }
+
+  const baseSize = Math.floor(totalTeams / gCount)
+  const remainder = totalTeams % gCount
+
+  let totalMatches = 0
+  for (let i = 0; i < gCount; i++) {
+    const size = baseSize + (i < remainder ? 1 : 0)
+    totalMatches += (size * (size - 1)) / 2
+  }
+
+  let text = ''
+  if (remainder === 0) {
+    text = `${gCount} grupos de ${baseSize} parejas`
+  } else {
+    text = `${remainder} grupo(s) de ${baseSize + 1} parejas y ${gCount - remainder} grupo(s) de ${baseSize} parejas`
+  }
+
+  return { text, totalMatches, minSize: baseSize }
+})
+
+const knockoutSummary = computed(() => {
+  const gCount = Math.max(2, groupsCount.value || 2)
+  const qualified = gCount * (teamsPerGroup.value || 2)
+  let roundLabel = 'Eliminatorias'
+  if (qualified === 2) roundLabel = 'Final directa'
+  else if (qualified <= 4) roundLabel = 'Semifinales'
+  else if (qualified <= 8) roundLabel = 'Cuartos de Final'
+  else if (qualified <= 16) roundLabel = 'Octavos de Final'
+  else roundLabel = 'Dieciseisavos de Final'
+
+  return { qualified, roundLabel }
+})
+
+const confirmGenerateGroupsMatches = async () => {
+  processing.value = true
+  try {
+    await tournamentService.generateMatches(uuid, {
+      groupsCount: groupsCount.value,
+      teamsPerGroup: teamsPerGroup.value,
+      pairingMode: pairingMode.value,
+      redrawGroups: true
+    })
+    await tournamentService.updateTournament(uuid, { status: 'active' })
+    showGroupsConfigModal.value = false
+    toast.add({ severity: 'success', summary: t('common.success'), detail: t('dashboard.matches_success'), life: 3000 })
+    await fetchTournamentData(true)
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+  } finally {
+    processing.value = false
+  }
+}
+
+const handleResetMatches = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: '¿Estás seguro de que quieres reiniciar el sorteo? Se borrarán las partidas actuales y la asignación de grupos (las parejas inscritas se mantienen) para que puedas volver a configurar los grupos.',
+    header: 'Reiniciar Sorteo',
+    icon: 'pi pi-refresh',
+    rejectProps: {
+      label: t('tournament_admin.match_edit.cancel_btn'),
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Sí, reiniciar sorteo',
+      severity: 'danger'
+    },
+    accept: async () => {
+      processing.value = true
+      try {
+        await tournamentService.resetMatches(uuid)
+        toast.add({
+          severity: 'success',
+          summary: t('common.success'),
+          detail: 'Sorteo reiniciado. Ahora puedes volver a configurar los grupos.',
+          life: 4000
+        })
+        await fetchTournamentData(true)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+      } finally {
+        processing.value = false
+      }
+    }
+  })
+}
+
 const handleGenerateMatches = async (event) => {
+  if (tournament.value?.type === 'groups') {
+    showGroupsConfigModal.value = true
+    return
+  }
+
   confirm.require({
     target: event.currentTarget,
     message: t('tournament_admin.preparation.draw_confirm_msg'),
@@ -251,11 +374,90 @@ const handleGenerateMatches = async (event) => {
         if (tournament.value.type === 'league') {
           await tournamentService.updateTournament(uuid, { leagueMatchDays: leagueMatchDays.value })
         }
-        await tournamentService.generateMatches(uuid)
+        await tournamentService.generateMatches(uuid, { groupsCount: groupsCount.value })
         // Automatically switch to active phase
         await tournamentService.updateTournament(uuid, { status: 'active' })
         const msg = tournament.value?.type === 'eliminatory' ? t('tournament_admin.preparation.draw_success') : t('dashboard.matches_success')
         toast.add({ severity: 'success', summary: t('common.success'), detail: msg, life: 3000 })
+        await fetchTournamentData(true)
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+      } finally {
+        processing.value = false
+      }
+    }
+  })
+}
+
+const hasKnockoutMatches = computed(() => {
+  return matches.value.some(m => m.bracketRound !== null && m.bracketRound !== undefined)
+})
+
+const groupStageProgress = computed(() => {
+  const groupMatches = matches.value.filter(m => !m.bracketRound)
+  const finished = groupMatches.filter(m => m.status === 'finished').length
+  return {
+    total: groupMatches.length,
+    finished,
+    allDone: groupMatches.length > 0 && finished === groupMatches.length
+  }
+})
+
+const sortedEnrolledTeams = computed(() => {
+  return [...enrolledTeams.value].sort((a, b) => {
+    if (a.mesa && b.mesa && a.mesa !== b.mesa) {
+      return a.mesa.localeCompare(b.mesa, undefined, { numeric: true })
+    }
+    if (a.mesa && !b.mesa) return -1
+    if (!a.mesa && b.mesa) return 1
+    return (a.name || '').localeCompare(b.name || '')
+  })
+})
+
+const saveGroupsConfig = async (newTeamsPerGroup, newPairingMode) => {
+  if (newTeamsPerGroup !== undefined) teamsPerGroup.value = newTeamsPerGroup
+  if (newPairingMode !== undefined) pairingMode.value = newPairingMode
+  try {
+    await tournamentService.updateTournament(uuid, {
+      leagueMatchDays: {
+        groupsCount: groupsCount.value,
+        teamsPerGroup: teamsPerGroup.value,
+        pairingMode: pairingMode.value
+      }
+    })
+  } catch (e) {
+    console.error('Error saving groups config:', e)
+  }
+}
+
+const handleGenerateKnockout = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: `¿Generar el cuadro eliminatorio con las ${teamsPerGroup.value} mejores parejas de cada grupo?`,
+    header: 'Generar Fase Eliminatoria',
+    icon: 'pi pi-sitemap',
+    rejectProps: {
+      label: t('tournament_admin.match_edit.cancel_btn'),
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Generar Cuadro',
+      severity: 'primary'
+    },
+    accept: async () => {
+      processing.value = true
+      try {
+        await tournamentService.generateKnockout(uuid, {
+          teamsPerGroup: teamsPerGroup.value,
+          pairingMode: pairingMode.value
+        })
+        toast.add({
+          severity: 'success',
+          summary: t('common.success'),
+          detail: 'Cuadro eliminatorio generado correctamente',
+          life: 3000
+        })
         await fetchTournamentData(true)
       } catch (e) {
         toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
@@ -451,7 +653,9 @@ const groupedMatches = computed(() => {
     const idxA = stageOrder.indexOf(a[0])
     const idxB = stageOrder.indexOf(b[0])
     if (idxA !== -1 && idxB !== -1) return idxA - idxB
-    return 0
+    if (idxA === -1 && idxB !== -1) return -1
+    if (idxA !== -1 && idxB === -1) return 1
+    return a[0].localeCompare(b[0], undefined, { numeric: true })
   })
 
   if (matchesOrder.value === 'desc') {
@@ -507,6 +711,10 @@ const goToPublicView = () => {
 const normalizeStageKey = (stage) => {
   if (!stage) return 'general'
   const s = stage.toLowerCase().trim()
+
+  if (s.startsWith('grupo') || s.startsWith('mesa') || s.startsWith('group') || s.startsWith('talde') || s.startsWith('mahaia')) {
+    return stage.trim()
+  }
   
   const rondaMatch = s.match(/(?:ronda|round)\s*(\d+)/i)
   if (rondaMatch) {
@@ -639,7 +847,7 @@ const normalizeStageKey = (stage) => {
                 <p class="text-[9px] font-black uppercase tracking-widest">{{ t('tournament_admin.enrollment.empty') }}</p>
               </div>
               <div v-else class="teams-list-scroll custom-scrollbar">
-                <div v-for="tt in enrolledTeams" :key="tt.id" class="team-list-item flex align-items-center justify-content-between">
+                <div v-for="tt in sortedEnrolledTeams" :key="tt.id" class="team-list-item flex align-items-center justify-content-between">
                   <div class="flex align-items-center gap-3">
                     <Checkbox :modelValue="tt.isConfirmed" :binary="true" @change="handleToggleConfirm(tt.id)" v-tooltip.top="t('tournament_admin.enrollment.confirmed_tooltip')" />
                     <div class="team-info">
@@ -744,6 +952,13 @@ const normalizeStageKey = (stage) => {
                       <span class="block text-[9px] font-black text-slate-600 uppercase mb-1">{{ t('tournament_admin.preparation.system_label') }}</span>
                       <span class="text-2xl font-black italic text-secondary">{{ t('tournament_form.types.' + tournament.type) }}</span>
                     </div>
+                    <template v-if="tournament.type === 'groups'">
+                      <div class="h-8 w-px bg-white/10"></div>
+                      <div class="text-center">
+                        <span class="block text-[9px] font-black text-slate-600 uppercase mb-1">{{ t('tournament_admin.groups.count_label') }}</span>
+                        <span class="text-2xl font-black italic text-emerald-400">{{ groupsCount }}</span>
+                      </div>
+                    </template>
                   </div>
                   
 
@@ -759,15 +974,123 @@ const normalizeStageKey = (stage) => {
 
             <!-- ACTIVE MODE (Active/Finished) -->
             <section v-else class="active-tournament-view">
+               <!-- GROUPS STANDINGS & KNOCKOUT GENERATOR (Only for 'groups' tournaments) -->
+               <div v-if="tournament.type === 'groups'" class="mb-12 space-y-8">
+                  <!-- Knockout Phase Generator Card -->
+                  <div v-if="!hasKnockoutMatches" class="mus-card-premium p-6 border border-[#e9c349]/30 bg-[#e9c349]/[0.03] rounded-3xl">
+                    <div class="flex flex-column lg:flex-row align-items-center justify-content-between gap-6">
+                      <div>
+                        <div class="flex align-items-center gap-3 mb-2">
+                          <i class="pi pi-sitemap text-secondary text-xl"></i>
+                          <h4 class="m-0 text-white font-black italic uppercase tracking-wider text-lg">
+                            Fase Eliminatoria (Cuadro Final)
+                          </h4>
+                          <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"
+                                :class="groupStageProgress.allDone ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-white/5 text-slate-400 border border-white/10'">
+                            Partidas de Grupos: {{ groupStageProgress.finished }} / {{ groupStageProgress.total }}
+                          </span>
+                        </div>
+                        <p class="m-0 text-xs text-slate-400 font-bold">
+                          Cuando finalice la liguilla de grupos, genera automáticamente el cuadro eliminatorio con las mejores parejas de cada grupo.
+                        </p>
+                      </div>
+
+                      <div class="flex flex-wrap align-items-center gap-4">
+                        <div class="flex align-items-center gap-2 bg-black/40 px-4 py-2 rounded-2xl border border-white/10">
+                          <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Clasifican por grupo:</span>
+                          <div class="flex gap-1">
+                            <button v-for="n in [1, 2, 3, 4]" :key="n"
+                                    type="button"
+                                    @click="saveGroupsConfig(n, undefined)"
+                                    class="w-7 h-7 rounded-lg font-black text-xs border transition-all"
+                                    :class="teamsPerGroup === n ? 'bg-[#e9c349] text-slate-900 border-[#e9c349]' : 'bg-white/5 text-slate-400 border-white/10'">
+                              {{ n }}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div class="flex align-items-center gap-2 bg-black/40 px-4 py-2 rounded-2xl border border-white/10">
+                          <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Cruces:</span>
+                          <button type="button"
+                                  @click="saveGroupsConfig(undefined, pairingMode === 'seeded' ? 'random' : 'seeded')"
+                                  class="px-3 py-1 rounded-lg font-black text-[10px] uppercase tracking-wider bg-white/5 text-[#e9c349] border border-[#e9c349]/30">
+                            {{ pairingMode === 'seeded' ? '1.º vs 2.º (Cruzado)' : 'Sorteo Aleatorio' }}
+                          </button>
+                        </div>
+
+                        <button @click="handleGenerateKnockout($event)"
+                                :disabled="processing"
+                                class="mus-btn-primary px-5 py-3 text-xs">
+                          <i class="pi pi-bolt mr-2"></i>
+                          Generar Cuadro ({{ Object.keys(classification || {}).length * teamsPerGroup }} parejas)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Compact Group Standings Preview for Admin -->
+                  <div v-if="Object.keys(classification || {}).length > 0" class="side-panel-premium">
+                    <div class="panel-title flex align-items-center justify-content-between cursor-pointer" @click="showStandingsInAdmin = !showStandingsInAdmin">
+                      <span><i class="pi pi-table mr-2"></i> Clasificación de Grupos</span>
+                      <i class="pi text-xs text-slate-500" :class="showStandingsInAdmin ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+                    </div>
+                    <div v-show="showStandingsInAdmin" class="p-4 grid">
+                      <div v-for="(teams, groupName) in classification" :key="groupName" class="col-12 lg:col-6 p-2">
+                        <div class="bg-black/30 border border-white/5 rounded-2xl overflow-hidden">
+                          <div class="px-4 py-2 bg-white/5 border-b border-white/5 flex justify-content-between align-items-center">
+                            <span class="text-xs font-black italic uppercase text-[#e9c349] tracking-widest">{{ groupName }}</span>
+                            <span class="text-[9px] font-bold uppercase text-slate-500">Top {{ teamsPerGroup }} clasifican</span>
+                          </div>
+                          <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                              <tr class="text-[9px] font-black uppercase text-slate-500 border-b border-white/5">
+                                <th class="p-2 text-center w-8">#</th>
+                                <th class="p-2">Pareja</th>
+                                <th class="p-2 text-center">PJ</th>
+                                <th class="p-2 text-center text-emerald-400">PG</th>
+                                <th class="p-2 text-center text-rose-400">PP</th>
+                                <th class="p-2 text-center">Dif V</th>
+                                <th class="p-2 text-center">Dif T</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr v-for="(tRow, idx) in teams" :key="tRow.id || tRow.teamName"
+                                  class="border-b border-white/5 last:border-0"
+                                  :class="idx < teamsPerGroup ? 'bg-emerald-500/[0.06]' : ''">
+                                <td class="p-2 text-center font-black" :class="idx < teamsPerGroup ? 'text-[#e9c349]' : 'text-slate-600'">{{ idx + 1 }}</td>
+                                <td class="p-2 font-black uppercase italic text-white truncate max-w-[160px]">{{ tRow.teamName }}</td>
+                                <td class="p-2 text-center text-slate-400 font-bold">{{ tRow.matchesPlayed }}</td>
+                                <td class="p-2 text-center text-emerald-400 font-black">{{ tRow.matchesWon }}</td>
+                                <td class="p-2 text-center text-rose-400/60 font-bold">{{ tRow.matchesLost }}</td>
+                                <td class="p-2 text-center font-bold" :class="tRow.vacasDiff >= 0 ? 'text-emerald-400' : 'text-rose-400'">{{ tRow.vacasDiff > 0 ? '+' : '' }}{{ tRow.vacasDiff }}</td>
+                                <td class="p-2 text-center font-bold" :class="tRow.tantosDiff >= 0 ? 'text-slate-300' : 'text-rose-400/70'">{{ tRow.tantosDiff > 0 ? '+' : '' }}{{ tRow.tantosDiff }}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+               </div>
+
                <div class="flex align-items-center justify-content-between mb-8 px-2">
                   <h3 class="m-0 text-main font-black uppercase italic tracking-tighter text-2xl">
                      <i class="pi pi-calendar mr-3 text-secondary"></i>
                      {{ t('tournament_view.tabs.matches') }}
                   </h3>
-                  <button @click="toggleMatchesOrder" class="mus-btn-secondary px-4 py-2 text-[9px] gap-2">
-                     <i :class="matchesOrder === 'asc' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'"></i>
-                     {{ matchesOrder === 'asc' ? t('tournament_admin.matches.order_asc') : t('tournament_admin.matches.order_desc') }}
-                  </button>
+                  <div class="flex align-items-center gap-3">
+                    <button v-if="matches.length > 0"
+                            @click="handleResetMatches($event)"
+                            :disabled="processing"
+                            class="mus-btn-secondary px-4 py-2 text-[9px] gap-2 border-rose-500/30 text-rose-400 hover:bg-rose-500/10">
+                      <i class="pi pi-refresh"></i>
+                      Reiniciar Sorteo
+                    </button>
+                    <button @click="toggleMatchesOrder" class="mus-btn-secondary px-4 py-2 text-[9px] gap-2">
+                       <i :class="matchesOrder === 'asc' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'"></i>
+                       {{ matchesOrder === 'asc' ? t('tournament_admin.matches.order_asc') : t('tournament_admin.matches.order_desc') }}
+                    </button>
+                  </div>
                </div>
 
                <div v-if="matches.length === 0" class="text-center py-20 opacity-30">
@@ -796,7 +1119,7 @@ const normalizeStageKey = (stage) => {
                         {{ stage === 'final' && stageMatches.some(m => normalizeStageKey(m.stage) === 'third_place') ? t('tournament_view.knockout.final') + ' & ' + t('tournament_view.knockout.third_place') : getStageLabel(stage) }}
                       </template>
                     </h4>
-                    <button v-if="tournament?.type === 'league'" @click.stop="openStageDateModal(stage, stageMatches)" class="mus-btn-secondary px-2 py-1 ml-auto text-[10px]" v-tooltip.top="t('tournament_admin.match_edit.date_tooltip')"><i class="pi pi-calendar"></i></button>
+                    <button v-if="tournament?.type === 'league' || tournament?.type === 'groups'" @click.stop="openStageDateModal(stage, stageMatches)" class="mus-btn-secondary px-2 py-1 ml-auto text-[10px]" v-tooltip.top="t('tournament_admin.match_edit.date_tooltip')"><i class="pi pi-calendar"></i></button>
                     <div class="h-px flex-1 bg-gradient-to-r from-secondary/20 to-transparent ml-4"></div>
                     <i class="pi text-xs text-slate-500" :class="collapsedStages[stage] ? 'pi-chevron-down' : 'pi-chevron-up'"></i>
                   </div>
@@ -1033,6 +1356,135 @@ const normalizeStageKey = (stage) => {
     <Dialog v-model:visible="showEnrollmentDialog" modal :closable="false" :style="{ width: '450px' }" class="mus-dialog-premium" @show="onEnrollmentDialogShow">
       <div class="p-4">
         <TournamentEnrollmentForm ref="enrollmentForm" :tournamentUuid="uuid" @success="onEnrollmentSuccess" @cancel="showEnrollmentDialog = false" />
+      </div>
+    </Dialog>
+
+    <!-- Groups & Knockout Configuration Modal -->
+    <Dialog v-model:visible="showGroupsConfigModal" modal :closable="false" :style="{ width: '620px' }" :dismissableMask="true" class="mus-dialog-premium">
+      <div class="p-5">
+        <div class="flex align-items-center justify-content-between mb-4">
+          <div class="flex align-items-center gap-3">
+            <div class="header-icon scale-90">
+              <i class="pi pi-sitemap text-secondary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="m-0 text-xl font-black text-white italic uppercase tracking-tighter">
+                Configurar <span class="text-secondary">Liguilla + Eliminatorias</span>
+              </h3>
+              <p class="m-0 text-[9px] font-black text-slate-500 uppercase tracking-[0.25em] mt-1">
+                {{ enrolledTeams.length }} parejas inscritas
+              </p>
+            </div>
+          </div>
+          <button @click="showGroupsConfigModal = false" class="close-modal-btn" type="button">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
+        <div class="header-line mb-6"></div>
+
+        <div class="space-y-6">
+          <!-- Step 1: Number of Groups -->
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+            <div class="flex align-items-center justify-content-between mb-3">
+              <div>
+                <span class="block text-[10px] font-black uppercase tracking-widest text-[#e9c349]">1. ¿En cuántos grupos repartir las parejas?</span>
+                <span class="text-xs text-slate-400 font-bold">Las {{ enrolledTeams.length }} parejas se sortearán equitativamente</span>
+              </div>
+              <div class="stepper-control">
+                <button type="button" @click="groupsCount = Math.max(2, groupsCount - 1)" class="stepper-action"><i class="pi pi-minus"></i></button>
+                <span class="stepper-value">{{ groupsCount }}</span>
+                <button type="button" @click="groupsCount = Math.min(Math.max(2, Math.floor(enrolledTeams.length / 2)), groupsCount + 1)" class="stepper-action"><i class="pi pi-plus"></i></button>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-3">
+              <button v-for="g in [2, 3, 4, 5, 6, 8].filter(n => n * 2 <= enrolledTeams.length)" :key="'g-opt-'+g"
+                      type="button"
+                      @click="groupsCount = g"
+                      class="px-3 py-1.5 rounded-xl font-black text-xs border transition-all"
+                      :class="groupsCount === g ? 'bg-[#e9c349] text-slate-900 border-[#e9c349]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'">
+                {{ g }} Grupos
+              </button>
+            </div>
+
+            <div class="p-3 rounded-xl bg-black/40 border border-white/5 flex align-items-center justify-content-between text-xs">
+              <span class="font-bold text-slate-300"><i class="pi pi-users text-secondary mr-2"></i>{{ groupsDistributionSummary.text }}</span>
+              <span class="font-black text-emerald-400 uppercase">{{ groupsDistributionSummary.totalMatches }} partidas de liguilla</span>
+            </div>
+          </div>
+
+          <!-- Step 2: Qualifiers per group -->
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+            <div class="flex align-items-center justify-content-between mb-3">
+              <div>
+                <span class="block text-[10px] font-black uppercase tracking-widest text-[#e9c349]">2. ¿Cuántas parejas pasan por cada grupo?</span>
+                <span class="text-xs text-slate-400 font-bold">Clasificarán al cuadro eliminatorio final</span>
+              </div>
+              <div class="flex gap-2">
+                <button v-for="n in [1, 2, 3, 4]" :key="'qual-'+n"
+                        type="button"
+                        @click="teamsPerGroup = n"
+                        class="w-10 h-10 rounded-xl font-black text-sm border transition-all"
+                        :class="teamsPerGroup === n ? 'bg-[#e9c349] text-slate-900 border-[#e9c349]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'">
+                  {{ n }}
+                </button>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-black/40 border border-white/5 flex align-items-center justify-content-between text-xs">
+              <span class="font-bold text-slate-300">
+                <i class="pi pi-trophy text-secondary mr-2"></i>
+                Pasan las <strong>{{ teamsPerGroup }} mejores</strong> de cada uno de los {{ groupsCount }} grupos
+              </span>
+              <span class="font-black text-[#e9c349] uppercase">
+                {{ knockoutSummary.qualified }} parejas → {{ knockoutSummary.roundLabel }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Step 3: Pairing Mode -->
+          <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+            <span class="block text-[10px] font-black uppercase tracking-widest text-[#e9c349] mb-3">3. Formato de cruces en Eliminatorias</span>
+            <div class="grid grid-nogutter gap-3">
+              <button type="button"
+                      @click="pairingMode = 'seeded'"
+                      class="col p-3 rounded-xl border text-left transition-all cursor-pointer"
+                      :class="pairingMode === 'seeded' ? 'bg-[#e9c349]/15 border-[#e9c349] text-white' : 'bg-black/30 border-white/10 text-slate-400'">
+                <div class="font-black text-xs uppercase mb-1 flex align-items-center justify-content-between">
+                  <span>1.º vs 2.º (Cruzado)</span>
+                  <i v-if="pairingMode === 'seeded'" class="pi pi-check-circle text-[#e9c349]"></i>
+                </div>
+                <div class="text-[10px] opacity-80">1.º Grupo A vs 2.º Grupo B, evitando cruces del mismo grupo hasta la Final.</div>
+              </button>
+
+              <button type="button"
+                      @click="pairingMode = 'random'"
+                      class="col p-3 rounded-xl border text-left transition-all cursor-pointer"
+                      :class="pairingMode === 'random' ? 'bg-[#e9c349]/15 border-[#e9c349] text-white' : 'bg-black/30 border-white/10 text-slate-400'">
+                <div class="font-black text-xs uppercase mb-1 flex align-items-center justify-content-between">
+                  <span>Sorteo Aleatorio</span>
+                  <i v-if="pairingMode === 'random'" class="pi pi-check-circle text-[#e9c349]"></i>
+                </div>
+                <div class="text-[10px] opacity-80">Todas las parejas clasificadas se emparejan por sorteo puro.</div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 justify-content-end mt-6">
+          <button type="button" @click="showGroupsConfigModal = false" class="mus-btn-secondary px-5 py-3 text-xs">
+            {{ t('tournament_admin.match_edit.cancel_btn') }}
+          </button>
+          <button type="button"
+                  @click="confirmGenerateGroupsMatches"
+                  :disabled="processing || enrolledTeams.length < 4"
+                  class="mus-btn-primary px-6 py-3 text-xs">
+            <i v-if="processing" class="pi pi-spin pi-spinner mr-2"></i>
+            <i v-else class="pi pi-bolt mr-2"></i>
+            Confirmar y Generar Sorteo
+          </button>
+        </div>
       </div>
     </Dialog>
   </div>

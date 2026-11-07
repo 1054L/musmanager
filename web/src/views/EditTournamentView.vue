@@ -79,7 +79,7 @@ watch(() => form.value.provinceId, () => onProvinceChange(true))
 const types = computed(() => [
   { value: 'eliminatory', label: t('tournament_form.types.eliminatory'), disabled: false },
   { value: 'league', label: t('tournament_form.types.league'), disabled: false },
-  { value: 'groups', label: t('tournament_form.types.groups'), disabled: true },
+  { value: 'groups', label: t('tournament_form.types.groups'), disabled: false },
   { value: 'ceros', label: t('tournament_form.types.ceros'), disabled: true }
 ])
 

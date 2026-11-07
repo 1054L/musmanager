@@ -9,13 +9,40 @@ class StandingCalculator
 {
     public function calculate(Tournament $tournament): array
     {
-        $tournamentTeams = $tournament->getTournamentTeams();
+        $tournamentTeams = $tournament->getTournamentTeams()->toArray();
+        return $this->calculateForTeams($tournamentTeams);
+    }
+
+    public function calculateByGroups(Tournament $tournament): array
+    {
+        $groups = [];
+        foreach ($tournament->getTournamentTeams() as $tt) {
+            $groupName = $tt->getMesa() ?: 'Grupo A';
+            $groups[$groupName][] = $tt;
+        }
+
+        ksort($groups, SORT_NATURAL);
+
+        $groupedStandings = [];
+        foreach ($groups as $groupName => $teams) {
+            $groupedStandings[$groupName] = $this->calculateForTeams($teams, true);
+        }
+
+        return $groupedStandings;
+    }
+
+    /**
+     * @param TournamentTeam[] $tournamentTeams
+     */
+    private function calculateForTeams(array $tournamentTeams, bool $onlyGroupStage = false): array
+    {
         $standings = [];
 
         foreach ($tournamentTeams as $tt) {
             $stats = [
                 'id' => $tt->getId(),
                 'teamName' => $tt->getTeam()->getName(),
+                'groupName' => $tt->getMesa(),
                 'matchesPlayed' => 0,
                 'matchesWon' => 0,
                 'matchesLost' => 0,
@@ -34,6 +61,10 @@ class StandingCalculator
             );
 
             foreach ($allMatches as $match) {
+                if ($onlyGroupStage && $match->getBracketRound() !== null) {
+                    continue;
+                }
+
                 // Only count finished matches that have a winner
                 if ($match->getWinner() === null) {
                     continue;

@@ -104,6 +104,10 @@ const handleGenerateGroups = async (tournament) => {
 }
 
 const handleGenerateMatches = async (tournament) => {
+  if (tournament.type === 'groups') {
+    router.push(`/tournament/${tournament.uuid}/manage`)
+    return
+  }
   processingUuid.value = tournament.uuid
   try {
     await tournamentService.generateMatches(tournament.uuid)

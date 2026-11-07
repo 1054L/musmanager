@@ -330,10 +330,14 @@ export const tournamentService = {
     return response.json();
   },
 
-  async generateMatches(uuid) {
+  async generateMatches(uuid, options = {}) {
     const response = await fetch(`${API_URL}/admin/tournament/${uuid}/generate-matches`, {
       method: 'POST',
-      headers: authService.getAuthHeader()
+      headers: {
+        ...authService.getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(options)
     });
     if (!response.ok) {
       let errorMessage = 'Error al generar partidas';
@@ -346,6 +350,42 @@ export const tournamentService = {
         else errorMessage = `Error del servidor (${response.status})`;
       }
       throw new Error(errorMessage);
+    }
+    return response.json();
+  },
+
+  async generateKnockout(uuid, options = {}) {
+    const response = await fetch(`${API_URL}/admin/tournament/${uuid}/generate-knockout`, {
+      method: 'POST',
+      headers: {
+        ...authService.getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(options)
+    });
+    if (!response.ok) {
+      let errorMessage = 'Error al generar el cuadro eliminatorio';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorData.detail || errorData.title || errorMessage;
+      } catch (e) {
+        if (response.status === 403) errorMessage = 'No tienes permisos para realizar esta acción';
+        else if (response.status === 401) errorMessage = 'Sesión expirada o inválida';
+        else errorMessage = `Error del servidor (${response.status})`;
+      }
+      throw new Error(errorMessage);
+    }
+    return response.json();
+  },
+
+  async resetMatches(uuid) {
+    const response = await fetch(`${API_URL}/admin/tournament/${uuid}/reset-matches`, {
+      method: 'POST',
+      headers: authService.getAuthHeader()
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Error al reiniciar el sorteo');
     }
     return response.json();
   },
