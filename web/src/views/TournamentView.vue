@@ -772,7 +772,7 @@ const saveMatchResult = async () => {
               <div v-if="tournament.type === 'groups' && Object.keys(normalizedClassification).length > 0"
                    class="mb-6 p-4 rounded-2xl bg-emerald-500/[0.07] border border-emerald-500/25 flex flex-wrap align-items-center justify-content-between gap-3">
                 <div class="flex align-items-center gap-3">
-                  <span class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399] inline-block"></span>
+                  <span style="width: 10px; height: 10px; min-width: 10px; border-radius: 50%;" class="bg-emerald-400 shadow-[0_0_10px_#34d399] inline-block"></span>
                   <span class="text-xs font-black uppercase tracking-wider text-white">
                     {{ t('tournament_view.classification.qual_zone_label') }}
                     <span class="text-emerald-400">
@@ -827,7 +827,8 @@ const saveMatchResult = async () => {
                           ]">
                         <td class="p-4 w-[60px] text-center border-r border-white/5">
                            <span v-if="tournament.type === 'groups'"
-                                 class="inline-flex align-items-center justify-content-center w-6 h-6 rounded-lg text-xs font-black"
+                                 style="width: 28px; height: 28px; min-width: 28px; border-radius: 50%;"
+                                 class="inline-flex align-items-center justify-content-center text-xs font-black"
                                  :class="index < teamsPerGroup ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'text-slate-500'">
                              {{ index + 1 }}
                            </span>

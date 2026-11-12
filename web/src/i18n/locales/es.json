@@ -163,6 +163,7 @@
     "role": "Tipo de Usuario",
     "roleUser": "Jugador",
     "roleAdmin": "Organizador",
+    "admin_invite_banner": "Invitación activa: Al registrarte con este correo serás nombrado administrador del torneo automáticamente.",
     "forgot_password_link": "¿Olvidaste tu contraseña?",
     "forgot_password": {
       "title": "Recuperar Contraseña",
@@ -874,6 +875,33 @@
     "stats": {
       "confirmed": "Confirmadas",
       "finished": "Finalizados"
+    },
+    "managers": {
+      "btn_tooltip": "Administradores del Torneo",
+      "modal_title": "Administradores del Torneo",
+      "modal_subtitle": "GESTIÓN DE PERMISOS Y CO-ORGANIZADORES",
+      "current_section": "Equipo de Administración Actual",
+      "owner_badge": "Propietario",
+      "active_badge": "Admin Activo",
+      "pending_badge": "Pendiente de Registro",
+      "empty_co_admins": "Todavía no has añadido co-administradores a este torneo.",
+      "add_section_title": "Añadir o Invitar Administradores",
+      "add_section_desc": "Introduce uno o varios correos electrónicos y el idioma en el que recibirán el aviso. Si ya son usuarios de Mus Manager quedarán vinculados al instante; si no lo son, recibirán una invitación para crear su cuenta y ser administradores del torneo.",
+      "email_placeholder": "correo{'@'}ejemplo.com (puedes pegar varios separados por comas)",
+      "lang_label": "Idioma del correo",
+      "lang_es": "Castellano (ES)",
+      "lang_eu": "Euskera (EU)",
+      "lang_en": "Inglés (EN)",
+      "add_row_btn": "Añadir otro correo",
+      "send_btn": "Enviar Invitaciones y Nombrar Admins",
+      "sending_btn": "Enviando...",
+      "resend_tooltip": "Reenviar invitación por correo",
+      "remove_tooltip": "Revocar acceso de administrador",
+      "remove_confirm_title": "Quitar Administrador",
+      "remove_confirm_msg": "¿Seguro que quieres quitar a {email} como administrador de este torneo?",
+      "remove_success": "Administrador eliminado correctamente",
+      "invite_success_summary": "Procesados {total}: {existing} usuario(s) vinculado(s) y {invited} invitación(es) de registro enviada(s).",
+      "resend_success": "Invitación reenviada a {email}"
     }
   },
   "terms": {

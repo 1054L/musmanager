@@ -16,8 +16,12 @@ use App\Entity\MusMatch;
 use App\Entity\MusMatchGame;
 use App\Entity\Province;
 use App\Entity\Town;
+use App\Entity\User;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Repository\TournamentRepository;
 use App\Repository\TeamRepository;
 use App\Repository\ProvinceRepository;
@@ -617,10 +621,35 @@ class TournamentController extends AbstractController
 
         $user = $this->getUser();
         $isManager = false;
+        $isOwner = false;
         if ($user) {
-            $isManager = $this->isGranted('ROLE_SUPER_ADMIN')
-                || ($tournament->getCreatedBy() && $tournament->getCreatedBy()->getId() === $user->getId())
-                || $tournament->getManagers()->contains($user);
+            $isOwner = $this->isGranted('ROLE_SUPER_ADMIN')
+                || ($tournament->getCreatedBy() && $tournament->getCreatedBy()->getId() === $user->getId());
+            $isManager = $isOwner || $tournament->getManagers()->contains($user);
+        }
+
+        $ownerData = null;
+        $managersData = [];
+        $pendingManagersData = [];
+        if ($isManager) {
+            $creator = $tournament->getCreatedBy();
+            if ($creator) {
+                $ownerData = [
+                    'id' => $creator->getId(),
+                    'email' => $creator->getEmail(),
+                    'firstName' => $creator->getFirstName(),
+                    'lastName' => $creator->getLastName(),
+                ];
+            }
+            foreach ($tournament->getManagers() as $mgr) {
+                $managersData[] = [
+                    'id' => $mgr->getId(),
+                    'email' => $mgr->getEmail(),
+                    'firstName' => $mgr->getFirstName(),
+                    'lastName' => $mgr->getLastName(),
+                ];
+            }
+            $pendingManagersData = $tournament->getPendingManagers();
         }
 
         $matches = [];
@@ -675,6 +704,10 @@ class TournamentController extends AbstractController
             'ruleGames' => $tournament->getRuleGames(),
             'hasThirdPlace' => $tournament->isHasThirdPlace(),
             'isManager' => $isManager,
+            'isOwner' => $isOwner,
+            'owner' => $ownerData,
+            'managers' => $managersData,
+            'pendingManagers' => $pendingManagersData,
             'teamsCount' => count($tournament->getTournamentTeams()),
             'matches' => $matches,
             'teams' => array_map(function(TournamentTeam $tt) {
@@ -704,6 +737,307 @@ class TournamentController extends AbstractController
             'success' => true,
             'isConfirmed' => $tt->isConfirmed()
         ]);
+    }
+
+    #[Route('/api/admin/tournament/{uuid}/managers', name: 'app_tournament_invite_managers', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function inviteManagers(
+        string $uuid,
+        Request $request,
+        TournamentRepository $tournamentRepository,
+        EntityManagerInterface $entityManager,
+        MailerInterface $mailer,
+        TranslatorInterface $translator
+    ): JsonResponse {
+        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
+        if (!$tournament) {
+            return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+        }
+
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        $isOwner = $currentUser && (
+            $this->isGranted('ROLE_SUPER_ADMIN')
+            || ($tournament->getCreatedBy() && $tournament->getCreatedBy()->getId() === $currentUser->getId())
+        );
+
+        if (!$isOwner) {
+            return new JsonResponse(['error' => 'Solo el propietario del torneo puede gestionar administradores'], 403);
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+        $invitationsInput = $data['invitations'] ?? [];
+
+        // Also support passing "emails" (array or comma/newline-separated string) + "locale"
+        if (empty($invitationsInput) && !empty($data['emails'])) {
+            $defaultLocale = $data['locale'] ?? 'es';
+            $rawEmails = is_array($data['emails'])
+                ? $data['emails']
+                : preg_split('/[\s,;]+/', (string)$data['emails'], -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($rawEmails as $rawEmail) {
+                $invitationsInput[] = [
+                    'email' => $rawEmail,
+                    'locale' => $defaultLocale,
+                ];
+            }
+        }
+
+        if (empty($invitationsInput)) {
+            return new JsonResponse(['error' => 'Debes indicar al menos un correo electrónico'], 400);
+        }
+
+        $allowedLocales = ['es', 'eu', 'en'];
+        $frontendUrl = rtrim($_ENV['FRONTEND_URL'] ?? 'https://musmanager.com', '/');
+        $inviterName = trim(($currentUser->getFirstName() ?? '') . ' ' . ($currentUser->getLastName() ?? ''));
+        if ($inviterName === '') {
+            $inviterName = $currentUser->getEmail();
+        }
+
+        $userRepo = $entityManager->getRepository(User::class);
+        $pendingList = $tournament->getPendingManagers();
+        $results = [];
+
+        foreach ($invitationsInput as $item) {
+            $rawEmail = is_array($item) ? ($item['email'] ?? '') : (string)$item;
+            $locale = is_array($item) ? ($item['locale'] ?? 'es') : ($data['locale'] ?? 'es');
+            if (!in_array($locale, $allowedLocales, true)) {
+                $locale = 'es';
+            }
+
+            $email = strtolower(trim($rawEmail));
+            if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $results[] = [
+                    'email' => $rawEmail,
+                    'status' => 'invalid_email',
+                ];
+                continue;
+            }
+
+            // Check if email belongs to tournament creator
+            if ($tournament->getCreatedBy() && strtolower($tournament->getCreatedBy()->getEmail()) === $email) {
+                $results[] = [
+                    'email' => $email,
+                    'status' => 'already_owner',
+                ];
+                continue;
+            }
+
+            // Look up existing user case-insensitively
+            $existingUser = $userRepo->createQueryBuilder('u')
+                ->where('LOWER(u.email) = :email')
+                ->setParameter('email', $email)
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+
+            if ($existingUser instanceof User) {
+                // Add as active manager on the tournament
+                $tournament->addManager($existingUser);
+
+                // Ensure the user also has ROLE_ADMIN
+                $roles = $existingUser->getRoles();
+                if (!in_array('ROLE_ADMIN', $roles, true)) {
+                    $roles[] = 'ROLE_ADMIN';
+                    $existingUser->setRoles(array_values(array_unique($roles)));
+                }
+
+                // Remove from pendingManagers if present
+                $pendingList = array_values(array_filter($pendingList, fn($p) => strtolower($p['email'] ?? '') !== $email));
+
+                $actionLink = $frontendUrl . '/tournament/' . $tournament->getUuidAccessToken() . '/manage';
+                $subject = $translator->trans('emails.admin_invite.existing_subject', [
+                    '%tournament%' => $tournament->getName()
+                ], 'messages', $locale);
+
+                $emailSent = $this->sendAdminInviteEmail(
+                    $mailer,
+                    $existingUser->getEmail(),
+                    $subject,
+                    $tournament,
+                    $inviterName,
+                    $locale,
+                    true,
+                    $actionLink
+                );
+
+                $results[] = [
+                    'email' => $existingUser->getEmail(),
+                    'status' => 'added_existing_user',
+                    'isExistingUser' => true,
+                    'locale' => $locale,
+                    'emailSent' => $emailSent,
+                ];
+            } else {
+                // User is not registered yet -> store pending invitation & send registration invite email
+                $token = bin2hex(random_bytes(16));
+                $foundIdx = null;
+                foreach ($pendingList as $idx => $p) {
+                    if (strtolower($p['email'] ?? '') === $email) {
+                        $foundIdx = $idx;
+                        break;
+                    }
+                }
+                $inviteRecord = [
+                    'email' => $email,
+                    'locale' => $locale,
+                    'invitedAt' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+                    'token' => $token,
+                ];
+                if ($foundIdx !== null) {
+                    $pendingList[$foundIdx] = $inviteRecord;
+                } else {
+                    $pendingList[] = $inviteRecord;
+                }
+
+                $actionLink = $frontendUrl . '/register?email=' . urlencode($email)
+                    . '&tournament=' . urlencode($tournament->getUuidAccessToken())
+                    . '&invite=' . urlencode($token)
+                    . '&lang=' . urlencode($locale);
+
+                $subject = $translator->trans('emails.admin_invite.new_subject', [
+                    '%tournament%' => $tournament->getName()
+                ], 'messages', $locale);
+
+                $emailSent = $this->sendAdminInviteEmail(
+                    $mailer,
+                    $email,
+                    $subject,
+                    $tournament,
+                    $inviterName,
+                    $locale,
+                    false,
+                    $actionLink
+                );
+
+                $results[] = [
+                    'email' => $email,
+                    'status' => 'invited_new_user',
+                    'isExistingUser' => false,
+                    'locale' => $locale,
+                    'emailSent' => $emailSent,
+                ];
+            }
+        }
+
+        $tournament->setPendingManagers($pendingList);
+        $entityManager->flush();
+
+        $managersData = [];
+        foreach ($tournament->getManagers() as $mgr) {
+            $managersData[] = [
+                'id' => $mgr->getId(),
+                'email' => $mgr->getEmail(),
+                'firstName' => $mgr->getFirstName(),
+                'lastName' => $mgr->getLastName(),
+            ];
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'results' => $results,
+            'managers' => $managersData,
+            'pendingManagers' => $tournament->getPendingManagers(),
+        ]);
+    }
+
+    #[Route('/api/admin/tournament/{uuid}/managers', name: 'app_tournament_remove_manager', methods: ['DELETE'])]
+    #[IsGranted('ROLE_USER')]
+    public function removeManager(
+        string $uuid,
+        Request $request,
+        TournamentRepository $tournamentRepository,
+        EntityManagerInterface $entityManager
+    ): JsonResponse {
+        $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
+        if (!$tournament) {
+            return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+        }
+
+        /** @var User|null $currentUser */
+        $currentUser = $this->getUser();
+        $isOwner = $currentUser && (
+            $this->isGranted('ROLE_SUPER_ADMIN')
+            || ($tournament->getCreatedBy() && $tournament->getCreatedBy()->getId() === $currentUser->getId())
+        );
+
+        if (!$isOwner) {
+            return new JsonResponse(['error' => 'Solo el propietario del torneo puede eliminar administradores'], 403);
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+        $userId = $data['userId'] ?? $request->query->get('userId');
+        $email = strtolower(trim((string)($data['email'] ?? $request->query->get('email') ?? '')));
+
+        if ($userId) {
+            foreach ($tournament->getManagers() as $mgr) {
+                if ($mgr->getId() === (int)$userId) {
+                    $tournament->removeManager($mgr);
+                    break;
+                }
+            }
+        }
+
+        if ($email !== '') {
+            foreach ($tournament->getManagers() as $mgr) {
+                if (strtolower($mgr->getEmail()) === $email) {
+                    $tournament->removeManager($mgr);
+                }
+            }
+            $pendingList = array_values(array_filter(
+                $tournament->getPendingManagers(),
+                fn($p) => strtolower($p['email'] ?? '') !== $email
+            ));
+            $tournament->setPendingManagers($pendingList);
+        }
+
+        $entityManager->flush();
+
+        $managersData = [];
+        foreach ($tournament->getManagers() as $mgr) {
+            $managersData[] = [
+                'id' => $mgr->getId(),
+                'email' => $mgr->getEmail(),
+                'firstName' => $mgr->getFirstName(),
+                'lastName' => $mgr->getLastName(),
+            ];
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'managers' => $managersData,
+            'pendingManagers' => $tournament->getPendingManagers(),
+        ]);
+    }
+
+    private function sendAdminInviteEmail(
+        MailerInterface $mailer,
+        string $recipientEmail,
+        string $subject,
+        Tournament $tournament,
+        string $inviterName,
+        string $locale,
+        bool $isExistingUser,
+        string $actionLink
+    ): bool {
+        try {
+            $emailMessage = (new Email())
+                ->from($_ENV['MAILER_FROM'] ?? 'info@musmanager.com')
+                ->to($recipientEmail)
+                ->subject($subject)
+                ->html($this->renderView('emails/tournament_admin_invite.html.twig', [
+                    'tournament' => $tournament,
+                    'inviterName' => $inviterName,
+                    'recipientEmail' => $recipientEmail,
+                    'locale' => $locale,
+                    'isExistingUser' => $isExistingUser,
+                    'actionLink' => $actionLink,
+                ]));
+
+            $mailer->send($emailMessage);
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     #[Route('/api/admin/match/{id}/update', name: 'app_match_update', methods: ['POST'])]

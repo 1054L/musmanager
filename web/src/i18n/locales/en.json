@@ -163,6 +163,7 @@
     "role": "User Type",
     "roleUser": "Player",
     "roleAdmin": "Organizer",
+    "admin_invite_banner": "Active invitation: By registering with this email you will automatically be appointed tournament administrator.",
     "forgot_password_link": "Forgot your password?",
     "forgot_password": {
       "title": "Recover Password",
@@ -874,6 +875,33 @@
     "stats": {
       "confirmed": "Confirmed",
       "finished": "Finished"
+    },
+    "managers": {
+      "btn_tooltip": "Tournament Administrators",
+      "modal_title": "Tournament Administrators",
+      "modal_subtitle": "PERMISSIONS & CO-ORGANIZERS MANAGEMENT",
+      "current_section": "Current Administration Team",
+      "owner_badge": "Owner",
+      "active_badge": "Active Admin",
+      "pending_badge": "Pending Registration",
+      "empty_co_admins": "You haven't added any co-administrators to this tournament yet.",
+      "add_section_title": "Add or Invite Administrators",
+      "add_section_desc": "Enter one or multiple email addresses and the language for their notification email. If they are already Mus Manager users they will be linked immediately; otherwise, they will receive an invitation to create an account and administer the tournament.",
+      "email_placeholder": "email{'@'}example.com (you can paste multiple separated by commas)",
+      "lang_label": "Email language",
+      "lang_es": "Spanish (ES)",
+      "lang_eu": "Basque (EU)",
+      "lang_en": "English (EN)",
+      "add_row_btn": "Add another email",
+      "send_btn": "Send Invitations & Appoint Admins",
+      "sending_btn": "Sending...",
+      "resend_tooltip": "Resend invitation email",
+      "remove_tooltip": "Revoke administrator access",
+      "remove_confirm_title": "Remove Administrator",
+      "remove_confirm_msg": "Are you sure you want to remove {email} as an administrator of this tournament?",
+      "remove_success": "Administrator removed successfully",
+      "invite_success_summary": "Processed {total}: {existing} existing user(s) linked and {invited} registration invitation(s) sent.",
+      "resend_success": "Invitation resent to {email}"
     }
   },
   "terms": {

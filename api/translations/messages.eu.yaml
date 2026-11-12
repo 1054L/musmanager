@@ -7,5 +7,18 @@ emails:
         ignore: "Aldaketa hau eskatu ez baduzu, mezu hau baztertu dezakezu segurtasunez."
         note: "Oharra: Esteka hau ordubete barru iraungiko da segurtasun arrazoiengatik."
         footer: "Eskubide guztiak erreserbatuta."
+    admin_invite:
+        existing_subject: "%tournament% txapelketako administratzaile izendatu zaituzte - Mus Manager"
+        new_subject: "Mus Manager-en erabiltzaile eta %tournament% txapelketako administratzaile izateko gonbidapena"
+        greeting: "Kaixo,"
+        tournament_label: "Esleitutako Txapelketa"
+        existing_intro: "%inviter% erabiltzaileak \"%tournament%\" txapelketako administratzaile gisa gehitu zaitu Mus Manager-en."
+        existing_body: "Plataformako erabiltzailea zarenez, txapelketa zure kontuari lotuta dago jada. Administrazio paneletik bikoteak izena eman, zozketak egin, partiden emaitzak erregistratu eta txapelketako faseak kudeatu ahal izango dituzu."
+        existing_button: "Txapelketa Kudeatu"
+        existing_note: "Oharra: Hasi saioa zure ohiko Mus Manager kontuarekin txapelketaren kudeaketa panelera zuzenean sartzeko."
+        new_intro: "%inviter% erabiltzaileak Mus Manager-era batzeko eta \"%tournament%\" txapelketako administratzaile izateko gonbidatu zaitu."
+        new_body: "Oraindik ez duzu konturik erregistratuta %email% helbidearekin. Txapelketa kudeatzen hasteko (izen-emateak, zozketak, emaitzak eta sailkapenak denbora errealean), sortu zure doako kontua beheko botoian klik eginez."
+        new_button: "Kontua Sortu eta Txapelketa Kudeatu"
+        new_note: "Garrantzitsua: Erregistratu helbide elektroniko hau bera erabiliz (%email%), sistemak txapelketako administratzaile baimenak automatikoki eslei diezazkizun."
 auth:
     forgot_password_success: "Posta hori existitzen bada, pasahitza berrezartzeko esteka bat jasoko duzu."

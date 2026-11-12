@@ -7,5 +7,18 @@ emails:
         ignore: "Si no has solicitado este cambio, puedes ignorar este correo con seguridad."
         note: "Nota: Este enlace caducará en 1 hora por razones de seguridad."
         footer: "Todos los derechos reservados."
+    admin_invite:
+        existing_subject: "Has sido nombrado administrador del torneo %tournament% - Mus Manager"
+        new_subject: "Invitación para ser usuario y administrador del torneo %tournament% - Mus Manager"
+        greeting: "Hola,"
+        tournament_label: "Torneo Asignado"
+        existing_intro: "%inviter% te ha añadido como administrador del torneo \"%tournament%\" en Mus Manager."
+        existing_body: "Como ya eres usuario de nuestra plataforma, el torneo ya está vinculado a tu cuenta. Desde el panel de administración podrás inscribir parejas, realizar sorteos, anotar los resultados de las partidas y gestionar las fases del campeonato."
+        existing_button: "Gestionar Torneo"
+        existing_note: "Nota: Inicia sesión con tu cuenta habitual en Mus Manager para acceder directamente al panel de gestión del torneo."
+        new_intro: "%inviter% te ha invitado a unirte a Mus Manager como administrador del torneo \"%tournament%\"."
+        new_body: "Aún no tienes una cuenta registrada con el correo %email%. Para empezar a gestionar el torneo (inscripciones, sorteos, actas y clasificaciones en tiempo real), solo tienes que crear tu cuenta gratuita pulsando el siguiente botón."
+        new_button: "Crear Cuenta y Administrar Torneo"
+        new_note: "Importante: Regístrate utilizando esta misma dirección de correo (%email%) para que el sistema te asigne automáticamente los permisos de administrador del torneo."
 auth:
     forgot_password_success: "Si ese correo existe, recibirás un enlace para restablecer tu contraseña."

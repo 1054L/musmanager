@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #e2e8f0; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #0a0a0a;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+        }
+        .wrapper {
+            background-color: #111111;
+            border: 1px solid #222222;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .header { 
+            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            padding: 40px 20px;
+            text-align: center; 
+            border-bottom: 2px solid #bf953f;
+        }
+        .logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .header h1 { 
+            color: #bf953f; 
+            font-size: 24px; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            font-weight: 950; 
+            font-style: italic;
+            margin: 0;
+        }
+        .content { 
+            padding: 40px; 
+        }
+        .greeting {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-style: italic;
+        }
+        .text {
+            font-size: 15px;
+            color: #94a3b8;
+            margin-bottom: 24px;
+        }
+        .tournament-box {
+            background: #161f1a;
+            border: 1px solid rgba(191, 149, 63, 0.35);
+            border-left: 4px solid #bf953f;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .tournament-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #bf953f;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+        .tournament-name {
+            font-size: 20px;
+            font-weight: 900;
+            color: #ffffff;
+            font-style: italic;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        .button-container { 
+            text-align: center; 
+            margin: 36px 0; 
+        }
+        .button { 
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #aa771c 100%);
+            color: #000000 !important; 
+            padding: 18px 36px; 
+            text-decoration: none; 
+            font-weight: 950; 
+            text-transform: uppercase; 
+            font-size: 14px; 
+            letter-spacing: 2px;
+            display: inline-block;
+            border-radius: 2px;
+            box-shadow: 0 10px 20px rgba(191, 149, 63, 0.2);
+        }
+        .footer { 
+            text-align: center; 
+            padding: 30px;
+            font-size: 11px; 
+            color: #475569;
+            background-color: #0a0a0a;
+            border-top: 1px solid #222222;
+        }
+        .note { 
+            font-size: 12px; 
+            color: #64748b; 
+            background: #1a1a1a;
+            padding: 15px;
+            border-left: 3px solid #bf953f;
+            margin-top: 30px;
+        }
+        .footer p { margin: 5px 0; }
+        .legal { text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <div class="header">
+                <img src="https://musmanager.com/logo.png" alt="Mus Manager" class="logo">
+                <h1>MUS MANAGER</h1>
+            </div>
+            <div class="content">
+                <div class="greeting">
+                    {{ 'emails.admin_invite.greeting'|trans([], 'messages', locale) }}
+                </div>
+
+                {% if isExistingUser %}
+                    <p class="text">
+                        {{ 'emails.admin_invite.existing_intro'|trans({'%inviter%': inviterName, '%tournament%': tournament.name}, 'messages', locale) }}
+                    </p>
+                {% else %}
+                    <p class="text">
+                        {{ 'emails.admin_invite.new_intro'|trans({'%inviter%': inviterName, '%tournament%': tournament.name}, 'messages', locale) }}
+                    </p>
+                {% endif %}
+
+                <div class="tournament-box">
+                    <div class="tournament-label">{{ 'emails.admin_invite.tournament_label'|trans([], 'messages', locale) }}</div>
+                    <p class="tournament-name">{{ tournament.name }}</p>
+                </div>
+
+                {% if isExistingUser %}
+                    <p class="text">
+                        {{ 'emails.admin_invite.existing_body'|trans([], 'messages', locale) }}
+                    </p>
+                    <div class="button-container">
+                        <a href="{{ actionLink }}" class="button">
+                            {{ 'emails.admin_invite.existing_button'|trans([], 'messages', locale) }}
+                        </a>
+                    </div>
+                    <div class="note">
+                        <strong>{{ 'emails.admin_invite.existing_note'|trans([], 'messages', locale) }}</strong>
+                    </div>
+                {% else %}
+                    <p class="text">
+                        {{ 'emails.admin_invite.new_body'|trans({'%email%': recipientEmail}, 'messages', locale) }}
+                    </p>
+                    <div class="button-container">
+                        <a href="{{ actionLink }}" class="button">
+                            {{ 'emails.admin_invite.new_button'|trans([], 'messages', locale) }}
+                        </a>
+                    </div>
+                    <div class="note">
+                        <strong>{{ 'emails.admin_invite.new_note'|trans({'%email%': recipientEmail}, 'messages', locale) }}</strong>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="footer">
+                <p class="legal">&copy; {{ "now"|date("Y") }} MUS MANAGER. {{ 'emails.reset_password.footer'|trans([], 'messages', locale) }}</p>
+                <p>www.musmanager.com</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

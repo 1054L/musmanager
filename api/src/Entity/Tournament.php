@@ -79,6 +79,9 @@ class Tournament
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $leagueMatchDays = null;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $pendingManagers = [];
+
     /**
      * @var Collection<int, User>
      */
@@ -406,6 +409,17 @@ class Tournament
     public function setLeagueMatchDays(?array $leagueMatchDays): static
     {
         $this->leagueMatchDays = $leagueMatchDays;
+        return $this;
+    }
+
+    public function getPendingManagers(): array
+    {
+        return $this->pendingManagers ?? [];
+    }
+
+    public function setPendingManagers(?array $pendingManagers): static
+    {
+        $this->pendingManagers = $pendingManagers ? array_values($pendingManagers) : [];
         return $this;
     }
 }

@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { authService } from '../services/api'
 import { useI18n } from 'vue-i18n'
 import MusLoader from './MusLoader.vue'
@@ -18,8 +18,9 @@ const props = defineProps({
 
 const emit = defineEmits(['success', 'mode-change'])
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const mode = ref(props.initialMode)
 const email = ref('')
 const password = ref('')
@@ -29,7 +30,21 @@ const ageVerified = ref(false)
 const loading = ref(false)
 const error = ref(null)
 
+onMounted(() => {
+  if (route.query.lang && ['es', 'eu', 'en'].includes(String(route.query.lang))) {
+    locale.value = String(route.query.lang)
+    localStorage.setItem('locale', String(route.query.lang))
+  }
+  if (route.query.email) {
+    email.value = String(route.query.email)
+  }
+  if (route.query.tournament || route.query.invite) {
+    role.value = 'admin'
+  }
+})
+
 const isLogin = computed(() => mode.value === 'login')
+const hasAdminInvite = computed(() => !!(route.query.tournament || route.query.invite))
 
 const formattedSubtitle = computed(() => {
   const text = isLogin.value ? t('auth.loginDesc') : t('auth.registerDesc')
@@ -60,9 +75,13 @@ const handleSubmit = async () => {
     await authService.login(email.value, password.value)
     emit('success')
     
-    // Use location.href to ensure a clean state and full reload on the dashboard
-    if (props.redirect) {
-      window.location.href = props.redirect
+    const targetRedirect = route.query.redirect
+      ? String(route.query.redirect)
+      : (route.query.tournament ? `/tournament/${route.query.tournament}/manage` : props.redirect)
+
+    // Use location.href to ensure a clean state and full reload on the target page
+    if (targetRedirect) {
+      window.location.href = targetRedirect
     } else {
       window.location.reload()
     }
@@ -86,6 +105,10 @@ const handleSubmit = async () => {
     </header>
 
     <form @submit.prevent="handleSubmit" class="space-y-6 text-left">
+      <div v-if="hasAdminInvite && !isLogin" class="p-4 rounded-2xl bg-[#e9c349]/10 border border-[#e9c349]/30 text-[#e9c349] text-xs font-bold flex items-center gap-3">
+        <i class="pi pi-shield text-lg"></i>
+        <span>{{ t('auth.admin_invite_banner') }}</span>
+      </div>
       <Transition name="slide-fade">
         <div v-if="error" class="error-banner">
           <i class="pi pi-exclamation-circle mr-2"></i>

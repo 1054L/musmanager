@@ -429,6 +429,38 @@ export const tournamentService = {
       throw new Error(errorData.error || 'Error al cargar clasificación');
     }
     return response.json();
+  },
+
+  async inviteManagers(uuid, invitations) {
+    const response = await fetch(`${API_URL}/admin/tournament/${uuid}/managers`, {
+      method: 'POST',
+      headers: {
+        ...authService.getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ invitations })
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Error al invitar administradores');
+    }
+    return response.json();
+  },
+
+  async removeManager(uuid, payload) {
+    const response = await fetch(`${API_URL}/admin/tournament/${uuid}/managers`, {
+      method: 'DELETE',
+      headers: {
+        ...authService.getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Error al eliminar administrador');
+    }
+    return response.json();
   }
 };
 

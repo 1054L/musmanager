@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Tournament;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,13 +30,16 @@ class RegistrationController extends AbstractController
             return new JsonResponse(['error' => 'You must confirm you are 18 or older to register'], 400);
         }
 
-        $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
+        $normalizedEmail = strtolower(trim($data['email']));
+
+        $existingUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $normalizedEmail])
+            ?? $entityManager->getRepository(User::class)->findOneBy(['email' => trim($data['email'])]);
         if ($existingUser) {
             return new JsonResponse(['error' => 'Email already registered'], 409);
         }
 
         $user = new User();
-        $user->setEmail($data['email']);
+        $user->setEmail($normalizedEmail);
         $user->setAgeVerified(true);
         $user->setAgeVerifiedAt(new \DateTimeImmutable());
         $user->setTermsAccepted(true);
@@ -52,13 +56,46 @@ class RegistrationController extends AbstractController
         $user->setPassword($hashedPassword);
 
         $entityManager->persist($user);
+
+        // Automatically link user as manager for any tournament with a pending invitation for this email
+        $assignedTournaments = [];
+        $allTournaments = $entityManager->getRepository(Tournament::class)->findAll();
+        foreach ($allTournaments as $tournament) {
+            $pending = $tournament->getPendingManagers();
+            if (empty($pending)) {
+                continue;
+            }
+            $matched = false;
+            $remaining = [];
+            foreach ($pending as $inv) {
+                $invEmail = strtolower(trim($inv['email'] ?? ''));
+                if ($invEmail === $normalizedEmail) {
+                    $matched = true;
+                } else {
+                    $remaining[] = $inv;
+                }
+            }
+            if ($matched) {
+                $tournament->addManager($user);
+                $tournament->setPendingManagers($remaining);
+                $roles = $user->getRoles();
+                if (!in_array('ROLE_ADMIN', $roles, true)) {
+                    $roles[] = 'ROLE_ADMIN';
+                    $user->setRoles(array_values(array_unique($roles)));
+                }
+                $assignedTournaments[] = $tournament->getUuidAccessToken();
+            }
+        }
+
         $entityManager->flush();
 
         return new JsonResponse([
             'message' => 'User registered successfully',
+            'assignedTournaments' => $assignedTournaments,
             'user' => [
                 'id' => $user->getId(),
                 'email' => $user->getEmail(),
+                'roles' => $user->getRoles(),
                 'ageVerified' => $user->isAgeVerified(),
                 'ageVerifiedAt' => $user->getAgeVerifiedAt()->format(\DateTimeInterface::ATOM)
             ]

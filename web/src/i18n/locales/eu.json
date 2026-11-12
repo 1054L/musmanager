@@ -163,6 +163,7 @@
     "role": "Erabiltzaile Mota",
     "roleUser": "Jokalaria",
     "roleAdmin": "Antolatzailea",
+    "admin_invite_banner": "Gonbidapen aktiboa: Helbide honekin erregistratzean txapelketako administratzaile izendatuko zaituzte automatikoki.",
     "forgot_password_link": "Pasahitza ahaztu duzu?",
     "forgot_password": {
       "title": "Pasahitza Berreskuratu",
@@ -873,6 +874,33 @@
     "stats": {
       "confirmed": "Konfirmatuta",
       "finished": "Amaituta"
+    },
+    "managers": {
+      "btn_tooltip": "Txapelketako Administratzaileak",
+      "modal_title": "Txapelketako Administratzaileak",
+      "modal_subtitle": "BAIMENEN ETA KO-ANTOLATZAILEEN KUDEAKETA",
+      "current_section": "Egungo Administrazio Taldea",
+      "owner_badge": "Jabea",
+      "active_badge": "Admin Aktiboa",
+      "pending_badge": "Erregistratzeko Zain",
+      "empty_co_admins": "Oraindik ez duzu ko-administratzailerik gehitu txapelketa honetan.",
+      "add_section_title": "Administratzaileak Gehitu edo Gonbidatu",
+      "add_section_desc": "Sartu helbide elektroniko bat edo gehiago eta jakinarazpena zein hizkuntzatan jasoko duten. Dagoeneko Mus Manager-eko erabiltzaileak badira berehala lotuko dira; ez badira, kontua sortzeko eta txapelketako administratzaile izateko gonbidapena jasoko dute.",
+      "email_placeholder": "posta{'@'}adibidea.eus (komaz bereizitako hainbat itsatsi ditzakezu)",
+      "lang_label": "Mezuaren hizkuntza",
+      "lang_es": "Gaztelania (ES)",
+      "lang_eu": "Euskara (EU)",
+      "lang_en": "Ingelesa (EN)",
+      "add_row_btn": "Gehitu beste helbide bat",
+      "send_btn": "Gonbidapenak Bidali eta Admin Izendatu",
+      "sending_btn": "Bidaltzen...",
+      "resend_tooltip": "Gonbidapena berriro bidali postaz",
+      "remove_tooltip": "Administratzaile baimena kendu",
+      "remove_confirm_title": "Administratzailea Kendu",
+      "remove_confirm_msg": "Ziur al zaude {email} txapelketa honetako administratzaile izateari utzi nahi diozula?",
+      "remove_success": "Administratzailea ongi ezabatu da",
+      "invite_success_summary": "{total} prozesatuta: {existing} erabiltzaile lotuta eta {invited} erregistro-gonbidapen bidalita.",
+      "resend_success": "Gonbidapena berriro bidali zaio honi: {email}"
     }
   },
   "terms": {

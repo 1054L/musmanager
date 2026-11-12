@@ -7,5 +7,18 @@ emails:
         ignore: "If you did not request this change, you can safely ignore this email."
         note: "Note: This link will expire in 1 hour for security reasons."
         footer: "All rights reserved."
+    admin_invite:
+        existing_subject: "You have been appointed administrator of %tournament% - Mus Manager"
+        new_subject: "Invitation to join Mus Manager and administer %tournament%"
+        greeting: "Hello,"
+        tournament_label: "Assigned Tournament"
+        existing_intro: "%inviter% has added you as an administrator of the tournament \"%tournament%\" on Mus Manager."
+        existing_body: "Since you are already a registered user on our platform, the tournament is now linked to your account. From the administration panel you can enroll pairs, run draws, record match scores, and manage tournament stages."
+        existing_button: "Manage Tournament"
+        existing_note: "Note: Log in with your regular Mus Manager account to access the tournament management panel directly."
+        new_intro: "%inviter% has invited you to join Mus Manager as an administrator of the tournament \"%tournament%\"."
+        new_body: "You do not yet have an account registered with %email%. To start managing the tournament (enrollments, draws, match scores, and live standings), simply create your free account by clicking the button below."
+        new_button: "Create Account & Manage Tournament"
+        new_note: "Important: Please register using this exact email address (%email%) so the system automatically grants you administrator permissions for the tournament."
 auth:
     forgot_password_success: "If that email exists, you will receive a link to reset your password."

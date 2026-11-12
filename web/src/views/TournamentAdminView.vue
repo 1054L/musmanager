@@ -71,6 +71,139 @@ const enrollmentForm = ref(null)
 const matchesOrder = ref('asc')
 const collapsedStages = ref({})
 const leagueMatchDays = ref([])
+const showManagersModal = ref(false)
+const isSendingInvites = ref(false)
+const inviteRows = ref([{ email: '', locale: locale.value || 'es' }])
+
+const totalCoAdminsCount = computed(() => {
+  return (tournament.value?.managers?.length || 0) + (tournament.value?.pendingManagers?.length || 0)
+})
+
+const addInviteRow = () => {
+  const lastLocale = inviteRows.value[inviteRows.value.length - 1]?.locale || locale.value || 'es'
+  inviteRows.value.push({ email: '', locale: lastLocale })
+}
+
+const removeInviteRow = (idx) => {
+  if (inviteRows.value.length > 1) {
+    inviteRows.value.splice(idx, 1)
+  } else {
+    inviteRows.value[0].email = ''
+  }
+}
+
+const handleEmailSplit = (idx) => {
+  const row = inviteRows.value[idx]
+  if (!row || !row.email) return
+  const parts = row.email.split(/[\s,;]+/).map(s => s.trim()).filter(Boolean)
+  if (parts.length > 1) {
+    const rowLocale = row.locale || locale.value || 'es'
+    row.email = parts[0]
+    const extraRows = parts.slice(1).map(email => ({ email, locale: rowLocale }))
+    inviteRows.value.splice(idx + 1, 0, ...extraRows)
+  }
+}
+
+const handleInviteManagers = async () => {
+  // Expand any row that might contain comma/space-separated emails
+  const expanded = []
+  for (const row of inviteRows.value) {
+    const parts = (row.email || '').split(/[\s,;]+/).map(s => s.trim()).filter(Boolean)
+    for (const email of parts) {
+      expanded.push({ email, locale: row.locale || 'es' })
+    }
+  }
+
+  if (expanded.length === 0) return
+
+  isSendingInvites.value = true
+  try {
+    const res = await tournamentService.inviteManagers(uuid, expanded)
+    if (tournament.value) {
+      tournament.value.managers = res.managers || []
+      tournament.value.pendingManagers = res.pendingManagers || []
+    }
+    const results = res.results || []
+    const existingCount = results.filter(r => r.status === 'added_existing_user').length
+    const invitedCount = results.filter(r => r.status === 'invited_new_user').length
+    toast.add({
+      severity: 'success',
+      summary: t('common.success'),
+      detail: t('tournament_admin.managers.invite_success_summary', {
+        total: existingCount + invitedCount,
+        existing: existingCount,
+        invited: invitedCount
+      }),
+      life: 5000
+    })
+    inviteRows.value = [{ email: '', locale: locale.value || 'es' }]
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+  } finally {
+    isSendingInvites.value = false
+  }
+}
+
+const handleResendManagerInvite = async (pendingItem) => {
+  isSendingInvites.value = true
+  try {
+    const res = await tournamentService.inviteManagers(uuid, [
+      { email: pendingItem.email, locale: pendingItem.locale || 'es' }
+    ])
+    if (tournament.value) {
+      tournament.value.managers = res.managers || []
+      tournament.value.pendingManagers = res.pendingManagers || []
+    }
+    toast.add({
+      severity: 'success',
+      summary: t('common.success'),
+      detail: t('tournament_admin.managers.resend_success', { email: pendingItem.email }),
+      life: 3500
+    })
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+  } finally {
+    isSendingInvites.value = false
+  }
+}
+
+const handleRemoveManager = (event, payload) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: t('tournament_admin.managers.remove_confirm_msg', { email: payload.email }),
+    header: t('tournament_admin.managers.remove_confirm_title'),
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: t('tournament_form.actions.cancel'),
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: t('common.delete'),
+      severity: 'danger'
+    },
+    accept: async () => {
+      processing.value = true
+      try {
+        const res = await tournamentService.removeManager(uuid, payload)
+        if (tournament.value) {
+          tournament.value.managers = res.managers || []
+          tournament.value.pendingManagers = res.pendingManagers || []
+        }
+        toast.add({
+          severity: 'success',
+          summary: t('common.success'),
+          detail: t('tournament_admin.managers.remove_success'),
+          life: 3000
+        })
+      } catch (e) {
+        toast.add({ severity: 'error', summary: 'Error', detail: e.message, life: 5000 })
+      } finally {
+        processing.value = false
+      }
+    }
+  })
+}
 
 const toggleMatchDay = (day) => {
   const index = leagueMatchDays.value.indexOf(day);
@@ -803,6 +936,14 @@ const normalizeStageKey = (stage) => {
             <button @click="goToPublicView" class="eye-btn" v-tooltip.left="t('tournament_view.public_view') || 'Vista Pública'">
               <i class="pi pi-eye"></i>
             </button>
+            <button @click="showManagersModal = true" class="eye-btn relative" v-tooltip.left="t('tournament_admin.managers.btn_tooltip')">
+              <i class="pi pi-shield"></i>
+              <span v-if="totalCoAdminsCount > 0"
+                    style="width: 18px; height: 18px; min-width: 18px; border-radius: 50%;"
+                    class="absolute -top-1 -right-1 bg-[#e9c349] text-slate-900 text-[9px] font-black flex align-items-center justify-content-center">
+                {{ totalCoAdminsCount }}
+              </span>
+            </button>
             <button @click="router.push(`/admin/tournament/${uuid}/edit`)" class="eye-btn" v-tooltip.left="t('common.edit') || 'Editar'">
               <i class="pi pi-pencil"></i>
             </button>
@@ -1007,7 +1148,8 @@ const normalizeStageKey = (stage) => {
                             <button v-for="n in [1, 2, 3, 4]" :key="n"
                                     type="button"
                                     @click="saveGroupsConfig(n, undefined)"
-                                    class="w-7 h-7 rounded-lg font-black text-xs border transition-all"
+                                    style="width: 28px; height: 28px; min-width: 28px;"
+                                    class="rounded-lg font-black text-xs border transition-all flex align-items-center justify-content-center"
                                     :class="teamsPerGroup === n ? 'bg-[#e9c349] text-slate-900 border-[#e9c349]' : 'bg-white/5 text-slate-400 border-white/10'">
                               {{ n }}
                             </button>
@@ -1437,7 +1579,8 @@ const normalizeStageKey = (stage) => {
                 <button v-for="n in [1, 2, 3, 4]" :key="'qual-'+n"
                         type="button"
                         @click="teamsPerGroup = n"
-                        class="w-10 h-10 rounded-xl font-black text-sm border transition-all"
+                        style="width: 36px; height: 36px; min-width: 36px;"
+                        class="rounded-xl font-black text-sm border transition-all flex align-items-center justify-content-center"
                         :class="teamsPerGroup === n ? 'bg-[#e9c349] text-slate-900 border-[#e9c349]' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'">
                   {{ n }}
                 </button>
@@ -1496,6 +1639,195 @@ const normalizeStageKey = (stage) => {
             <i v-else class="pi pi-bolt mr-2"></i>
             {{ t('tournament_admin.groups.confirm_draw_btn') }}
           </button>
+        </div>
+      </div>
+    </Dialog>
+
+    <!-- TOURNAMENT CO-ADMINS / MANAGERS MODAL -->
+    <Dialog v-model:visible="showManagersModal"
+            modal
+            :closable="false"
+            :style="{ width: '720px', maxWidth: '95vw' }"
+            :dismissableMask="true"
+            class="mus-dialog-premium">
+      <div class="p-6">
+        <header class="flex justify-content-between align-items-center mb-6 border-b border-white/10 pb-4">
+          <div class="flex align-items-center gap-3">
+            <div style="width: 40px; height: 40px; min-width: 40px;" class="rounded-xl bg-secondary/10 flex align-items-center justify-content-center border border-secondary/20">
+              <i class="pi pi-shield text-secondary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="m-0 text-white font-black italic uppercase tracking-tighter text-lg">
+                {{ t('tournament_admin.managers.modal_title') }}
+              </h3>
+              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                {{ t('tournament_admin.managers.modal_subtitle') }}
+              </span>
+            </div>
+          </div>
+          <button @click="showManagersModal = false" class="close-modal-btn small">
+            <i class="pi pi-times text-xs"></i>
+          </button>
+        </header>
+
+        <!-- Current Administrators & Pending Invitations -->
+        <div class="mb-6">
+          <span class="block text-[10px] font-black uppercase tracking-widest text-[#e9c349] mb-3">
+            {{ t('tournament_admin.managers.current_section') }}
+          </span>
+
+          <div class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+            <!-- Owner -->
+            <div v-if="tournament?.owner" class="p-3 rounded-xl bg-white/[0.04] border border-white/10 flex align-items-center justify-content-between gap-3">
+              <div class="flex align-items-center gap-3 min-w-0">
+                <div style="width: 32px; height: 32px; min-width: 32px;" class="rounded-lg bg-[#e9c349]/15 border border-[#e9c349]/30 flex align-items-center justify-content-center text-[#e9c349]">
+                  <i class="pi pi-crown text-xs"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-black text-white truncate">{{ tournament.owner.email }}</div>
+                  <div v-if="tournament.owner.firstName || tournament.owner.lastName" class="text-[10px] text-slate-400 font-bold">
+                    {{ tournament.owner.firstName }} {{ tournament.owner.lastName }}
+                  </div>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-[#e9c349]/20 border border-[#e9c349]/40 text-[#e9c349] text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
+                {{ t('tournament_admin.managers.owner_badge') }}
+              </span>
+            </div>
+
+            <!-- Active Co-Admins -->
+            <div v-for="mgr in (tournament?.managers || [])" :key="'mgr-' + mgr.id"
+                 class="p-3 rounded-xl bg-emerald-500/[0.05] border border-emerald-500/20 flex align-items-center justify-content-between gap-3">
+              <div class="flex align-items-center gap-3 min-w-0">
+                <div style="width: 32px; height: 32px; min-width: 32px;" class="rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex align-items-center justify-content-center text-emerald-400">
+                  <i class="pi pi-user text-xs"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-black text-white truncate">{{ mgr.email }}</div>
+                  <div v-if="mgr.firstName || mgr.lastName" class="text-[10px] text-slate-400 font-bold">
+                    {{ mgr.firstName }} {{ mgr.lastName }}
+                  </div>
+                </div>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
+                  {{ t('tournament_admin.managers.active_badge') }}
+                </span>
+                <button v-if="tournament?.isOwner"
+                        type="button"
+                        @click="handleRemoveManager($event, { userId: mgr.id, email: mgr.email })"
+                        style="width: 28px; height: 28px; min-width: 28px;"
+                        class="rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all flex align-items-center justify-content-center cursor-pointer"
+                        v-tooltip.top="t('tournament_admin.managers.remove_tooltip')">
+                  <i class="pi pi-times text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Pending Registration Invitations -->
+            <div v-for="pend in (tournament?.pendingManagers || [])" :key="'pend-' + pend.email"
+                 class="p-3 rounded-xl bg-amber-500/[0.05] border border-amber-500/25 flex align-items-center justify-content-between gap-3">
+              <div class="flex align-items-center gap-3 min-w-0">
+                <div style="width: 32px; height: 32px; min-width: 32px;" class="rounded-lg bg-amber-500/15 border border-amber-500/30 flex align-items-center justify-content-center text-amber-400">
+                  <i class="pi pi-envelope text-xs"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-xs font-black text-white truncate">{{ pend.email }}</div>
+                  <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+                    {{ t('tournament_admin.managers.lang_label') }}: {{ (pend.locale || 'es').toUpperCase() }}
+                  </div>
+                </div>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <span class="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
+                  {{ t('tournament_admin.managers.pending_badge') }}
+                </span>
+                <button v-if="tournament?.isOwner"
+                        type="button"
+                        :disabled="isSendingInvites"
+                        @click="handleResendManagerInvite(pend)"
+                        style="width: 28px; height: 28px; min-width: 28px;"
+                        class="rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:border-[#e9c349] hover:text-[#e9c349] transition-all flex align-items-center justify-content-center cursor-pointer"
+                        v-tooltip.top="t('tournament_admin.managers.resend_tooltip')">
+                  <i class="pi pi-send text-[10px]"></i>
+                </button>
+                <button v-if="tournament?.isOwner"
+                        type="button"
+                        @click="handleRemoveManager($event, { email: pend.email })"
+                        style="width: 28px; height: 28px; min-width: 28px;"
+                        class="rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all flex align-items-center justify-content-center cursor-pointer"
+                        v-tooltip.top="t('tournament_admin.managers.remove_tooltip')">
+                  <i class="pi pi-times text-[10px]"></i>
+                </button>
+              </div>
+            </div>
+
+            <div v-if="totalCoAdminsCount === 0" class="p-4 rounded-xl bg-black/30 border border-white/5 text-center text-xs text-slate-500 font-bold">
+              {{ t('tournament_admin.managers.empty_co_admins') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Add / Invite New Co-Admins Form (Only for Tournament Owner) -->
+        <div v-if="tournament?.isOwner" class="p-4 rounded-2xl bg-white/[0.03] border border-white/10">
+          <div class="mb-3">
+            <span class="block text-[10px] font-black uppercase tracking-widest text-[#e9c349] mb-1">
+              {{ t('tournament_admin.managers.add_section_title') }}
+            </span>
+            <p class="m-0 text-xs text-slate-400 font-medium leading-relaxed">
+              {{ t('tournament_admin.managers.add_section_desc') }}
+            </p>
+          </div>
+
+          <div class="space-y-3 mt-4">
+            <div v-for="(row, idx) in inviteRows" :key="'inv-row-' + idx"
+                 class="flex flex-column sm:flex-row align-items-stretch sm:align-items-center gap-2">
+              <div class="flex-1">
+                <input v-model="row.email"
+                       type="text"
+                       @blur="handleEmailSplit(idx)"
+                       :placeholder="t('tournament_admin.managers.email_placeholder')"
+                       class="w-full px-4 py-2.5 rounded-xl bg-black/50 border border-white/10 text-white text-xs font-bold outline-none focus:border-[#e9c349]" />
+              </div>
+              <div class="flex align-items-center gap-2">
+                <select v-model="row.locale"
+                        class="px-3 py-2.5 rounded-xl bg-black/50 border border-white/10 text-[#e9c349] text-xs font-black uppercase outline-none cursor-pointer">
+                  <option value="es" class="bg-slate-900 text-white">{{ t('tournament_admin.managers.lang_es') }}</option>
+                  <option value="eu" class="bg-slate-900 text-white">{{ t('tournament_admin.managers.lang_eu') }}</option>
+                  <option value="en" class="bg-slate-900 text-white">{{ t('tournament_admin.managers.lang_en') }}</option>
+                </select>
+                <button type="button"
+                        @click="removeInviteRow(idx)"
+                        style="width: 36px; height: 36px; min-width: 36px;"
+                        class="rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white transition-all flex align-items-center justify-content-center cursor-pointer">
+                  <i class="pi pi-trash text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <button type="button"
+                    @click="addInviteRow"
+                    class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase tracking-wider cursor-pointer transition-all">
+              <i class="pi pi-plus text-[9px] mr-1"></i>
+              {{ t('tournament_admin.managers.add_row_btn') }}
+            </button>
+          </div>
+
+          <div class="flex gap-3 justify-content-end mt-6 pt-4 border-t border-white/10">
+            <button type="button" @click="showManagersModal = false" class="mus-btn-secondary px-5 py-3 text-xs">
+              {{ t('tournament_admin.match_edit.cancel_btn') }}
+            </button>
+            <button type="button"
+                    @click="handleInviteManagers"
+                    :disabled="isSendingInvites || !inviteRows.some(r => r.email && r.email.trim())"
+                    class="mus-btn-primary px-6 py-3 text-xs">
+              <i v-if="isSendingInvites" class="pi pi-spin pi-spinner mr-2"></i>
+              <i v-else class="pi pi-send mr-2"></i>
+              {{ isSendingInvites ? t('tournament_admin.managers.sending_btn') : t('tournament_admin.managers.send_btn') }}
+            </button>
+          </div>
         </div>
       </div>
     </Dialog>

@@ -155,7 +155,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const loggedIn = localStorage.getItem('user')
   if (to.matched.some(record => record.meta.requiresAuth) && !loggedIn) {
-    next('/login')
+    next({ path: '/login', query: { redirect: to.fullPath } })
   } else {
     next()
   }
