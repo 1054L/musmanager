@@ -651,7 +651,24 @@
       "group_qual_single": "Clasifica 1 pareja",
       "group_qual_multi": "Clasifican {count} parejas",
       "qualified_badge": "Clasifica",
-      "empty": "No hay clasificación disponible todavía"
+      "empty": "No hay clasificación disponible todavía",
+      "tiebreaker": {
+        "tooltip": "Info de desempates",
+        "title": "Criterios de Clasificación y Desempate",
+        "subtitle": "El orden de la tabla se decide aplicando estos criterios por orden de prioridad:",
+        "rule1_title": "Partidas Ganadas (PG / Pts)",
+        "rule1_desc": "Cada victoria suma 1 punto. Sube quien haya ganado más partidas.",
+        "rule2_title": "Diferencia de Vacas / Chicos (+/- V)",
+        "rule2_desc": "En caso de empate a puntos, sube quien tenga mejor saldo entre chicos ganados y perdidos.",
+        "rule3_title": "Vacas / Chicos Ganados (VG)",
+        "rule3_desc": "Si la diferencia es igual, sube la pareja que haya ganado más chicos en total.",
+        "rule4_title": "Tantos a Favor (TF)",
+        "rule4_desc": "Si persiste el empate, sube quien haya sumado más tantos a favor en el conjunto de sus partidas.",
+        "rule5_title": "Diferencia de Tantos (+/- T)",
+        "rule5_desc": "A igualdad de tantos anotados, sube quien tenga mejor diferencia entre tantos a favor y en contra.",
+        "rule6_title": "Tantos en Contra (TC)",
+        "rule6_desc": "Como último desempate, sube la pareja que haya encajado menos tantos en contra."
+      }
     },
     "bracket": {
       "title": "Cuadro de Eliminatorias",

@@ -168,6 +168,18 @@ const uuid = route.params.uuid
 const bracketContainer = ref(null);
 const isFullscreen = ref(false);
 const zoomLevel = ref(1);
+const highlightTiebreaker = ref(false);
+
+const scrollToTiebreaker = () => {
+  const el = document.getElementById('tiebreaker-info');
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    highlightTiebreaker.value = true;
+    setTimeout(() => {
+      highlightTiebreaker.value = false;
+    }, 2200);
+  }
+};
 
 const toggleFullscreen = () => {
   if (!bracketContainer.value) return;
@@ -597,6 +609,15 @@ const saveMatchResult = async () => {
 
               <!-- Controls Button at tab level -->
               <div class="flex align-items-center gap-3">
+                <button v-if="activeTab === 'standings' && (tournament.type === 'league' || tournament.type === 'groups') && Object.keys(normalizedClassification).length > 0"
+                        type="button"
+                        @click="scrollToTiebreaker"
+                        v-tooltip.top="t('tournament_view.classification.tiebreaker.tooltip')"
+                        :title="t('tournament_view.classification.tiebreaker.tooltip')"
+                        style="width: 30px; height: 30px; min-width: 30px; border-radius: 50%;"
+                        class="bg-[#e9c349]/15 hover:bg-[#e9c349]/30 border border-[#e9c349]/40 text-[#e9c349] flex align-items-center justify-content-center transition-all cursor-pointer p-0">
+                  <i class="pi pi-info-circle text-sm"></i>
+                </button>
                 <div v-if="activeTab === 'bracket' && bracketMatches.length > 0" class="flex align-items-center gap-2 mr-2">
                    <i class="pi pi-search-minus text-slate-500 text-[10px]"></i>
                    <input type="range" v-model="zoomLevel" min="0.1" max="1.5" step="0.05" class="w-20 accent-secondary" />
@@ -787,9 +808,19 @@ const saveMatchResult = async () => {
 
               <div v-for="(teams, mesaName) in (tournament.type === 'league' ? { 'General': Object.values(classification).flat() } : classification)" :key="mesaName" class="mb-10">
                 <div class="flex align-items-center justify-content-between mb-4">
-                  <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest m-0 flex items-center gap-2">
-                    <i class="pi pi-table"></i> {{ mesaName === 'General' ? t('tournament_view.rounds.general') : getStageLabel(mesaName) }}
-                  </h4>
+                  <div class="flex align-items-center gap-2">
+                    <h4 class="text-[#e9c349] font-black italic uppercase tracking-widest m-0 flex items-center gap-2">
+                      <i class="pi pi-table"></i> {{ mesaName === 'General' ? t('tournament_view.rounds.general') : getStageLabel(mesaName) }}
+                    </h4>
+                    <button type="button"
+                            @click="scrollToTiebreaker"
+                            v-tooltip.top="t('tournament_view.classification.tiebreaker.tooltip')"
+                            :title="t('tournament_view.classification.tiebreaker.tooltip')"
+                            style="width: 24px; height: 24px; min-width: 24px; border-radius: 50%;"
+                            class="bg-[#e9c349]/15 hover:bg-[#e9c349]/30 border border-[#e9c349]/40 text-[#e9c349] inline-flex align-items-center justify-content-center transition-all cursor-pointer p-0">
+                      <i class="pi pi-info-circle text-xs"></i>
+                    </button>
+                  </div>
                   <span v-if="tournament.type === 'groups'"
                         class="px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-widest flex align-items-center gap-2">
                     <i class="pi pi-check-circle text-[10px]"></i>
@@ -862,7 +893,47 @@ const saveMatchResult = async () => {
               </div>
               <div v-if="Object.keys(normalizedClassification).length === 0" class="text-center py-10 opacity-30">
                 <p class="font-bold">{{ t('tournament_view.classification.empty') }}</p>
-             </div>
+              </div>
+
+              <!-- Tie-breaker & Ranking Criteria Info Box (for League and Groups tournaments) -->
+              <div v-if="(tournament.type === 'league' || tournament.type === 'groups') && Object.keys(normalizedClassification).length > 0"
+                   id="tiebreaker-info"
+                   class="mt-8 p-6 rounded-2xl transition-all duration-500"
+                   :class="highlightTiebreaker ? 'bg-[#e9c349]/10 border-2 border-[#e9c349] shadow-[0_0_25px_rgba(233,195,73,0.25)]' : 'bg-white/[0.03] border border-white/10'">
+                <div class="flex align-items-center gap-3 mb-2">
+                  <div style="width: 32px; height: 32px; min-width: 32px; border-radius: 50%;"
+                       class="bg-[#e9c349]/15 border border-[#e9c349]/30 flex align-items-center justify-content-center text-[#e9c349]">
+                    <i class="pi pi-info-circle text-sm"></i>
+                  </div>
+                  <div>
+                    <h5 class="m-0 text-sm font-black italic uppercase tracking-wider text-[#e9c349]">
+                      {{ t('tournament_view.classification.tiebreaker.title') }}
+                    </h5>
+                    <p class="m-0 text-[11px] text-slate-400 font-bold">
+                      {{ t('tournament_view.classification.tiebreaker.subtitle') }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="grid mt-3">
+                  <div v-for="step in [1, 2, 3, 4, 5, 6]" :key="'tb-' + step" class="col-12 md:col-6 lg:col-4 p-2">
+                    <div class="p-3 rounded-xl bg-black/30 border border-white/5 h-full flex align-items-start gap-3">
+                      <span style="width: 24px; height: 24px; min-width: 24px; border-radius: 50%;"
+                            class="bg-[#e9c349]/20 border border-[#e9c349]/40 text-[#e9c349] text-[11px] font-black flex align-items-center justify-content-center mt-0.5">
+                        {{ step }}
+                      </span>
+                      <div>
+                        <div class="text-xs font-black text-white uppercase italic mb-1">
+                          {{ t(`tournament_view.classification.tiebreaker.rule${step}_title`) }}
+                        </div>
+                        <p class="m-0 text-[11px] text-slate-400 font-medium leading-relaxed">
+                          {{ t(`tournament_view.classification.tiebreaker.rule${step}_desc`) }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
            </div>
 
             <div v-else-if="activeTab === 'bracket'" class="py-8">

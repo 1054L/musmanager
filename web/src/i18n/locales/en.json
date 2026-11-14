@@ -651,7 +651,24 @@
       "group_qual_single": "1 pair qualifies",
       "group_qual_multi": "{count} pairs qualify",
       "qualified_badge": "Qualifies",
-      "empty": "No standings available yet"
+      "empty": "No standings available yet",
+      "tiebreaker": {
+        "tooltip": "Tie-breaker info",
+        "title": "Standings & Tie-Breaker Criteria",
+        "subtitle": "The table order is determined by applying the following criteria in order of priority:",
+        "rule1_title": "Matches Won (MW / Pts)",
+        "rule1_desc": "Each victory awards 1 point. The pair with the most wins ranks higher.",
+        "rule2_title": "Sets Difference (+/- S)",
+        "rule2_desc": "If tied on points, the pair with the best difference between sets won and lost ranks higher.",
+        "rule3_title": "Sets Won (SW)",
+        "rule3_desc": "If sets difference is equal, the pair with the most total sets won ranks higher.",
+        "rule4_title": "Points For (PF)",
+        "rule4_desc": "If still tied, the pair that has scored the most total points across all matches ranks higher.",
+        "rule5_title": "Points Difference (+/- P)",
+        "rule5_desc": "If tied on points scored, the pair with the best difference between points for and against ranks higher.",
+        "rule6_title": "Points Against (PA)",
+        "rule6_desc": "As the final tie-breaker, the pair that has conceded the fewest points ranks higher."
+      }
     },
     "bracket": {
       "title": "Knockout Bracket",

@@ -650,7 +650,24 @@
       "group_qual_single": "Bikote 1 sailkatzen da",
       "group_qual_multi": "{count} bikote sailkatzen dira",
       "qualified_badge": "Sailkatua",
-      "empty": "Ez dago sailkapenik eskuragarri oraindik"
+      "empty": "Ez dago sailkapenik eskuragarri oraindik",
+      "tiebreaker": {
+        "tooltip": "Berdinketa-hausteen informazioa",
+        "title": "Sailkapen eta Berdinketa Hausteko Irizpideak",
+        "subtitle": "Taulako ordena irizpide hauek lehentasun-hurrenkeran aplikatuz erabakitzen da:",
+        "rule1_title": "Irabazitako Partidak (IP / Ptk)",
+        "rule1_desc": "Garaipen bakoitzak puntu 1 gehitzen du. Partida gehien irabazi dituena igotzen da.",
+        "rule2_title": "Jokoen / Ustelen Aldea (+/- J)",
+        "rule2_desc": "Puntuetan berdinduz gero, irabazitako eta galdutako jokoen arteko alde onena duena igotzen da.",
+        "rule3_title": "Irabazitako Jokoak / Ustelak (IJ)",
+        "rule3_desc": "Aldea berdina bada, guztira joko gehien irabazi dituen bikotea igotzen da.",
+        "rule4_title": "Aldeko Tantuak (AT)",
+        "rule4_desc": "Berdinketak jarraitzen badu, partida guztietan aldeko tantu gehien lortu dituena igotzen da.",
+        "rule5_title": "Tantuen Aldea (+/- T)",
+        "rule5_desc": "Aldeko tantuetan berdinduz gero, aldeko eta aurkako tantuen arteko alde onena duena igotzen da.",
+        "rule6_title": "Aurkako Tantuak (KT)",
+        "rule6_desc": "Azken berdinketa-hauste gisa, aurkako tantu gutxien jaso dituen bikotea igotzen da."
+      }
     },
     "bracket": {
       "title": "Kanporaketa Koadroa",
