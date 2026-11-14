@@ -271,6 +271,75 @@ const restingTeamsByDay = computed(() => {
   return resting;
 });
 
+const isGroupStage = (stage, stageMatches) => {
+  if (tournament.value?.type !== 'groups') return false;
+  if (!stageMatches || stageMatches.length === 0) return false;
+  return !stageMatches.some(m => m.bracketRound !== null && m.bracketRound !== undefined);
+};
+
+const getGroupRounds = (stage, stageMatches) => {
+  if (!stageMatches || stageMatches.length === 0) return [];
+
+  const groupTeamsMap = new Map();
+  (tournament.value?.teams || []).forEach(tt => {
+    if (tt.mesa && tt.mesa.toLowerCase().trim() === stage.toLowerCase().trim()) {
+      groupTeamsMap.set(tt.id, { id: tt.id, name: tt.name });
+    }
+  });
+  stageMatches.forEach(m => {
+    if (m.teamA?.id && !groupTeamsMap.has(m.teamA.id)) {
+      groupTeamsMap.set(m.teamA.id, { id: m.teamA.id, name: m.teamA.name });
+    }
+    if (m.teamB?.id && !groupTeamsMap.has(m.teamB.id)) {
+      groupTeamsMap.set(m.teamB.id, { id: m.teamB.id, name: m.teamB.name });
+    }
+  });
+  const groupTeams = Array.from(groupTeamsMap.values());
+
+  const sorted = [...stageMatches].sort((a, b) => (a.id || 0) - (b.id || 0));
+  const buckets = new Map();
+  let inferredRound = 1;
+  let usedTeamIds = new Set();
+
+  sorted.forEach(m => {
+    let day = m.matchDay ? Number(m.matchDay) : null;
+    if (!day) {
+      const t1 = m.teamA?.id;
+      const t2 = m.teamB?.id;
+      if ((t1 && usedTeamIds.has(t1)) || (t2 && usedTeamIds.has(t2))) {
+        inferredRound++;
+        usedTeamIds = new Set();
+      }
+      if (t1) usedTeamIds.add(t1);
+      if (t2) usedTeamIds.add(t2);
+      day = inferredRound;
+    }
+    if (!buckets.has(day)) buckets.set(day, []);
+    buckets.get(day).push(m);
+  });
+
+  return Array.from(buckets.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([day, roundMatches]) => {
+      const playingIds = new Set();
+      roundMatches.forEach(m => {
+        if (m.teamA?.id) playingIds.add(m.teamA.id);
+        if (m.teamB?.id) playingIds.add(m.teamB.id);
+      });
+      const restingTeams = groupTeams.length % 2 !== 0
+        ? groupTeams.filter(t => !playingIds.has(t.id))
+        : [];
+      return {
+        day,
+        stageKey: `matchDay_${day}`,
+        label: getStageLabel(`matchDay_${day}`),
+        deadlineDate: roundMatches[0]?.deadlineDate || null,
+        matches: roundMatches,
+        restingTeams
+      };
+    });
+};
+
 // Auto-select first stage tab when matches load
 watch(groupedMatches, (newGroups) => {
   if (newGroups.length > 0 && !activeStageTab.value) {
@@ -722,7 +791,7 @@ const saveMatchResult = async () => {
                  <div v-for="([stage, stageMatches]) in groupedMatches" :key="stage" class="col-12 mb-8">
                      <div class="flex align-items-center justify-content-between mb-2">
                         <h4 class="text-[#e9c349] font-black italic uppercase tracking-[0.2em] m-0 flex align-items-center gap-2 text-xs">
-                           <i class="pi pi-calendar"></i>
+                           <i class="pi" :class="isGroupStage(stage, stageMatches) ? 'pi-table' : 'pi-calendar'"></i>
                            <template v-if="stage.startsWith('matchDay_')">
                              <span>
                                {{ getStageLabel(stage) }}
@@ -735,7 +804,7 @@ const saveMatchResult = async () => {
                              {{ getStageLabel(stage) }}
                            </template>
                         </h4>
-                        <div v-if="stageMatches[0]?.deadlineDate" class="flex align-items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-full">
+                        <div v-if="!isGroupStage(stage, stageMatches) && stageMatches[0]?.deadlineDate" class="flex align-items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-full">
                            <span class="text-[9px] font-black text-rose-400 uppercase tracking-widest">{{ t('common.deadline') }}</span>
                            <span class="text-[10px] font-black text-white italic">{{ formatDate(stageMatches[0].deadlineDate) }}</span>
                         </div>
@@ -750,8 +819,71 @@ const saveMatchResult = async () => {
                           <span class="text-[10px] font-black text-white uppercase italic">{{ team.name }}</span>
                        </div>
                     </div>
+
+                    <!-- Group Stage Separated by Jornadas/Rounds (for 'groups' tournaments) -->
+                    <div v-if="isGroupStage(stage, stageMatches)" class="mt-4 pl-3 md:pl-4 border-l-2 border-white/10 space-y-6">
+                       <div v-for="round in getGroupRounds(stage, stageMatches)" :key="stage + '-' + round.stageKey" class="mb-6">
+                          <div class="flex align-items-center justify-content-between mb-2">
+                             <div class="flex align-items-center gap-2">
+                                <i class="pi pi-calendar text-[#e9c349] text-xs"></i>
+                                <span class="text-white font-black italic uppercase tracking-[0.15em] text-xs">
+                                   {{ round.label }}
+                                </span>
+                                <span v-if="round.deadlineDate" class="ml-1 text-slate-500 font-bold text-xs lowercase opacity-70">
+                                   - [{{ formatFullDate(round.deadlineDate) }}]
+                                </span>
+                             </div>
+                             <div v-if="round.deadlineDate" class="flex align-items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-3 py-1 rounded-full">
+                                <span class="text-[9px] font-black text-rose-400 uppercase tracking-widest">{{ t('common.deadline') }}</span>
+                                <span class="text-[10px] font-black text-white italic">{{ formatDate(round.deadlineDate) }}</span>
+                             </div>
+                          </div>
+
+                          <!-- Resting Teams in this Group & Jornada -->
+                          <div v-if="round.restingTeams.length > 0" class="flex flex-wrap gap-2 mb-3">
+                             <div v-for="team in round.restingTeams" :key="'rest-' + stage + '-' + round.day + '-' + team.id"
+                                  class="bg-[#e9c349]/10 border border-[#e9c349]/20 rounded-xl px-3 py-2 flex align-items-center gap-2">
+                                <i class="pi pi-info-circle text-[#e9c349] text-xs"></i>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">{{ t('tournament_view.match_status.resting') || 'Descansa' }}:</span>
+                                <span class="text-[10px] font-black text-white uppercase italic">{{ team.name }}</span>
+                             </div>
+                          </div>
+
+                          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;" class="mt-2">
+                             <div v-for="(match, i) in round.matches" :key="match.id || i">
+                                <div class="bg-white/5 border border-white/10 rounded-2xl p-3 hover:bg-white/10 transition-all h-full">
+                                   <div class="flex justify-content-between align-items-center mb-2 border-bottom border-white/5 pb-1">
+                                      <span class="text-[8px] font-black text-[#e9c349]/80 uppercase tracking-widest">
+                                         {{ getStageLabel(stage) }} · {{ round.label }}
+                                      </span>
+                                      <Tag :value="t('tournament_view.match_status.' + (match.status || 'pending'))" 
+                                           :severity="match.status === 'finished' ? 'success' : 'secondary'" 
+                                           class="text-[7px] font-black uppercase whitespace-nowrap px-2 py-0.5" />
+                                   </div>
+
+                                   <div class="flex flex-column gap-2">
+                                      <div class="flex align-items-center gap-2">
+                                         <div style="width: 18px; height: 18px; flex-shrink: 0;" class="rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[7px] font-black opacity-30">A</div>
+                                         <span class="text-main font-black italic text-sm truncate uppercase flex-1" :class="{'opacity-50': match.status === 'finished' && match.scoreB > match.scoreA}">
+                                            {{ match.teamA?.name || match.teamA || t('tournament_admin.matches.tbd') }}
+                                         </span>
+                                         <span class="text-lg font-black italic ml-2" :class="match.scoreA > match.scoreB ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreA }}</span>
+                                      </div>
+                                      <div class="flex align-items-center gap-2">
+                                         <div style="width: 18px; height: 18px; flex-shrink: 0;" class="rounded bg-slate-800 border border-white/10 flex align-items-center justify-center text-[7px] font-black opacity-30">B</div>
+                                         <span class="text-main font-black italic text-sm truncate uppercase flex-1" :class="{'opacity-50': match.status === 'finished' && (match.scoreA > match.scoreB || !match.teamB)}">
+                                            {{ match.teamB?.name || match.teamB || (match.teamA && match.status === 'finished' ? 'BYE' : t('tournament_admin.matches.tbd')) }}
+                                         </span>
+                                         <span class="text-lg font-black italic ml-2" :class="match.scoreB > match.scoreA ? 'text-[#e9c349]' : 'text-slate-600'">{{ match.scoreB }}</span>
+                                      </div>
+                                   </div>
+                                </div>
+                             </div>
+                          </div>
+                       </div>
+                    </div>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;" class="mt-4">
+                    <div v-else style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;" class="mt-4">
                        <div v-for="(match, i) in stageMatches" :key="i">
                          <div class="bg-white/5 border border-white/10 rounded-2xl p-3 hover:bg-white/10 transition-all h-full">
                             <!-- Mini Header for Status -->

@@ -236,7 +236,13 @@ const fetchTournamentData = async (silent = false) => {
     const data = await tournamentService.getTournament(uuid)
     tournament.value = data
     enrolledTeams.value = data.teams || []
-    leagueMatchDays.value = Array.isArray(data.leagueMatchDays) ? data.leagueMatchDays : []
+    if (Array.isArray(data.leagueMatchDays)) {
+      leagueMatchDays.value = data.leagueMatchDays
+    } else if (data.leagueMatchDays && typeof data.leagueMatchDays === 'object' && Array.isArray(data.leagueMatchDays.matchDays)) {
+      leagueMatchDays.value = data.leagueMatchDays.matchDays
+    } else {
+      leagueMatchDays.value = []
+    }
 
     if (data.type === 'groups' && data.leagueMatchDays && typeof data.leagueMatchDays === 'object' && !Array.isArray(data.leagueMatchDays)) {
       if (data.leagueMatchDays.groupsCount) groupsCount.value = Number(data.leagueMatchDays.groupsCount)
@@ -511,8 +517,22 @@ const handleGenerateMatches = async (event) => {
       try {
         if (tournament.value.type === 'league') {
           await tournamentService.updateTournament(uuid, { leagueMatchDays: leagueMatchDays.value })
+        } else if (tournament.value.type === 'groups') {
+          await tournamentService.updateTournament(uuid, {
+            leagueMatchDays: {
+              groupsCount: groupsCount.value,
+              teamsPerGroup: teamsPerGroup.value,
+              pairingMode: pairingMode.value,
+              matchDays: leagueMatchDays.value
+            }
+          })
         }
-        await tournamentService.generateMatches(uuid, { groupsCount: groupsCount.value })
+        await tournamentService.generateMatches(uuid, {
+          groupsCount: groupsCount.value,
+          teamsPerGroup: teamsPerGroup.value,
+          pairingMode: pairingMode.value,
+          matchDays: leagueMatchDays.value
+        })
         // Automatically switch to active phase
         await tournamentService.updateTournament(uuid, { status: 'active' })
         const msg = tournament.value?.type === 'eliminatory' ? t('tournament_admin.preparation.draw_success') : t('dashboard.matches_success')
@@ -560,7 +580,8 @@ const saveGroupsConfig = async (newTeamsPerGroup, newPairingMode) => {
       leagueMatchDays: {
         groupsCount: groupsCount.value,
         teamsPerGroup: teamsPerGroup.value,
-        pairingMode: pairingMode.value
+        pairingMode: pairingMode.value,
+        matchDays: leagueMatchDays.value
       }
     })
   } catch (e) {
@@ -831,6 +852,82 @@ const toggleStage = (stage) => {
   collapsedStages.value[stage] = !collapsedStages.value[stage]
 }
 
+const isGroupStage = (stage, stageMatches) => {
+  if (tournament.value?.type !== 'groups') return false
+  if (!stageMatches || stageMatches.length === 0) return false
+  return !stageMatches.some(m => m.bracketRound !== null && m.bracketRound !== undefined)
+}
+
+const getGroupRounds = (stage, stageMatches) => {
+  if (!stageMatches || stageMatches.length === 0) return []
+
+  // Collect all teams in this group
+  const groupTeamsMap = new Map()
+  enrolledTeams.value.forEach(tt => {
+    if (tt.mesa && tt.mesa.toLowerCase().trim() === stage.toLowerCase().trim()) {
+      groupTeamsMap.set(tt.id, { id: tt.id, name: tt.name })
+    }
+  })
+  stageMatches.forEach(m => {
+    if (m.teamA?.id && !groupTeamsMap.has(m.teamA.id)) {
+      groupTeamsMap.set(m.teamA.id, { id: m.teamA.id, name: m.teamA.name })
+    }
+    if (m.teamB?.id && !groupTeamsMap.has(m.teamB.id)) {
+      groupTeamsMap.set(m.teamB.id, { id: m.teamB.id, name: m.teamB.name })
+    }
+  })
+  const groupTeams = Array.from(groupTeamsMap.values())
+
+  // Bucket matches by matchDay (inferring sequentially if matchDay is missing)
+  const sorted = [...stageMatches].sort((a, b) => (a.id || 0) - (b.id || 0))
+  const buckets = new Map()
+  let inferredRound = 1
+  let usedTeamIds = new Set()
+
+  sorted.forEach(m => {
+    let day = m.matchDay ? Number(m.matchDay) : null
+    if (!day) {
+      const t1 = m.teamA?.id
+      const t2 = m.teamB?.id
+      if ((t1 && usedTeamIds.has(t1)) || (t2 && usedTeamIds.has(t2))) {
+        inferredRound++
+        usedTeamIds = new Set()
+      }
+      if (t1) usedTeamIds.add(t1)
+      if (t2) usedTeamIds.add(t2)
+      day = inferredRound
+    }
+    if (!buckets.has(day)) buckets.set(day, [])
+    buckets.get(day).push(m)
+  })
+
+  const rounds = Array.from(buckets.entries())
+    .sort((a, b) => a[0] - b[0])
+    .map(([day, roundMatches]) => {
+      const playingIds = new Set()
+      roundMatches.forEach(m => {
+        if (m.teamA?.id) playingIds.add(m.teamA.id)
+        if (m.teamB?.id) playingIds.add(m.teamB.id)
+      })
+      const restingTeams = groupTeams.length % 2 !== 0
+        ? groupTeams.filter(t => !playingIds.has(t.id))
+        : []
+      return {
+        day,
+        stageKey: `matchDay_${day}`,
+        label: getStageLabel(`matchDay_${day}`),
+        deadlineDate: roundMatches[0]?.deadlineDate || null,
+        matches: roundMatches,
+        restingTeams
+      }
+    })
+
+  if (matchesOrder.value === 'desc') {
+    rounds.reverse()
+  }
+  return rounds
+}
+
 const toggleMatchesOrder = () => {
   matchesOrder.value = matchesOrder.value === 'asc' ? 'desc' : 'asc'
 }
@@ -1036,8 +1133,8 @@ const normalizeStageKey = (stage) => {
           <section v-if="['draft', 'pending'].includes(tournament.status)" class="side-panel-premium">
             <h3 class="panel-title"><i class="pi pi-step-forward"></i> {{ t('tournament_admin.status.title') }}</h3>
             <div class="p-6">
-              <!-- League Match Days Selector (Moved here) -->
-              <div v-if="tournament.type === 'league' && ['draft', 'pending'].includes(tournament.status)" class="w-full mb-10 pb-10 border-b border-white/5">
+              <!-- League / Groups Match Days Selector -->
+              <div v-if="(tournament.type === 'league' || tournament.type === 'groups') && ['draft', 'pending'].includes(tournament.status)" class="w-full mb-10 pb-10 border-b border-white/5">
                 <div class="flex align-items-center justify-center gap-2 mb-6">
                   <span class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">
                     {{ t('tournament_admin.teams.league.match_days_label') }}
@@ -1278,7 +1375,7 @@ const normalizeStageKey = (stage) => {
                     <i class="pi text-xs text-slate-500" :class="collapsedStages[stage] ? 'pi-chevron-down' : 'pi-chevron-up'"></i>
                   </div>
                   
-                  <!-- Resting Teams Info -->
+                  <!-- Resting Teams Info (for League) -->
                   <div v-if="!collapsedStages[stage] && restingTeamsByDay[stage]" class="flex flex-wrap gap-2 mb-4">
                     <div v-for="team in restingTeamsByDay[stage]" :key="'rest-'+team.id" 
                          class="bg-[#e9c349]/10 border border-[#e9c349]/20 rounded-xl px-3 py-2 flex align-items-center gap-2">
@@ -1288,7 +1385,74 @@ const normalizeStageKey = (stage) => {
                     </div>
                   </div>
 
-                    <div v-show="!collapsedStages[stage]" class="grid">
+                  <!-- Group Stage Separated by Jornadas/Rounds (for 'groups' tournaments) -->
+                  <div v-if="isGroupStage(stage, stageMatches)" v-show="!collapsedStages[stage]" class="space-y-6 pl-2 md:pl-4 border-l-2 border-white/5">
+                    <div v-for="round in getGroupRounds(stage, stageMatches)" :key="stage + '-' + round.stageKey" class="mb-6">
+                      <div class="flex align-items-center justify-content-between mb-3">
+                        <div class="flex align-items-center gap-2">
+                          <i class="pi pi-calendar text-secondary text-xs"></i>
+                          <span class="text-xs font-black italic uppercase tracking-[0.2em] text-white">
+                            {{ round.label }}
+                          </span>
+                          <span v-if="round.deadlineDate" class="ml-1 text-slate-400 font-bold text-xs lowercase opacity-70">
+                            - [{{ new Date(round.deadlineDate).toLocaleDateString() }}]
+                          </span>
+                        </div>
+                        <button @click.stop="openStageDateModal(`${getStageLabel(stage)} · ${round.label}`, round.matches)"
+                                class="mus-btn-secondary px-2 py-1 text-[10px]"
+                                v-tooltip.top="t('tournament_admin.match_edit.date_tooltip')">
+                          <i class="pi pi-calendar"></i>
+                        </button>
+                      </div>
+
+                      <!-- Resting Teams in this Group & Jornada -->
+                      <div v-if="round.restingTeams.length > 0" class="flex flex-wrap gap-2 mb-3">
+                        <div v-for="team in round.restingTeams" :key="'rest-' + stage + '-' + round.day + '-' + team.id"
+                             class="bg-[#e9c349]/10 border border-[#e9c349]/20 rounded-xl px-3 py-2 flex align-items-center gap-2">
+                          <i class="pi pi-info-circle text-[#e9c349] text-xs"></i>
+                          <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">{{ t('tournament_view.match_status.resting') || 'Descansa' }}:</span>
+                          <span class="text-[10px] font-black text-white uppercase italic">{{ team.name }}</span>
+                        </div>
+                      </div>
+
+                      <div class="grid">
+                        <div v-for="match in round.matches" :key="match.id"
+                             @click="openEditModal(match)"
+                             class="col-12 md:col-6 lg:col-3">
+                          <div class="match-card-premium group" :class="{ 'cursor-default opacity-80': !match.teamA || !match.teamB }">
+                            <div class="match-card-bg"></div>
+                            <div class="relative z-10">
+                              <div class="flex justify-content-between align-items-center mb-4">
+                                <div class="flex flex-column gap-1">
+                                  <span class="text-[8px] font-black text-secondary uppercase tracking-[0.2em]">
+                                    {{ getStageLabel(normalizeStageKey(match.stage)) }} · {{ round.label }}
+                                  </span>
+                                  <span class="match-status-tag" :class="{ 'is-finished': match.status === 'finished' }">
+                                    {{ t('tournament_view.match_status.' + match.status) }}
+                                  </span>
+                                </div>
+                                <div v-if="match.teamA && match.teamB" class="flex gap-2 relative z-20">
+                                  <div class="match-edit-icon"><i class="pi pi-pencil"></i></div>
+                                </div>
+                              </div>
+                              <div class="team-row">
+                                <span class="team-name" :class="{ 'is-winner': match.scoreA > match.scoreB || (match.teamA && !match.teamB && match.status === 'finished') }">{{ match.teamA?.name || match.teamA || t('tournament_admin.matches.tbd') }}</span>
+                                <span class="team-score" :class="{ 'is-winner': match.scoreA > match.scoreB }">{{ match.scoreA }}</span>
+                              </div>
+                              <div class="team-row mt-2">
+                                <span class="team-name" :class="{ 'is-winner': match.scoreB > match.scoreA, 'opacity-40': !match.teamB && match.status === 'finished' }">{{ match.teamB?.name || match.teamB || (match.teamA && match.status === 'finished' ? 'BYE' : t('tournament_admin.matches.tbd')) }}</span>
+                                <span class="text-slate-700 font-black italic text-xl" v-if="match.scoreA === 0 && match.scoreB === 0 && !match.teamA && !match.teamB">VS</span>
+                                <span v-else class="team-score" :class="{ 'is-winner': match.scoreB > match.scoreA }">{{ match.scoreB }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Standard Matches Grid (for League & Eliminatory/Knockout Stages) -->
+                  <div v-else v-show="!collapsedStages[stage]" class="grid">
                       <div v-for="match in stageMatches" :key="match.id" 
                            @click="openEditModal(match)"
                            :class="['final', 'third_place'].includes(normalizeStageKey(match.stage)) ? 'col-12 md:col-6 mb-4' : 'col-12 md:col-6 lg:col-3'">

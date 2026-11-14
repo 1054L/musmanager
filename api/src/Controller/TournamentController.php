@@ -389,13 +389,17 @@ class TournamentController extends AbstractController
                 }
             }
 
-            if (isset($data['teamsPerGroup']) || isset($data['pairingMode'])) {
-                $tournament->setLeagueMatchDays([
-                    'groupsCount' => $groupsCount,
-                    'teamsPerGroup' => max(1, (int)($data['teamsPerGroup'] ?? 2)),
-                    'pairingMode' => $data['pairingMode'] ?? 'seeded'
-                ]);
-            }
+            $existingConfig = is_array($tournament->getLeagueMatchDays()) ? $tournament->getLeagueMatchDays() : [];
+            $rawMatchDays = $data['matchDays'] ?? ($existingConfig['matchDays'] ?? (array_is_list($existingConfig) ? $existingConfig : []));
+            $matchDays = is_array($rawMatchDays) ? array_values(array_filter(array_map('intval', $rawMatchDays))) : [];
+            sort($matchDays);
+
+            $tournament->setLeagueMatchDays([
+                'groupsCount' => $groupsCount,
+                'teamsPerGroup' => max(1, (int)($data['teamsPerGroup'] ?? $existingConfig['teamsPerGroup'] ?? 2)),
+                'pairingMode' => $data['pairingMode'] ?? $existingConfig['pairingMode'] ?? 'seeded',
+                'matchDays' => $matchDays,
+            ]);
 
             $groups = [];
             foreach ($teams as $tt) {
@@ -403,6 +407,52 @@ class TournamentController extends AbstractController
                 $groups[$groupName][] = $tt;
             }
             ksort($groups, SORT_NATURAL);
+
+            // Calculate max rounds across groups to pre-calculate deadlines per jornada if matchDays are configured
+            $maxRounds = 0;
+            foreach ($groups as $groupTeams) {
+                $c = count($groupTeams);
+                if ($c >= 2) {
+                    $rCount = ($c % 2 !== 0) ? $c : ($c - 1);
+                    if ($rCount > $maxRounds) {
+                        $maxRounds = $rCount;
+                    }
+                }
+            }
+
+            $deadlineByRound = [];
+            if (!empty($matchDays) && $maxRounds > 0) {
+                $currentDeadline = $tournament->getStartDate() ?? new \DateTimeImmutable();
+                for ($r = 0; $r < $maxRounds; $r++) {
+                    if ($r === 0) {
+                        for ($i = 0; $i < 7; $i++) {
+                            $testDate = $currentDeadline->modify("+$i days");
+                            $dayNum = (int)$testDate->format('N');
+                            if (in_array($dayNum, $matchDays, true)) {
+                                $currentDeadline = $testDate;
+                                break;
+                            }
+                        }
+                    } else {
+                        $currentDayNum = (int)$currentDeadline->format('N');
+                        $nextDay = null;
+                        foreach ($matchDays as $md) {
+                            if ($md > $currentDayNum) {
+                                $nextDay = $md;
+                                break;
+                            }
+                        }
+                        if ($nextDay === null) {
+                            $nextDay = $matchDays[0];
+                            $daysToAdd = (7 - $currentDayNum) + $nextDay;
+                        } else {
+                            $daysToAdd = $nextDay - $currentDayNum;
+                        }
+                        $currentDeadline = $currentDeadline->modify("+$daysToAdd days");
+                    }
+                    $deadlineByRound[$r + 1] = $currentDeadline;
+                }
+            }
 
             foreach ($groups as $groupName => $groupTeams) {
                 $gTeams = array_values($groupTeams);
@@ -431,8 +481,12 @@ class TournamentController extends AbstractController
                                 $match->setTeam1($t1);
                                 $match->setTeam2($t2);
                             }
+                            $match->setMatchDay($round);
                             $match->setStage($groupName);
                             $match->setMesa($groupName);
+                            if (isset($deadlineByRound[$round])) {
+                                $match->setDeadlineDate($deadlineByRound[$round]);
+                            }
                             $entityManager->persist($match);
                         }
                     }
@@ -514,7 +568,8 @@ class TournamentController extends AbstractController
         $tournament->setLeagueMatchDays([
             'groupsCount' => count($groupedStandings),
             'teamsPerGroup' => $teamsPerGroup,
-            'pairingMode' => $pairingMode
+            'pairingMode' => $pairingMode,
+            'matchDays' => $existingConfig['matchDays'] ?? []
         ]);
 
         $ttById = [];
@@ -614,10 +669,46 @@ class TournamentController extends AbstractController
     }
 
     #[Route('/api/tournament/{uuid}', name: 'app_tournament_show', methods: ['GET'])]
-    public function show(string $uuid, TournamentRepository $tournamentRepository): JsonResponse
+    public function show(string $uuid, TournamentRepository $tournamentRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $tournament = $tournamentRepository->findOneBy(['uuidAccessToken' => $uuid]);
         if (!$tournament) return new JsonResponse(['error' => 'Torneo no encontrado'], 404);
+
+        // Auto-backfill matchDay for existing 'groups' tournaments whose group matches lacked matchDay
+        if ($tournament->getType() === 'groups') {
+            $groupMatchesByStage = [];
+            $needsBackfill = false;
+            foreach ($tournament->getMatches() as $m) {
+                if ($m->getBracketRound() === null) {
+                    $stageKey = $m->getStage() ?: ($m->getMesa() ?: 'Grupo A');
+                    $groupMatchesByStage[$stageKey][] = $m;
+                    if ($m->getMatchDay() === null) {
+                        $needsBackfill = true;
+                    }
+                }
+            }
+            if ($needsBackfill) {
+                foreach ($groupMatchesByStage as $stageKey => $gMatches) {
+                    usort($gMatches, fn(MusMatch $a, MusMatch $b) => ($a->getId() ?? 0) <=> ($b->getId() ?? 0));
+                    $round = 1;
+                    $usedTeamIds = [];
+                    foreach ($gMatches as $gm) {
+                        $t1Id = $gm->getTeam1()?->getId();
+                        $t2Id = $gm->getTeam2()?->getId();
+                        if (($t1Id !== null && isset($usedTeamIds[$t1Id])) || ($t2Id !== null && isset($usedTeamIds[$t2Id]))) {
+                            $round++;
+                            $usedTeamIds = [];
+                        }
+                        if ($t1Id !== null) $usedTeamIds[$t1Id] = true;
+                        if ($t2Id !== null) $usedTeamIds[$t2Id] = true;
+                        if ($gm->getMatchDay() === null) {
+                            $gm->setMatchDay($round);
+                        }
+                    }
+                }
+                $entityManager->flush();
+            }
+        }
 
         $user = $this->getUser();
         $isManager = false;
