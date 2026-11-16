@@ -259,7 +259,7 @@ onMounted(() => {
 <template>
   <div class="view-container animate-in fade-in slide-in-from-bottom-4 duration-1000">
     <!-- Header: KONTROL PANELA -->
-    <header class="flex justify-between items-center mb-12 px-2">
+    <header class="flex flex-wrap justify-between items-center gap-4 mb-12 px-2">
       <div>
         <h1 class="text-3xl font-black uppercase tracking-tighter text-white m-0 italic">
           {{ t('dashboard.title') }} <span class="text-secondary">{{ t('dashboard.title_gold') }}</span>
@@ -271,6 +271,13 @@ onMounted(() => {
           }) }}
         </p>
       </div>
+      <a :href="`/guia-administradores-${['es', 'eu', 'en'].includes(locale) ? locale : 'es'}.pdf`"
+         :download="`Guia-Administracion-Mus-${(locale || 'es').toUpperCase()}.pdf`"
+         target="_blank"
+         class="mus-btn-secondary px-4 py-2.5 flex items-center gap-2 no-underline text-[10px] font-black uppercase tracking-wider border border-[#e9c349]/30 text-[#e9c349] hover:bg-[#e9c349]/10 transition-all rounded-xl">
+        <i class="pi pi-file-pdf text-sm"></i>
+        <span>{{ t('dashboard.quick_actions.admin_guide') }}</span>
+      </a>
     </header>
 
     <div v-if="loading" class="flex justify-center items-center py-20">

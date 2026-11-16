@@ -250,7 +250,10 @@
       "new_tournament": "New Tournament",
       "new_tournament_desc": "Launch a new competitive event",
       "new_team": "New Pair",
-      "new_team_desc": "Register a participating pair"
+      "new_team_desc": "Register a participating pair",
+      "admin_guide": "Administration Guide (PDF)",
+      "admin_guide_desc": "Download the step-by-step manual to create and manage tournaments",
+      "admin_guide_tooltip": "Download Administration Guide (PDF)"
     },
     "delete_confirm_title": "Delete Tournament",
     "delete_confirm_msg": "Are you sure you want to delete this tournament? All associated data (teams, matches) will be permanently lost. This action cannot be undone.",

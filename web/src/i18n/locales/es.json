@@ -250,7 +250,10 @@
       "new_tournament": "Nuevo Torneo",
       "new_tournament_desc": "Lanza un nuevo evento competitivo",
       "new_team": "Nueva Pareja",
-      "new_team_desc": "Registra una pareja participante"
+      "new_team_desc": "Registra una pareja participante",
+      "admin_guide": "Guía de Administración (PDF)",
+      "admin_guide_desc": "Descarga el manual paso a paso para crear y gestionar torneos",
+      "admin_guide_tooltip": "Descargar Guía de Administración (PDF)"
     },
     "delete_confirm_title": "Eliminar Torneo",
     "delete_confirm_msg": "¿Estás seguro de que deseas eliminar este torneo? Todos los datos asociados (parejas, partidas) se perderán permanentemente. Esta acción no se puede deshacer.",

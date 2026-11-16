@@ -250,7 +250,10 @@
       "new_tournament": "Txapelketa Berria",
       "new_tournament_desc": "Abian jarri lehiaketa berri bat",
       "new_team": "Bikote Berria",
-      "new_team_desc": "Erregistratu parte hartuko duen bikote bat"
+      "new_team_desc": "Erregistratu parte hartuko duen bikote bat",
+      "admin_guide": "Administrazio Gida (PDF)",
+      "admin_guide_desc": "Deskargatu txapelketak sortu eta kudeatzeko eskuliburua",
+      "admin_guide_tooltip": "Deskargatu Administrazio Gida (PDF)"
     },
     "delete_confirm_title": "Txapelketa Ezabatu",
     "delete_confirm_msg": "Ziur al zaude txapelketa hau ezabatu nahi duzula? Lotutako datu guztiak (bikoteak, partidak) betiko galduko dira. Ekintza hau ezin da desegin.",

@@ -14,7 +14,7 @@ import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
 const confirm = useConfirm()
 const toast = useToast()
@@ -185,7 +185,18 @@ const getStatusSeverity = (status) => {
   }
 }
 
-const quickActions = [
+const downloadAdminGuide = () => {
+  const lang = ['es', 'eu', 'en'].includes(locale.value) ? locale.value : 'es'
+  const link = document.createElement('a')
+  link.href = `/guia-administradores-${lang}.pdf`
+  link.download = `Guia-Administracion-Mus-${lang.toUpperCase()}.pdf`
+  link.target = '_blank'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+const quickActions = computed(() => [
   { 
     title: t('dashboard.quick_actions.new_tournament'), 
     icon: 'pi pi-trophy', 
@@ -197,8 +208,14 @@ const quickActions = [
     icon: 'pi pi-users', 
     route: '/admin/team/create',
     desc: t('dashboard.quick_actions.new_team_desc')
+  },
+  {
+    title: t('dashboard.quick_actions.admin_guide'),
+    icon: 'pi pi-file-pdf',
+    action: downloadAdminGuide,
+    desc: t('dashboard.quick_actions.admin_guide_desc')
   }
-]
+])
 
 onMounted(() => {
   fetchTournaments()
@@ -230,7 +247,7 @@ onMounted(() => {
       <h2 class="section-title">{{ t('dashboard.quick_actions_title') }}</h2>
       <div class="actions-grid">
         <div v-for="action in quickActions" :key="action.title" 
-             @click="router.push(action.route)" 
+             @click="action.action ? action.action() : router.push(action.route)" 
              class="action-card mus-glass">
           <div class="action-icon">
             <i :class="action.icon"></i>

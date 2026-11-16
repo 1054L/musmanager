@@ -943,6 +943,17 @@ const goToPublicView = () => {
   window.open(`/tournament/${uuid}`, '_blank');
 }
 
+const downloadAdminGuide = () => {
+  const lang = ['es', 'eu', 'en'].includes(locale.value) ? locale.value : 'es';
+  const link = document.createElement('a');
+  link.href = `/guia-administradores-${lang}.pdf`;
+  link.download = `Guia-Administracion-Mus-${lang.toUpperCase()}.pdf`;
+  link.target = '_blank';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 const normalizeStageKey = (stage) => {
   if (!stage) return 'general'
   const s = stage.toLowerCase().trim()
@@ -1043,6 +1054,9 @@ const normalizeStageKey = (stage) => {
             </button>
             <button @click="router.push(`/admin/tournament/${uuid}/edit`)" class="eye-btn" v-tooltip.left="t('common.edit') || 'Editar'">
               <i class="pi pi-pencil"></i>
+            </button>
+            <button @click="downloadAdminGuide" class="eye-btn" v-tooltip.left="t('dashboard.quick_actions.admin_guide_tooltip')">
+              <i class="pi pi-file-pdf"></i>
             </button>
           </div>
         </div>
